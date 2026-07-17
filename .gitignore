@@ -1,0 +1,9 @@
+# Generated standalone files
+IHO_standalone.html
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
