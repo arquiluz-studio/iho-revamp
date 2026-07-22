@@ -1,6 +1,13 @@
 # Generated standalone files
 IHO_standalone.html
 
+# Next.js
+.next/
+node_modules/
+
+# Build artifacts
+tsconfig.tsbuildinfo
+
 # OS
 .DS_Store
 
