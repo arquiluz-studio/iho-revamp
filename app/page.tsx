@@ -91,10 +91,23 @@ const ContactAddress = ({ city, address, muted = false }: { city: string; addres
   </div>
 )
 
+const Switch = () => (
+  <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 200, display: 'flex', gap: 4, background: '#17150f', padding: 6, borderRadius: 40, boxShadow: '0 10px 34px rgba(0,0,0,0.3)' }}>
+    {([
+      { href: '/', label: 'ACTUAL', active: true },
+      { href: '/propuesta-a', label: 'A · VIDEO', active: false },
+      { href: '/propuesta-b', label: 'B · SLIDER', active: false },
+    ]).map(item => (
+      <a key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', padding: '9px 18px', borderRadius: 30, background: item.active ? '#ef483d' : 'transparent', color: item.active ? '#fff' : 'rgba(255,255,255,0.62)', fontFamily: '"Space Mono", monospace', fontSize: 11, letterSpacing: '1.2px', textDecoration: 'none' }}>{item.label}</a>
+    ))}
+  </div>
+)
+
 export default function Home() {
   return (
     <>
       <Script src="/iho-behaviors.js" strategy="afterInteractive" />
+      <Switch />
       <div style={{ width: '100%', overflowX: 'hidden' }}>
 
         {/* ============ HEADER ============ */}
