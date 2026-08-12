@@ -67,7 +67,7 @@ export default function EventoPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: '"Source Sans 3", sans-serif', fontSize: 18, color: '#17150f' }}>
         Evento no encontrado.{' '}
-        <a href="/propuesta" style={{ color: '#ef483d', marginLeft: 8 }}>Volver al inicio</a>
+        <a href="/" style={{ color: '#ef483d', marginLeft: 8 }}>Volver al inicio</a>
       </div>
     )
   }
@@ -105,11 +105,11 @@ export default function EventoPage() {
       {/* ── HEADER ── */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: scrolled ? '#faf7f1' : 'transparent', borderBottom: `1px solid ${scrolled ? 'rgba(20,18,12,0.08)' : 'rgba(255,255,255,0.14)'}`, transition: 'background 0.4s ease, border-color 0.4s ease' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/propuesta">
+          <a href="/">
             <img src={scrolled ? '/images/logo-iho-black.png' : '/images/logo-iho-white.png'} alt="IHO" style={{ height: 36, display: 'block' }} />
           </a>
           <nav className={menuOpen ? 'iho-nav-open' : ''} style={{ display: 'flex', alignItems: 'center', gap: 34, fontFamily: '"Source Sans 3", sans-serif', fontSize: 15, fontWeight: 500, color: navColor }}>
-            <a href="/propuesta#eventos" className="iho-nav-link" onClick={() => setMenuOpen(false)}>Lo que viene</a>
+            <a href="/#eventos" className="iho-nav-link" onClick={() => setMenuOpen(false)}>Lo que viene</a>
             <a href="#productos" className="iho-nav-link" onClick={() => setMenuOpen(false)}>Productos</a>
             <a href="#galeria" className="iho-nav-link" onClick={() => setMenuOpen(false)}>Galería</a>
             <a href="#registro" className="iho-btn" onClick={() => setMenuOpen(false)} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
@@ -307,7 +307,7 @@ export default function EventoPage() {
             ¿Te interesa alguna pieza<br />para tu proyecto?
           </h2>
           <a
-            href="/propuesta#contacto"
+            href="/#contacto"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#17150f', color: '#fff', padding: '16px 30px', borderRadius: 32, fontFamily: '"Source Sans 3", sans-serif', fontWeight: 600, fontSize: 15, textDecoration: 'none', flexShrink: 0 }}
           >
             Hablar con un especialista
@@ -319,13 +319,13 @@ export default function EventoPage() {
       {/* ── FOOTER ── */}
       <footer style={{ background: '#1a1916', color: '#c9c4ba' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '30px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <a href="/propuesta">
+          <a href="/">
             <img src="/images/logo-iho-white.png" alt="IHO" style={{ height: 30, display: 'block' }} />
           </a>
           <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 13, color: '#8a857b' }}>© {new Date().getFullYear()} Grupo IHO. Todos los derechos reservados.</div>
           <div style={{ display: 'flex', gap: 28, fontFamily: '"Source Sans 3", sans-serif', fontSize: 13 }}>
             <a href="#" style={{ color: '#c9c4ba' }}>Aviso de privacidad</a>
-            <a href="/propuesta#contacto" style={{ color: '#c9c4ba' }}>Contacto</a>
+            <a href="/#contacto" style={{ color: '#c9c4ba' }}>Contacto</a>
           </div>
         </div>
       </footer>
