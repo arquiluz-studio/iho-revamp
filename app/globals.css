@@ -1102,3 +1102,123 @@
         header.nav-hidden {
           transform: translateY(-100%);
         }
+
+        /* ── Product card hover ── */
+        .iho-prod-img {
+          transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
+        }
+        .iho-prod-card:hover .iho-prod-img {
+          transform: scale(1.06);
+        }
+
+        /* ── Product card wrapper — responsive flex-basis ── */
+        .iho-prod-card-wrapper {
+          flex: 0 0 calc((100% - 72px) / 4);
+          min-width: 180px;
+        }
+        @media (max-width: 899px) {
+          .iho-prod-card-wrapper {
+            flex: 0 0 calc((100% - 48px) / 3) !important;
+          }
+        }
+        @media (max-width: 599px) {
+          .iho-prod-card-wrapper {
+            flex: 0 0 calc((100% - 24px) / 2) !important;
+          }
+        }
+
+        /* ── No scrollbar ── */
+        .iho-no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+
+        /* ── Dark form inputs ── */
+        .iho-dark-input::placeholder {
+          color: rgba(255, 255, 255, 0.32);
+        }
+        .iho-dark-input:focus {
+          border-bottom-color: #ef483d !important;
+          outline: none;
+        }
+        .iho-dark-select {
+          appearance: none;
+          -webkit-appearance: none;
+        }
+        .iho-dark-select:focus {
+          border-bottom-color: #ef483d !important;
+          outline: none;
+        }
+
+        /* ── Gallery image hover ── */
+        .iho-gallery-img {
+          transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
+        }
+        .iho-gallery-img:hover {
+          transform: scale(1.04);
+        }
+
+        /* ── Responsive: Hero overlay h1 (video hero, full-bleed) ── */
+        @media (max-width: 1024px) {
+          .iho-hero-overlay h1 {
+            font-size: 56px !important;
+          }
+          /* Landing event hero */
+          .iho-event-hero h1 {
+            font-size: 64px !important;
+          }
+          /* Data grid: 2 columns */
+          .iho-datos-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          /* About / registration: single column */
+          .iho-sobre-grid,
+          .iho-registro-grid {
+            grid-template-columns: 1fr !important;
+          }
+          /* Products landing: 3 columns */
+          .iho-productos-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          /* Section padding */
+          #productos > div,
+          #eventos > div {
+            padding: 60px 28px !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .iho-hero-overlay h1 {
+            font-size: 40px !important;
+          }
+          .iho-event-hero h1 {
+            font-size: 42px !important;
+          }
+          /* Products landing: 2 columns */
+          .iho-productos-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          /* Gallery: 2 columns */
+          .iho-galeria-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          /* CTA band: stack */
+          .iho-cta-band {
+            flex-direction: column !important;
+            text-align: center !important;
+          }
+          .iho-cta-band h2 {
+            font-size: 32px !important;
+          }
+          /* Form: 1 column */
+          .iho-form-grid {
+            grid-template-columns: 1fr !important;
+          }
+          /* Datos: 1 column */
+          .iho-datos-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          /* Section padding */
+          #productos > div,
+          #eventos > div {
+            padding: 48px 20px !important;
+          }
+        }
