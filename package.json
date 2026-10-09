@@ -11,7 +11,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "db:types": "supabase gen types typescript --project-id kpqunlmsixadfabltupo --schema public > lib/supabase/database.types.ts",
-    "media:import": "tsx --env-file=.env.local scripts/import-local-media.ts"
+    "media:import": "tsx --conditions=react-server --env-file=.env.local scripts/import-local-media.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

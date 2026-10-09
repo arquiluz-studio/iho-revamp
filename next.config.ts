@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   turbopack: { root: path.resolve('.') },
   experimental: { globalNotFound: true },
+  images: {
+    remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' }],
+  },
   async redirects() {
     return [{ source: '/evento/:slug', destination: '/eventos/:slug', permanent: true }]
   },
