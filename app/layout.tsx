@@ -1,16 +1,20 @@
 import type { Metadata } from 'next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getTranslations } from 'next-intl/server'
 import './globals.css'
 
-export const metadata: Metadata = {
-  title: 'Grupo IHO — Todo el proyecto, un solo proveedor',
-  description:
-    'Grupo empresarial latinoamericano de interiorismo corporativo, industrial, comercial y residencial. Soluciones arquitectónicas y de iluminación en LATAM.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta')
+  return { title: t('title'), description: t('description') }
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
   return (
-    <html lang="es">
-      <body>{children}</body>
+    <html lang={locale}>
+      <body>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   )
 }

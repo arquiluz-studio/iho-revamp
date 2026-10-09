@@ -1,12 +1,21 @@
-# Generated standalone files
-IHO_standalone.html
-
 # Next.js
 .next/
 node_modules/
+next-env.d.ts
 
 # Build artifacts
-tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Env
+.env*
+!.env.example
+
+# Supabase
+supabase/.temp/
+supabase/.branches/
+
+# Vercel
+.vercel
 
 # OS
 .DS_Store

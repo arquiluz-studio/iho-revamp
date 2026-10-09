@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "title": "Grupo IHO — Todo el proyecto, un solo proveedor",
+    "description": "Grupo empresarial latinoamericano de interiorismo corporativo, industrial, comercial y residencial. Soluciones arquitectónicas y de iluminación en LATAM."
+  },
+  "common": {
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "menu": "Menú",
+    "backHome": "Volver al inicio",
+    "notFound": "No encontramos esta página.",
+    "viewAll": "Ver todo",
+    "requiredField": "Campo requerido",
+    "invalidEmail": "Correo no válido",
+    "genericError": "Algo salió mal. Intenta de nuevo.",
+    "sending": "Enviando…"
+  },
+  "nav": {
+    "events": "Lo que viene",
+    "products": "Productos",
+    "group": "Grupo IHO",
+    "brands": "Marcas",
+    "projects": "Proyectos",
+    "areas": "Áreas",
+    "spaces": "Espacios",
+    "contact": "Contactar",
+    "gallery": "Galería",
+    "requestPass": "Solicitar cortesía"
+  },
+  "switchers": {
+    "country": "País",
+    "language": "Idioma",
+    "geoBanner": "Parece que estás en {country}.",
+    "geoBannerCta": "Ir a IHO {country}",
+    "dismiss": "Cerrar"
+  },
+  "hero": {
+    "eyebrow": "EST. 1992 · LATINOAMÉRICA",
+    "title": "TODO EL PROYECTO,\n*UN SOLO* PROVEEDOR.",
+    "cta": "Cuéntanos tu proyecto",
+    "scroll": "DESLIZA"
+  },
+  "home": {
+    "products": { "label": "— PARA TI", "title": "PRODUCTOS\nDESTACADOS." },
+    "events": {
+      "label": "— EVENTOS Y LANZAMIENTOS",
+      "title": "LO QUE\nVIENE.",
+      "today": "HOY · {date}",
+      "saveTheDate": "SAVE THE DATE",
+      "done": "REALIZADO",
+      "viewEvent": "Ver evento",
+      "viewGallery": "Ver galería"
+    },
+    "group": {
+      "label": "— GRUPO IHO",
+      "title": "UN GRUPO,\nTODAS LAS\nESCALAS.",
+      "p1": "Somos un grupo empresarial latinoamericano que ofrece productos y servicios desde el interiorismo corporativo, industrial, comercial y residencial hasta soluciones arquitectónicas y de iluminación.",
+      "p2": "Una fortaleza logística que permite que tu proyecto, sin importar su tamaño, se resuelva con un solo proveedor.",
+      "mapTitle": "Mapa de presencia en LATAM"
+    },
+    "areas": { "label": "— ÁREAS IHO", "title": "UNA PUERTA\nPOR INDUSTRIA.", "cta": "Ver todas las áreas" },
+    "projects": {
+      "label": "— PROYECTOS",
+      "title": "MARCAS QUE YA\nCONFIARON.",
+      "intro": "Estos son algunos de los proyectos emblemáticos donde IHO ha materializado el diseño interior, transformando la arquitectura en atmósferas con identidad y propósito."
+    },
+    "brands": {
+      "label": "— MARCAS",
+      "title": "PROPUESTA\nMULTIMARCA.",
+      "intro": "Curaduría y distribución de más de 150 marcas líderes a nivel mundial que transforman el espacio corporativo en atmósferas únicas, innovadoras y personalizadas."
+    },
+    "team": {
+      "label": "— EQUIPO",
+      "title": "SOMOS MÁS DE +120\nPROFESIONALES.",
+      "intro": "En IHO, nuestro éxito se construye gracias al talento y la diversidad de nuestro equipo."
+    }
+  },
+  "eventTypes": {
+    "event": "EVENTO",
+    "launch": "LANZAMIENTO",
+    "fair": "FERIA",
+    "webinar": "WEBINAR",
+    "lunch_and_learn": "LUNCH & LEARN",
+    "workshop": "TALLER",
+    "showroom": "SHOWROOM"
+  },
+  "eventAccess": {
+    "open": "Entrada libre",
+    "registration_required": "Acceso con registro previo",
+    "invite_only": "Solo invitados"
+  },
+  "contact": {
+    "label": "— CONTACTO",
+    "title": "CONTACTA CON IHO",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "company": "Empresa",
+    "message": "Cuéntanos más de tu proyecto",
+    "submit": "Enviar",
+    "success": "Gracias. Un especialista te contactará pronto.",
+    "imageAlt": "Contacto IHO"
+  },
+  "footer": {
+    "rights": "© {year} Grupo IHO. Todos los derechos reservados.",
+    "privacy": "Aviso de privacidad",
+    "contact": "Contacto"
+  },
+  "event": {
+    "notFound": "Evento no encontrado.",
+    "online": "En línea",
+    "viewProducts": "Ver productos en exhibición",
+    "addToCalendar": "Agregar al calendario",
+    "facts": { "date": "FECHA", "time": "HORARIO", "venue": "SEDE", "access": "ACCESO" },
+    "about": { "label": "— SOBRE EL EVENTO", "title": "Una noche para\nrecorrer el showroom.", "agenda": "EN EL RECORRIDO" },
+    "registration": {
+      "label": "— REGISTRO",
+      "title": "Solicita tu\ncortesía.",
+      "intro": "El acceso es sin costo con registro previo. Los lugares son limitados; la confirmación llega por correo en un máximo de 48 horas.",
+      "name": "NOMBRE COMPLETO",
+      "company": "EMPRESA O DESPACHO",
+      "email": "CORREO",
+      "phone": "TELÉFONO",
+      "passType": "TIPO DE PASE",
+      "passTypes": { "general": "Cortesía general", "guided": "Recorrido guiado", "press": "Prensa" },
+      "companions": "ACOMPAÑANTES",
+      "companionsOptions": { "0": "Sin acompañantes", "1": "1 acompañante", "2": "2 acompañantes" },
+      "consent": "He leído y acepto el <link>aviso de privacidad</link> de Grupo IHO.",
+      "consentRequired": "Debes aceptar el aviso de privacidad",
+      "marketing": "Quiero recibir novedades y eventos de IHO.",
+      "submit": "Enviar registro",
+      "success": "REGISTRO ENVIADO · TE CONFIRMAMOS POR CORREO",
+      "waitlist": "CUPO LLENO · QUEDASTE EN LISTA DE ESPERA",
+      "closed": "El registro para este evento está cerrado."
+    },
+    "brands": { "label": "— MARCAS PARTICIPANTES" },
+    "products": { "label": "— CATÁLOGO DEL EVENTO", "title": "Productos en\nexhibición.", "count": "{count} PIEZAS", "quote": "Cotizar" },
+    "gallery": { "label": "— GALERÍA", "title": "Ediciones\nanteriores.", "pastTitle": "Así se\nvivió.", "item": "Galería {n}" },
+    "cta": { "title": "¿Te interesa alguna pieza\npara tu proyecto?", "button": "Hablar con un especialista" }
+  },
+  "pages": {
+    "events": { "label": "— EVENTOS", "title": "Eventos y\nlanzamientos.", "upcoming": "Próximos", "past": "Realizados", "empty": "No hay eventos por ahora." },
+    "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Espacio", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución" },
+    "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca" },
+    "areas": { "label": "— ÁREAS", "brands": "Marcas del área", "projects": "Proyectos" },
+    "spaces": { "label": "— ESPACIOS", "projects": "Proyectos" },
+    "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud." },
+    "contact": { "label": "— CONTACTO", "offices": "Oficinas" }
+  },
+  "download": {
+    "title": "Descarga en alta resolución",
+    "intro": "Déjanos tus datos una vez y podrás descargar fotos de proyectos durante 30 días.",
+    "name": "Nombre completo",
+    "company": "Empresa",
+    "email": "Correo",
+    "submit": "Continuar"
+  }
+}

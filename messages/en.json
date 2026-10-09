@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "title": "IHO Group — The whole project, one single supplier",
+    "description": "Latin American group for corporate, industrial, commercial and residential interiors. Architectural and lighting solutions across LATAM."
+  },
+  "common": {
+    "previous": "Previous",
+    "next": "Next",
+    "menu": "Menu",
+    "backHome": "Back to home",
+    "notFound": "We couldn't find this page.",
+    "viewAll": "View all",
+    "requiredField": "Required field",
+    "invalidEmail": "Invalid email",
+    "genericError": "Something went wrong. Please try again.",
+    "sending": "Sending…"
+  },
+  "nav": {
+    "events": "What's next",
+    "products": "Products",
+    "group": "IHO Group",
+    "brands": "Brands",
+    "projects": "Projects",
+    "areas": "Areas",
+    "spaces": "Spaces",
+    "contact": "Contact",
+    "gallery": "Gallery",
+    "requestPass": "Request a pass"
+  },
+  "switchers": {
+    "country": "Country",
+    "language": "Language",
+    "geoBanner": "Looks like you're in {country}.",
+    "geoBannerCta": "Go to IHO {country}",
+    "dismiss": "Dismiss"
+  },
+  "hero": {
+    "eyebrow": "EST. 1992 · LATIN AMERICA",
+    "title": "THE WHOLE PROJECT,\n*ONE SINGLE* SUPPLIER.",
+    "cta": "Tell us about your project",
+    "scroll": "SCROLL"
+  },
+  "home": {
+    "products": { "label": "— FOR YOU", "title": "FEATURED\nPRODUCTS." },
+    "events": {
+      "label": "— EVENTS AND LAUNCHES",
+      "title": "WHAT'S\nNEXT.",
+      "today": "TODAY · {date}",
+      "saveTheDate": "SAVE THE DATE",
+      "done": "PAST EVENT",
+      "viewEvent": "View event",
+      "viewGallery": "View gallery"
+    },
+    "group": {
+      "label": "— IHO GROUP",
+      "title": "ONE GROUP,\nEVERY\nSCALE.",
+      "p1": "We are a Latin American business group offering products and services from corporate, industrial, commercial and residential interiors to architectural and lighting solutions.",
+      "p2": "A logistics powerhouse that lets your project, whatever its size, be solved by a single supplier.",
+      "mapTitle": "LATAM presence map"
+    },
+    "areas": { "label": "— IHO AREAS", "title": "ONE DOOR\nPER INDUSTRY.", "cta": "See all areas" },
+    "projects": {
+      "label": "— PROJECTS",
+      "title": "BRANDS THAT\nTRUSTED US.",
+      "intro": "These are some of the landmark projects where IHO has brought interior design to life, turning architecture into spaces with identity and purpose."
+    },
+    "brands": {
+      "label": "— BRANDS",
+      "title": "MULTI-BRAND\nOFFERING.",
+      "intro": "Curation and distribution of more than 150 leading global brands that turn corporate spaces into unique, innovative and personalized environments."
+    },
+    "team": {
+      "label": "— TEAM",
+      "title": "MORE THAN 120\nPROFESSIONALS.",
+      "intro": "At IHO, our success is built on the talent and diversity of our team."
+    }
+  },
+  "eventTypes": {
+    "event": "EVENT",
+    "launch": "LAUNCH",
+    "fair": "FAIR",
+    "webinar": "WEBINAR",
+    "lunch_and_learn": "LUNCH & LEARN",
+    "workshop": "WORKSHOP",
+    "showroom": "SHOWROOM"
+  },
+  "eventAccess": {
+    "open": "Free entry",
+    "registration_required": "Registration required",
+    "invite_only": "Invitation only"
+  },
+  "contact": {
+    "label": "— CONTACT",
+    "title": "CONTACT IHO",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company",
+    "message": "Tell us more about your project",
+    "submit": "Send",
+    "success": "Thank you. A specialist will contact you soon.",
+    "imageAlt": "Contact IHO"
+  },
+  "footer": {
+    "rights": "© {year} IHO Group. All rights reserved.",
+    "privacy": "Privacy notice",
+    "contact": "Contact"
+  },
+  "event": {
+    "notFound": "Event not found.",
+    "online": "Online",
+    "viewProducts": "See products on display",
+    "addToCalendar": "Add to calendar",
+    "facts": { "date": "DATE", "time": "TIME", "venue": "VENUE", "access": "ACCESS" },
+    "about": { "label": "— ABOUT THE EVENT", "title": "An evening to\nexplore the showroom.", "agenda": "AGENDA" },
+    "registration": {
+      "label": "— REGISTRATION",
+      "title": "Request your\npass.",
+      "intro": "Admission is free with prior registration. Spots are limited; confirmation arrives by email within 48 hours.",
+      "name": "FULL NAME",
+      "company": "COMPANY OR STUDIO",
+      "email": "EMAIL",
+      "phone": "PHONE",
+      "passType": "PASS TYPE",
+      "passTypes": { "general": "General pass", "guided": "Guided tour", "press": "Press" },
+      "companions": "GUESTS",
+      "companionsOptions": { "0": "No guests", "1": "1 guest", "2": "2 guests" },
+      "consent": "I have read and accept IHO Group's <link>privacy notice</link>.",
+      "consentRequired": "You must accept the privacy notice",
+      "marketing": "I want to receive IHO news and events.",
+      "submit": "Submit registration",
+      "success": "REGISTRATION SENT · WE'LL CONFIRM BY EMAIL",
+      "waitlist": "EVENT FULL · YOU'RE ON THE WAITLIST",
+      "closed": "Registration for this event is closed."
+    },
+    "brands": { "label": "— PARTICIPATING BRANDS" },
+    "products": { "label": "— EVENT CATALOG", "title": "Products on\ndisplay.", "count": "{count} PIECES", "quote": "Request a quote" },
+    "gallery": { "label": "— GALLERY", "title": "Previous\neditions.", "pastTitle": "How it\nwent.", "item": "Gallery {n}" },
+    "cta": { "title": "Interested in a piece\nfor your project?", "button": "Talk to a specialist" }
+  },
+  "pages": {
+    "events": { "label": "— EVENTS", "title": "Events and\nlaunches.", "upcoming": "Upcoming", "past": "Past", "empty": "No events right now." },
+    "projects": { "label": "— PROJECTS", "title": "IHO\nprojects.", "empty": "No published projects yet.", "client": "Client", "year": "Year", "city": "City", "sector": "Space", "brandsUsed": "Brands", "gallery": "Gallery", "download": "Download high resolution" },
+    "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand" },
+    "areas": { "label": "— AREAS", "brands": "Brands in this area", "projects": "Projects" },
+    "spaces": { "label": "— SPACES", "projects": "Projects" },
+    "products": { "label": "— PRODUCTS", "title": "Catalog.", "empty": "No products available in this country.", "all": "All", "brand": "Brand", "designer": "Designer", "specs": "Specifications", "variants": "Variants", "leadTime": "Ships in {days} days", "onRequest": "Made to order", "inStock": "In stock", "inquiry": "Request a quote", "inquirySent": "We received your request." },
+    "contact": { "label": "— CONTACT", "offices": "Offices" }
+  },
+  "download": {
+    "title": "High-resolution download",
+    "intro": "Leave your details once and you can download project photos for 30 days.",
+    "name": "Full name",
+    "company": "Company",
+    "email": "Email",
+    "submit": "Continue"
+  }
+}
