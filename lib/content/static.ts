@@ -77,7 +77,7 @@ function staticProducts(href: string): ProductCardVM[] {
   return PRODUCTS.map((p, i) => ({ key: `p${i}`, name: p.name, image: img(p.image, p.name), category: p.category, href }))
 }
 
-export function getStaticHome(paths: StaticPaths): HomeVM {
+export function getStaticHome(paths: StaticPaths, country = 'mx'): HomeVM {
   return {
     hero: { eyebrow: 'EST. 1992 · LATINOAMÉRICA', title: 'TODO EL PROYECTO,\n*UN SOLO* PROVEEDOR.', videoSrc: '/video/hero.mp4' },
     sectors: ['CORPORATIVO', 'INDUSTRIAL', 'COMERCIAL', 'RESIDENCIAL', 'HOTELERÍA', 'EDUCACIÓN'],
@@ -91,11 +91,13 @@ export function getStaticHome(paths: StaticPaths): HomeVM {
         { value: 4, prefix: '', suffix: '', label: 'Países en\nLATAM' },
       ],
       mapCountries: [
-        { code: 'mx', name: 'México', cities: ['CDMX', 'Cd. Juárez', 'Chihuahua', 'Guadalajara', 'Monterrey', 'Tijuana'], isCurrent: true, hasSite: true },
-        { code: 'gt', name: 'Guatemala', cities: ['Guatemala'], isCurrent: false, hasSite: true },
-        { code: 'cr', name: 'Costa Rica', cities: ['Costa Rica'], isCurrent: false, hasSite: true },
-        { code: 'pa', name: 'Panamá', cities: ['Panamá'], isCurrent: false, hasSite: true },
-      ],
+        { code: 'mx', name: 'México', cities: ['CDMX', 'Cd. Juárez', 'Chihuahua', 'Guadalajara', 'Monterrey', 'Tijuana'], hasSite: true },
+        { code: 'gt', name: 'Guatemala', cities: ['Guatemala'], hasSite: true },
+        { code: 'cr', name: 'Costa Rica', cities: ['Costa Rica'], hasSite: true },
+        { code: 'pa', name: 'Panamá', cities: ['Panamá'], hasSite: true },
+      ]
+        .map(c => ({ ...c, isCurrent: c.code === country }))
+        .sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent)),
     },
     areas: AREAS.map(a => ({ num: a.num, title: a.title, description: a.desc, image: img(a.img, a.title), href: '#areas' })),
     projects: PROJECTS.map(p => ({ key: p.slug, title: p.title, description: p.desc, image: img(p.img, p.title) })),
