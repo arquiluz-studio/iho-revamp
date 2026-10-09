@@ -1,0 +1,95 @@
+import type { ReactNode } from 'react'
+import { signOut } from '@/app/admin/actions/session'
+import { CountrySelector } from '@/components/admin/CountrySelector'
+import { AdminNav, type NavSection } from '@/components/admin/AdminNav'
+import { Button } from '@/components/admin/ui'
+import { ROLE_LABELS, GLOBAL_ROLE_LABELS, atLeast } from '@/lib/admin/roles'
+import { requireAdminSession } from '@/lib/admin/session'
+
+export default async function PanelLayout({ children }: { children: ReactNode }) {
+  const session = await requireAdminSession()
+  const role = session.activeCountry?.role
+
+  const sections: NavSection[] = [
+    { items: [{ href: '/admin', label: 'Dashboard', exact: true }] },
+  ]
+  if (session.activeCountry) {
+    sections.push(
+      {
+        title: `Contenido · ${session.activeCountry.name_es}`,
+        items: [
+          { href: '/admin/events', label: 'Eventos' },
+          { href: '/admin/calendar', label: 'Calendario' },
+          { href: '/admin/projects', label: 'Proyectos' },
+          { href: '/admin/country-brands', label: 'Marcas del país' },
+          { href: '/admin/media', label: 'Biblioteca de media' },
+          { href: '/admin/team', label: 'Equipo' },
+          { href: '/admin/socials', label: 'Redes sociales' },
+          ...(atLeast(role, 'admin')
+            ? [
+                { href: '/admin/offices', label: 'Oficinas' },
+                { href: '/admin/home', label: 'Home del país' },
+              ]
+            : []),
+        ],
+      },
+      {
+        title: 'Contactos',
+        items: [{ href: '/admin/leads', label: 'Leads' }],
+      },
+    )
+    if (atLeast(role, 'admin')) sections.push({ title: 'Equipo IHO', items: [{ href: '/admin/users', label: 'Usuarios' }] })
+  }
+  if (session.canManageCatalog) {
+    sections.push({
+      title: 'Global',
+      items: [
+        { href: '/admin/global/brands', label: 'Marcas' },
+        { href: '/admin/global/business-lines', label: 'Áreas' },
+        { href: '/admin/global/sectors', label: 'Espacios' },
+        ...(session.isSuperAdmin
+          ? [
+              { href: '/admin/global/countries', label: 'Países' },
+              { href: '/admin/global/audit', label: 'Auditoría' },
+            ]
+          : []),
+      ],
+    })
+  }
+
+  const roleLabel = session.profile.global_role
+    ? GLOBAL_ROLE_LABELS[session.profile.global_role]
+    : role
+      ? ROLE_LABELS[role]
+      : 'Sin rol'
+
+  return (
+    <div className="flex min-h-dvh">
+      <aside className="sticky top-0 flex h-dvh w-60 shrink-0 flex-col border-r border-zinc-200 bg-white">
+        <div className="border-b border-zinc-100 px-5 py-4">
+          <p className="text-[11px] font-semibold tracking-[0.2em] text-zinc-500">GRUPO IHO</p>
+          <p className="text-sm font-semibold">Admin</p>
+        </div>
+        {session.countries.length > 0 && (
+          <div className="border-b border-zinc-100 px-4 py-3">
+            <CountrySelector
+              countries={session.countries.map(c => ({ code: c.code, name: c.name_es, role: ROLE_LABELS[c.role] }))}
+              active={session.activeCountry?.code ?? ''}
+            />
+          </div>
+        )}
+        <AdminNav sections={sections} />
+        <div className="border-t border-zinc-100 px-4 py-3">
+          <p className="truncate text-xs font-medium text-zinc-800">{session.profile.full_name || session.email}</p>
+          <p className="truncate text-xs text-zinc-500">{roleLabel}</p>
+          <form action={signOut} className="mt-2">
+            <Button type="submit" variant="ghost" size="sm" className="-ml-3">
+              Cerrar sesión
+            </Button>
+          </form>
+        </div>
+      </aside>
+      <main className="min-w-0 flex-1 px-8 py-8">{children}</main>
+    </div>
+  )
+}

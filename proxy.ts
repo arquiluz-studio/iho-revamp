@@ -14,6 +14,7 @@ import {
   type CountryCode,
 } from '@/config/countries'
 import { routing } from '@/i18n/routing'
+import { withRefreshedSession } from '@/lib/supabase/proxy'
 
 const handleI18nRouting = createIntlMiddleware(routing)
 
@@ -40,15 +41,17 @@ function resolveCountry(request: NextRequest, host: string): { country: CountryC
   return { country: defaultCountry(), fromQuery: false }
 }
 
-function handleAdmin(request: NextRequest): NextResponse {
+const isAdminPath = (pathname: string) => pathname === '/admin' || pathname.startsWith('/admin/')
+
+function handleAdmin(request: NextRequest): Promise<NextResponse> | NextResponse {
   const { pathname } = request.nextUrl
   if (pathname === '/robots.txt') {
     return new NextResponse('User-agent: *\nDisallow: /\n', { headers: { 'content-type': 'text/plain' } })
   }
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) return NextResponse.next()
+  if (isAdminPath(pathname)) return withRefreshedSession(request, () => NextResponse.next({ request }))
   const url = request.nextUrl.clone()
   url.pathname = `/admin${pathname === '/' ? '' : pathname}`
-  return NextResponse.rewrite(url)
+  return withRefreshedSession(request, () => NextResponse.rewrite(url, { request }))
 }
 
 export function proxy(request: NextRequest) {
@@ -59,10 +62,10 @@ export function proxy(request: NextRequest) {
   if (adminHost && stripPort(host) === stripPort(adminHost)) return handleAdmin(request)
 
   const onProductionDomain = isProductionDomain(host)
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+  if (isAdminPath(pathname)) {
     // The admin is only reachable through ADMIN_HOST in production; previews and localhost can use /admin directly.
     if (onProductionDomain) return NextResponse.rewrite(new URL('/__not-found', request.url))
-    return NextResponse.next()
+    return withRefreshedSession(request, () => NextResponse.next({ request }))
   }
 
   const { country, fromQuery } = resolveCountry(request, host)
