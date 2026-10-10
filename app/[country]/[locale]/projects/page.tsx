@@ -50,7 +50,7 @@ export default async function ProjectsPage({ params }: { params: Promise<SitePar
       }
     }),
   )
-  const countries = sortByCountry(COUNTRY_CODES, locale, code => code).map(code => ({ id: code, label: COUNTRIES[code].name[locale] }))
+  const countries = sortByCountry(COUNTRY_CODES, code => code).map(code => ({ id: code, label: COUNTRIES[code].name[locale] }))
   const spaces = sectors.map(sector => ({ id: sector.id, label: t(sector, 'name', locale) }))
   const solutions = lines.map(line => ({ id: line.id, label: t(line, 'name', locale) }))
 

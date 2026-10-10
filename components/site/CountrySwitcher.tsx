@@ -20,7 +20,7 @@ export function CountrySwitcher({ current, countries }: {
     window.location.href = crossCountryUrl(code, window.location, '/?ref=selector')
   }
 
-  const sorted = sortByCountry(countries, locale, code => code)
+  const sorted = sortByCountry(countries, code => code)
 
   return (
     <div className={`iho-switcher${isOpen ? ' is-open' : ''}`}>

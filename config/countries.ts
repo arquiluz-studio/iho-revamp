@@ -2,7 +2,8 @@ export const LOCALES = ['es', 'en'] as const
 export type AppLocale = (typeof LOCALES)[number]
 export const DEFAULT_LOCALE: AppLocale = 'es'
 
-export const COUNTRY_CODES = ['mx', 'pa', 'cr', 'gt'] as const
+/** Also the site-wide display order: north to south, as on the map. */
+export const COUNTRY_CODES = ['mx', 'gt', 'cr', 'pa'] as const
 export type CountryCode = (typeof COUNTRY_CODES)[number]
 
 export type CountryConfig = {
@@ -111,18 +112,13 @@ export function crossCountryUrl(code: CountryCode, current: { protocol: string; 
   return `${current.protocol}//${current.host}${path}${separator}country=${code}`
 }
 
-/** Site-wide country order: headquarters first, then the rest alphabetically by localized name. */
-export function sortByCountry<T>(items: readonly T[], locale: AppLocale, codeOf: (item: T) => string): T[] {
-  const name = (item: T) => {
-    const code = codeOf(item)
-    return isCountryCode(code) ? COUNTRIES[code].name[locale] : code
+/** Sorts items by the site-wide country order (`COUNTRY_CODES`); unknown codes go last. Stable, so prior ordering within a country is kept. */
+export function sortByCountry<T>(items: readonly T[], codeOf: (item: T) => string): T[] {
+  const rank = (item: T) => {
+    const index = (COUNTRY_CODES as readonly string[]).indexOf(codeOf(item))
+    return index === -1 ? COUNTRY_CODES.length : index
   }
-  return [...items].sort((a, b) => {
-    const aFirst = codeOf(a) === HEADQUARTERS
-    const bFirst = codeOf(b) === HEADQUARTERS
-    if (aFirst !== bFirst) return aFirst ? -1 : 1
-    return name(a).localeCompare(name(b), locale)
-  })
+  return [...items].sort((a, b) => rank(a) - rank(b))
 }
 
 export function htmlLang(locale: AppLocale, country: CountryCode): string {

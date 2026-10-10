@@ -132,7 +132,7 @@ function toStats(value: unknown, locale: AppLocale): StatVM[] {
 
 async function mapCountries(current: CountryCode, locale: AppLocale): Promise<MapCountryVM[]> {
   const [countries, offices] = await Promise.all([getCountries(), getOffices()])
-  return sortByCountry(countries, locale, c => c.code)
+  return sortByCountry(countries, c => c.code)
     .map(c => {
       const own = offices.filter(o => o.country_code === c.code)
       const main = own.filter(o => o.is_main).map(o => cityDisplay(o.city))
@@ -151,7 +151,7 @@ async function mapCountries(current: CountryCode, locale: AppLocale): Promise<Ma
 export async function officesFor(current: CountryCode, locale: AppLocale): Promise<OfficeVM[]> {
   const offices = await getOffices()
   const byCity = [...offices].sort((a, b) => a.city.localeCompare(b.city, locale))
-  return sortByCountry(byCity, locale, o => o.country_code).map(o => ({
+  return sortByCountry(byCity, o => o.country_code).map(o => ({
     city: o.city,
     address: o.address,
     ...(o.country_code === current ? {} : { muted: true }),
