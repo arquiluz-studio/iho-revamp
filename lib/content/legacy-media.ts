@@ -31,7 +31,7 @@ export const LEGACY_EVENT_GALLERY = [
 
 export const LEGACY_BUSINESS_LINE_COVERS: Record<string, string> = {
   mobiliario: 'area-workspace',
-  arquitectura: 'area-specialty',
+  'productos-arquitectonicos': 'area-specialty',
   iluminacion: 'area-lighting',
 }
 

@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     return [
       { source: '/evento/:slug', destination: '/eventos/:slug', permanent: true },
       { source: '/areas', destination: '/soluciones', permanent: true },
+      { source: '/soluciones/arquitectura', destination: '/soluciones/productos-arquitectonicos', permanent: true },
       { source: '/areas/:slug', destination: '/soluciones/:slug', permanent: true },
       { source: '/en/areas', destination: '/en/solutions', permanent: true },
       { source: '/en/areas/:slug', destination: '/en/solutions/:slug', permanent: true },

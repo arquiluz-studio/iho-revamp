@@ -35,7 +35,7 @@ on conflict (country_code) do nothing;
 -- Taxonomies ------------------------------------------------------------------
 insert into public.business_lines (slug, name_es, name_en, description_es, description_en, sort) values
   ('furniture', 'Mobiliario', 'Furniture', 'Mobiliario y diseño integral para oficinas corporativas.', 'Furniture and integral design for corporate offices.', 1),
-  ('specialty', 'Arquitectura', 'Specialty', 'Productos y soluciones especiales para proyectos exigentes.', 'Special products and solutions for demanding projects.', 2),
+  ('specialty', 'Productos Arquitectónicos', 'Specialty', 'Productos y soluciones especiales para proyectos exigentes.', 'Special products and solutions for demanding projects.', 2),
   ('lighting', 'Iluminación', 'Lighting', 'Diseño y soluciones de iluminación arquitectónica para cada espacio.', 'Architectural lighting design and solutions for every space.', 3)
 on conflict (slug) do nothing;
 
