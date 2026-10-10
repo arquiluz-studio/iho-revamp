@@ -1,7 +1,10 @@
 import { notFound } from 'next/navigation'
 import { COUNTRY_CODES, LOCALES, htmlLang, isCountryCode, type CountryCode } from '@/config/countries'
 import { getPathname } from '@/i18n/navigation'
-import { getStaticEventSlugs } from '@/lib/content/static'
+import { getCountryBrands } from '@/lib/queries/brands'
+import { getEvents } from '@/lib/queries/events'
+import { getProjects } from '@/lib/queries/projects'
+import { getBusinessLines, getSectors } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -26,7 +29,26 @@ function entry(country: CountryCode, href: Href): string {
 export async function GET(_request: Request, { params }: { params: Promise<{ country: string }> }) {
   const { country } = await params
   if (!isCountryCode(country)) notFound()
-  const hrefs: Href[] = ['/', ...getStaticEventSlugs().map(slug => ({ pathname: '/events/[slug]' as const, params: { slug } }))]
+  const [events, projects, brands, lines, sectors] = await Promise.all([
+    getEvents(country),
+    getProjects(country),
+    getCountryBrands(country),
+    getBusinessLines(),
+    getSectors(),
+  ])
+  const hrefs: Href[] = [
+    '/',
+    '/events',
+    '/projects',
+    '/brands',
+    '/contact',
+    '/privacy',
+    ...events.map(e => ({ pathname: '/events/[slug]' as const, params: { slug: e.slug } })),
+    ...projects.map(p => ({ pathname: '/projects/[slug]' as const, params: { slug: p.slug } })),
+    ...brands.map(b => ({ pathname: '/brands/[slug]' as const, params: { slug: b.slug } })),
+    ...lines.map(l => ({ pathname: '/areas/[businessLine]' as const, params: { businessLine: l.slug } })),
+    ...sectors.map(s => ({ pathname: '/spaces/[sector]' as const, params: { sector: s.slug } })),
+  ]
   const body =
     '<?xml version="1.0" encoding="UTF-8"?>' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' +

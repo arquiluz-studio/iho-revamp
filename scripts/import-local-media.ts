@@ -10,6 +10,15 @@
 import { existsSync } from 'node:fs'
 import { readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import {
+  LEGACY_BUSINESS_LINE_COVERS,
+  LEGACY_CONTACT_IMAGE,
+  LEGACY_EVENT_COVERS,
+  LEGACY_EVENT_GALLERY,
+  LEGACY_HERO_VIDEO,
+  LEGACY_SECTOR_COVERS,
+  LEGACY_TEAM_FILES,
+} from '@/lib/content/legacy-media'
 import { originalLocation, type MediaKind } from '@/lib/media'
 import { processMediaAsset } from '@/lib/media/pipeline'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -100,16 +109,9 @@ async function main() {
 
   // --- Team (MX) ---
   console.log('Team')
-  const TEAM_FILES: Record<string, string> = {
-    'Salvador Miranda': 'equipo-salvador-miranda',
-    'Daniela García': 'equipo-daniela-garcia',
-    'Lupina Cornejo': 'equipo-lupina-cornejo',
-    'Manuel Macedo': 'equipo-manolo-macedo',
-    'Estefania Lara': 'equipo-estefania-lara',
-  }
   const { data: team } = await check(admin.from('team_members').select('id, full_name, country_code'))
   for (const member of team ?? []) {
-    const name = TEAM_FILES[member.full_name]
+    const name = LEGACY_TEAM_FILES[member.full_name]
     if (!name) continue
     const mediaId = await importFile(`images/equipo/${name}.png`, { kind: 'team_photo', country: member.country_code, alt: member.full_name })
     await check(admin.from('team_members').update({ photo_media_id: mediaId }).eq('id', member.id))
@@ -134,24 +136,16 @@ async function main() {
 
   // --- Events (MX): covers and post-event galleries ---
   console.log('Events')
-  const EVENT_COVERS: Record<string, string> = {
-    'feria-contract': 'evento-1', 'webinar-iluminacion': 'evento-2', 'lanzamiento-collection': 'evento-3',
-    'showroom-abierto': 'evento-1', 'feria-industrial': 'evento-2', 'webinar-disenio': 'evento-3', 'lanzamiento-premium': 'evento-1',
-  }
-  const GALLERY = [
-    'images/eventos/evento-2.webp', 'images/eventos/evento-3.webp', 'images/eventos/evento-1.webp',
-    'images/productos/producto-1.webp', 'images/productos/producto-2.webp', 'images/productos/producto-3.webp',
-  ]
   const { data: events } = await check(admin.from('events').select('id, slug, title_es, country_code, starts_at'))
   for (const event of events ?? []) {
-    const cover = EVENT_COVERS[event.slug]
+    const cover = LEGACY_EVENT_COVERS[event.slug]
     if (cover) {
       const mediaId = await importFile(`images/eventos/${cover}.webp`, { kind: 'event_photo', country: event.country_code, alt: event.title_es })
       await check(admin.from('events').update({ cover_media_id: mediaId }).eq('id', event.id))
     }
     if (new Date(event.starts_at) < new Date()) {
       let sort = 0
-      for (const file of GALLERY) {
+      for (const file of LEGACY_EVENT_GALLERY) {
         const mediaId = await importFile(file, { kind: 'event_photo', country: event.country_code, alt: event.title_es })
         await check(admin.from('event_media').upsert({ event_id: event.id, media_id: mediaId, sort: sort++ }, { ignoreDuplicates: true }))
       }
@@ -160,21 +154,19 @@ async function main() {
 
   // --- Areas (business lines) and spaces (sectors) covers ---
   console.log('Taxonomies')
-  const BUSINESS_LINE_COVERS: Record<string, string> = { furniture: 'area-workspace', specialty: 'area-specialty', lighting: 'area-lighting' }
-  const SECTOR_COVERS: Record<string, string> = { workspace: 'area-workspace', hospitality: 'area-hospitality', retail: 'area-commerce-retail' }
-  for (const [slug, name] of Object.entries(BUSINESS_LINE_COVERS)) {
+  for (const [slug, name] of Object.entries(LEGACY_BUSINESS_LINE_COVERS)) {
     const mediaId = await importFile(`images/areas/${name}.webp`, { kind: 'generic', country: null, alt: slug })
     await check(admin.from('business_lines').update({ cover_media_id: mediaId }).eq('slug', slug))
   }
-  for (const [slug, name] of Object.entries(SECTOR_COVERS)) {
+  for (const [slug, name] of Object.entries(LEGACY_SECTOR_COVERS)) {
     const mediaId = await importFile(`images/areas/${name}.webp`, { kind: 'generic', country: null, alt: slug })
     await check(admin.from('sectors').update({ cover_media_id: mediaId }).eq('slug', slug))
   }
 
   // --- Home: contact image and hero video (shared by every country until each uploads its own) ---
   console.log('Home')
-  const contactId = await importFile('images/contacto/contacto.webp', { kind: 'generic', country: 'mx', alt: 'Contacto IHO' })
-  const heroId = await importFile('video/hero.mp4', { kind: 'hero', country: 'mx', alt: 'IHO' })
+  const contactId = await importFile(LEGACY_CONTACT_IMAGE, { kind: 'generic', country: 'mx', alt: 'Contacto IHO' })
+  const heroId = await importFile(LEGACY_HERO_VIDEO, { kind: 'hero', country: 'mx', alt: 'IHO' })
   await check(
     admin.from('country_settings').update({ contact_image_media_id: contactId, hero_video_media_id: heroId }).not('country_code', 'is', null),
   )

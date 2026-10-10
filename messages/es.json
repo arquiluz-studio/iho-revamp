@@ -141,12 +141,24 @@
   },
   "pages": {
     "events": { "label": "— EVENTOS", "title": "Eventos y\nlanzamientos.", "upcoming": "Próximos", "past": "Realizados", "empty": "No hay eventos por ahora." },
-    "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Espacio", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución" },
-    "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca" },
+    "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Espacio", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "areas": "Áreas", "related": "— MÁS PROYECTOS" },
+    "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
     "areas": { "label": "— ÁREAS", "brands": "Marcas del área", "projects": "Proyectos" },
     "spaces": { "label": "— ESPACIOS", "projects": "Proyectos" },
     "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud." },
-    "contact": { "label": "— CONTACTO", "offices": "Oficinas" }
+    "contact": { "label": "— CONTACTO", "offices": "Oficinas" },
+    "privacy": {
+      "label": "— LEGAL",
+      "title": "Aviso de\nprivacidad.",
+      "intro": "Grupo IHO y sus filiales en cada país (en adelante, \"IHO\") son responsables del tratamiento de los datos personales que nos proporcionas a través de este sitio.",
+      "sections": [
+        { "title": "Datos que recabamos", "body": "Nombre, empresa, correo electrónico, teléfono y la información que incluyas en tus mensajes, registros a eventos o solicitudes de cotización y descarga." },
+        { "title": "Finalidades", "body": "Atender tus solicitudes de contacto y cotización, gestionar tu registro y acceso a eventos, enviarte la confirmación correspondiente y, solo si lo autorizas, compartirte novedades y eventos de IHO." },
+        { "title": "Transferencias", "body": "Tus datos pueden compartirse entre las empresas de Grupo IHO en Latinoamérica y con proveedores que nos prestan servicios de hospedaje, correo y análisis, quienes están obligados a protegerlos. No vendemos tus datos." },
+        { "title": "Derechos ARCO", "body": "Puedes acceder, rectificar, cancelar u oponerte al tratamiento de tus datos, así como revocar tu consentimiento, escribiendo a través del formulario de contacto de este sitio." },
+        { "title": "Cambios", "body": "Cualquier modificación a este aviso se publicará en esta página." }
+      ]
+    }
   },
   "download": {
     "title": "Descarga en alta resolución",

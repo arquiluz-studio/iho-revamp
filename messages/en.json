@@ -141,12 +141,24 @@
   },
   "pages": {
     "events": { "label": "— EVENTS", "title": "Events and\nlaunches.", "upcoming": "Upcoming", "past": "Past", "empty": "No events right now." },
-    "projects": { "label": "— PROJECTS", "title": "IHO\nprojects.", "empty": "No published projects yet.", "client": "Client", "year": "Year", "city": "City", "sector": "Space", "brandsUsed": "Brands", "gallery": "Gallery", "download": "Download high resolution" },
-    "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand" },
+    "projects": { "label": "— PROJECTS", "title": "IHO\nprojects.", "empty": "No published projects yet.", "client": "Client", "year": "Year", "city": "City", "sector": "Space", "brandsUsed": "Brands", "gallery": "Gallery", "download": "Download high resolution", "areas": "Areas", "related": "— MORE PROJECTS" },
+    "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand", "origin": "Origin" },
     "areas": { "label": "— AREAS", "brands": "Brands in this area", "projects": "Projects" },
     "spaces": { "label": "— SPACES", "projects": "Projects" },
     "products": { "label": "— PRODUCTS", "title": "Catalog.", "empty": "No products available in this country.", "all": "All", "brand": "Brand", "designer": "Designer", "specs": "Specifications", "variants": "Variants", "leadTime": "Ships in {days} days", "onRequest": "Made to order", "inStock": "In stock", "inquiry": "Request a quote", "inquirySent": "We received your request." },
-    "contact": { "label": "— CONTACT", "offices": "Offices" }
+    "contact": { "label": "— CONTACT", "offices": "Offices" },
+    "privacy": {
+      "label": "— LEGAL",
+      "title": "Privacy\nnotice.",
+      "intro": "Grupo IHO and its subsidiaries in each country (\"IHO\") are responsible for the personal data you provide through this website.",
+      "sections": [
+        { "title": "Data we collect", "body": "Name, company, email, phone and any information you include in messages, event registrations, quote or download requests." },
+        { "title": "Purposes", "body": "Responding to contact and quote requests, managing your event registration and access, sending the related confirmations and, only with your consent, sharing IHO news and events." },
+        { "title": "Transfers", "body": "Your data may be shared among Grupo IHO companies in Latin America and with providers of hosting, email and analytics services, who are bound to protect it. We never sell your data." },
+        { "title": "Your rights", "body": "You can access, correct or delete your data, object to its processing or withdraw your consent by writing to us through this website's contact form." },
+        { "title": "Changes", "body": "Any change to this notice will be published on this page." }
+      ]
+    }
   },
   "download": {
     "title": "High-resolution download",
