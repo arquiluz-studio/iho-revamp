@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { AreasGrid } from '@/components/site/AreasGrid'
+import { SolutionsGrid } from '@/components/site/SolutionsGrid'
 import { EmptyNote, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { legacyMedia } from '@/lib/content/legacy-media'
@@ -13,15 +13,15 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
-  const tp = await getTranslations({ locale, namespace: 'pages.verticals' })
-  return { title: `${tp('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/verticals', country, locale }) }
+  const tp = await getTranslations({ locale, namespace: 'pages.spaces' })
+  return { title: `${tp('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/spaces', country, locale }) }
 }
 
-export default async function VerticalsPage({ params }: { params: Promise<SiteParams> }) {
+export default async function SpacesPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
   const [tp, sectors, chrome] = await Promise.all([
-    getTranslations({ locale, namespace: 'pages.verticals' }),
+    getTranslations({ locale, namespace: 'pages.spaces' }),
     getSectors(),
     innerChrome(country, locale, paths),
   ])
@@ -35,7 +35,7 @@ export default async function VerticalsPage({ params }: { params: Promise<SitePa
   return (
     <PageShell chrome={chrome}>
       <PageHero label={tp('label')} title={tp('title')} />
-      {cards.length ? <AreasGrid areas={cards} heading={false} /> : <section className="iho-page-section"><EmptyNote>{tp('empty')}</EmptyNote></section>}
+      {cards.length ? <SolutionsGrid solutions={cards} heading={false} /> : <section className="iho-page-section"><EmptyNote>{tp('empty')}</EmptyNote></section>}
     </PageShell>
   )
 }

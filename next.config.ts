@@ -12,7 +12,17 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' }],
   },
   async redirects() {
-    return [{ source: '/evento/:slug', destination: '/eventos/:slug', permanent: true }]
+    return [
+      { source: '/evento/:slug', destination: '/eventos/:slug', permanent: true },
+      { source: '/areas', destination: '/soluciones', permanent: true },
+      { source: '/areas/:slug', destination: '/soluciones/:slug', permanent: true },
+      { source: '/en/areas', destination: '/en/solutions', permanent: true },
+      { source: '/en/areas/:slug', destination: '/en/solutions/:slug', permanent: true },
+      { source: '/verticales', destination: '/espacios', permanent: true },
+      { source: '/en/verticals', destination: '/en/spaces', permanent: true },
+      { source: '/admin/global/business-lines/:path*', destination: '/admin/global/solutions/:path*', permanent: true },
+      { source: '/admin/global/sectors/:path*', destination: '/admin/global/spaces/:path*', permanent: true },
+    ]
   },
 }
 

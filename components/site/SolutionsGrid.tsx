@@ -3,15 +3,15 @@ import { Arrow, ButtonArrow } from '@/components/ui/Arrow'
 import { MediaImage } from '@/components/ui/MediaImage'
 import { DisplayTitle, RichText, SectionLabel } from '@/components/ui/Section'
 import { ACUMIN } from '@/components/ui/tokens'
-import type { AreaCardVM } from '@/lib/types/site'
+import type { SolutionCardVM } from '@/lib/types/site'
 import { StaggerGrid } from './StaggerGrid'
 
-export function AreasGrid({ areas, ctaHref, heading = true, background = '#f1ece3' }: { areas: AreaCardVM[]; ctaHref?: string; heading?: boolean; background?: string }) {
-  const t = useTranslations('home.areas')
+export function SolutionsGrid({ solutions, ctaHref, heading = true, background = '#f1ece3' }: { solutions: SolutionCardVM[]; ctaHref?: string; heading?: boolean; background?: string }) {
+  const t = useTranslations('home.solutions')
   // In a 3-column grid the first card spans 2 columns when that fills the last row.
-  const firstSpans = areas.length % 3 === 2
+  const firstSpans = solutions.length % 3 === 2
   return (
-    <section id={heading ? 'areas' : undefined} style={{ background }}>
+    <section id={heading ? 'soluciones' : undefined} style={{ background }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: heading ? '88px 40px' : '72px 40px' }}>
         {heading && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 44 }}>
@@ -27,10 +27,10 @@ export function AreasGrid({ areas, ctaHref, heading = true, background = '#f1ece
             )}
           </div>
         )}
-        <StaggerGrid id="iho-areas-grid" delay={120} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
-          {areas.map((a, i) => (
+        <StaggerGrid id="iho-solutions-grid" delay={120} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
+          {solutions.map((a, i) => (
             <div key={`${a.num}-${a.title}`} className="iho-stagger" style={i === 0 && firstSpans ? { gridColumn: 'span 2' } : {}}>
-              <a href={a.href} className="iho-area-card" style={{ display: 'block', color: 'inherit', textDecoration: 'none' }}>
+              <a href={a.href} className="iho-solution-card" style={{ display: 'block', color: 'inherit', textDecoration: 'none' }}>
                 <MediaImage image={a.image} sizes="(max-width: 768px) 100vw, 66vw" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.04) 38%, rgba(0,0,0,0.62) 100%)', pointerEvents: 'none' }} />
                 <div className="ac-wash" />

@@ -59,7 +59,7 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
       <PageHero label={tp('label')} title={brand.name}>
         {lines.length > 0 && (
           <div style={{ marginTop: 28 }} className="iho-chips-dark">
-            <Chips links={lines.map(l => ({ href: paths.area(localSlug(l, locale)), label: t(l, 'name', locale) }))} />
+            <Chips links={lines.map(l => ({ href: paths.solution(localSlug(l, locale)), label: t(l, 'name', locale) }))} />
           </div>
         )}
       </PageHero>

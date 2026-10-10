@@ -66,8 +66,8 @@ export default async function ProjectPage({ params }: { params: Promise<Params> 
               { label: tp('city'), value: project.city },
               { label: tp('sector'), value: project.sector && link(paths.space(localSlug(project.sector, locale)), t(project.sector, 'name', locale)) },
               {
-                label: tp('areas'),
-                value: lines.length > 0 && lines.map((l, i) => <span key={l.id}>{i > 0 && ', '}{link(paths.area(localSlug(l, locale)), t(l, 'name', locale))}</span>),
+                label: tp('solutions'),
+                value: lines.length > 0 && lines.map((l, i) => <span key={l.id}>{i > 0 && ', '}{link(paths.solution(localSlug(l, locale)), t(l, 'name', locale))}</span>),
               },
             ]}
           />

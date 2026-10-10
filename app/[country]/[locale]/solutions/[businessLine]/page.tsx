@@ -28,33 +28,33 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: `${t(line, 'name', locale)} — IHO`,
     description: t(line, 'description', locale) || undefined,
-    alternates: buildAlternates({ href: l => ({ pathname: '/areas/[businessLine]', params: { businessLine: localSlug(line, l) } }), country, locale }),
+    alternates: buildAlternates({ href: l => ({ pathname: '/solutions/[businessLine]', params: { businessLine: localSlug(line, l) } }), country, locale }),
   }
 }
 
-export default async function AreaPage({ params }: { params: Promise<Params> }) {
+export default async function SolutionPage({ params }: { params: Promise<Params> }) {
   const { country, locale } = await resolveSiteParams(params)
   const { businessLine } = await params
   const paths = sitePaths(locale)
   const lines = await getBusinessLines()
   const line = pickBySlug(lines, businessLine, locale)
   if (!line) notFound()
-  if (localSlug(line, locale) !== businessLine) permanentRedirect(paths.area(localSlug(line, locale)))
+  if (localSlug(line, locale) !== businessLine) permanentRedirect(paths.solution(localSlug(line, locale)))
 
   const [tp, chrome, brands, projects] = await Promise.all([
-    getTranslations({ locale, namespace: 'pages.areas' }),
-    innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/areas/[businessLine]', params: { businessLine: localSlug(line, l) } }))),
+    getTranslations({ locale, namespace: 'pages.solutions' }),
+    innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/solutions/[businessLine]', params: { businessLine: localSlug(line, l) } }))),
     getCountryBrands(country),
     getProjects(country, { businessLine: line.slug }),
   ])
-  const areaBrands = brands.filter(b => b.business_lines.some(l => l.business_line?.id === line.id))
+  const solutionBrands = brands.filter(b => b.business_lines.some(l => l.business_line?.id === line.id))
   const name = t(line, 'name', locale)
 
   return (
     <PageShell chrome={chrome}>
       <PageHero label={tp('label')} title={name} image={imageOf(line.cover, locale, name, legacyMedia.businessLineCover(line.slug))}>
         <div style={{ marginTop: 32 }} className="iho-chips-dark">
-          <Chips links={lines.map(l => ({ href: paths.area(localSlug(l, locale)), label: t(l, 'name', locale) }))} current={paths.area(localSlug(line, locale))} />
+          <Chips links={lines.map(l => ({ href: paths.solution(localSlug(l, locale)), label: t(l, 'name', locale) }))} current={paths.solution(localSlug(line, locale))} />
         </div>
       </PageHero>
       {t(line, 'description', locale) && (
@@ -62,10 +62,10 @@ export default async function AreaPage({ params }: { params: Promise<Params> }) 
           <Prose paragraphs={paragraphs(t(line, 'description', locale))} />
         </section>
       )}
-      {areaBrands.length > 0 && (
+      {solutionBrands.length > 0 && (
         <section className="iho-page-section" style={{ paddingTop: 0 }}>
           <SectionHeading label={`— ${tp('brands').toUpperCase()}`} />
-          <BrandLogos brands={areaBrands.map(b => toBrandVM(b, locale, paths))} />
+          <BrandLogos brands={solutionBrands.map(b => toBrandVM(b, locale, paths))} />
         </section>
       )}
       {projects.length > 0 && (

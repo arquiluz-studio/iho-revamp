@@ -22,8 +22,7 @@
     "group": "Grupo IHO",
     "brands": "Marcas",
     "projects": "Proyectos",
-    "areas": "Áreas",
-    "verticals": "Verticales",
+    "solutions": "Soluciones",
     "spaces": "Espacios",
     "contact": "Contactar",
     "gallery": "Galería",
@@ -60,7 +59,7 @@
       "p2": "Una fortaleza logística que permite que tu proyecto, sin importar su tamaño, se resuelva con un solo proveedor.",
       "mapTitle": "Mapa de presencia en LATAM"
     },
-    "areas": { "label": "— ÁREAS IHO", "title": "UNA PUERTA\nPOR INDUSTRIA.", "cta": "Ver todas las áreas" },
+    "solutions": { "label": "— SOLUCIONES IHO", "title": "UNA PUERTA\nPOR INDUSTRIA.", "cta": "Ver todas las soluciones" },
     "projects": {
       "label": "— PROYECTOS",
       "title": "MARCAS QUE YA\nCONFIARON.",
@@ -158,11 +157,10 @@
   "pages": {
     "events": { "label": "— EVENTOS", "title": "Eventos y\nlanzamientos.", "upcoming": "Próximos", "past": "Realizados", "empty": "No hay eventos por ahora." },
     "about": { "label": "— NOSOTROS" },
-    "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "noMatch": "Ningún proyecto coincide con estos filtros.", "count": "{count} proyectos", "filters": "Filtros", "clear": "Limpiar", "filterCountry": "País", "filterVertical": "Vertical", "filterArea": "Área", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Vertical", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "areas": "Áreas", "related": "— MÁS PROYECTOS" },
+    "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "noMatch": "Ningún proyecto coincide con estos filtros.", "count": "{count} proyectos", "filters": "Filtros", "clear": "Limpiar", "filterCountry": "País", "filterSpace": "Espacio", "filterSolution": "Solución", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Espacio", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "solutions": "Soluciones", "related": "— MÁS PROYECTOS" },
     "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
-    "areas": { "label": "— ÁREAS", "empty": "Aún no hay áreas publicadas.", "brands": "Marcas del área", "projects": "Proyectos" },
-    "verticals": { "label": "— VERTICALES", "title": "Verticales\nIHO.", "empty": "Aún no hay verticales publicadas." },
-    "spaces": { "label": "— VERTICALES", "projects": "Proyectos" },
+    "solutions": { "label": "— SOLUCIONES", "empty": "Aún no hay soluciones publicadas.", "brands": "Marcas de la solución", "projects": "Proyectos" },
+    "spaces": { "label": "— ESPACIOS", "title": "Espacios\nIHO.", "empty": "Aún no hay espacios publicados.", "projects": "Proyectos" },
     "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud.", "price": "Precio", "availability": "Disponibilidad", "sale": "Oferta", "from": "Desde {price}", "quote": "Cotizar",
       "inquiryTitle": "¿Te interesa este producto?", "inquiryMessage": "Me interesa cotizar {product}." },
     "contact": { "label": "— CONTACTO", "offices": "Oficinas" },

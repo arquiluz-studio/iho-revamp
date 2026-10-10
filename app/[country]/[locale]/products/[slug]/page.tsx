@@ -63,7 +63,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const variants = product.variants.length > 1 ? product.variants : []
   const related = catalog.filter(p => p.id !== product.id && p.brand?.id === product.brand?.id).slice(0, 4)
   const chips = [
-    ...(product.business_line ? [{ href: paths.area(localSlug(product.business_line, locale)), label: t(product.business_line, 'name', locale) }] : []),
+    ...(product.business_line ? [{ href: paths.solution(localSlug(product.business_line, locale)), label: t(product.business_line, 'name', locale) }] : []),
     ...product.sectors.map(s => ({ href: paths.space(localSlug(s, locale)), label: t(s, 'name', locale) })),
   ]
 

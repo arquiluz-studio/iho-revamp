@@ -59,8 +59,8 @@ export default async function PanelLayout({ children }: { children: ReactNode })
       items: [
         { href: '/admin/global/brands', label: 'Marcas' },
         { href: '/admin/global/products', label: 'Productos' },
-        { href: '/admin/global/business-lines', label: 'Áreas' },
-        { href: '/admin/global/sectors', label: 'Espacios' },
+        { href: '/admin/global/solutions', label: 'Soluciones' },
+        { href: '/admin/global/spaces', label: 'Espacios' },
         ...(session.isSuperAdmin
           ? [
               { href: '/admin/global/countries', label: 'Países' },

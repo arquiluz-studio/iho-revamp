@@ -11,8 +11,7 @@ export type ImageVM = {
   color?: string | null
 }
 
-/** `activeOn`: internal (unlocalized) pathname prefixes under which the link shows as current, e.g. `/projects`. */
-export type NavLink = { href: string; label: string; activeOn?: string[] }
+export type NavLink = { href: string; label: string }
 
 export type EventVM = {
   slug: string
@@ -77,7 +76,7 @@ export type TeamMemberVM = {
 
 export type OfficeVM = { city: string; address: string; muted?: boolean }
 
-export type AreaCardVM = {
+export type SolutionCardVM = {
   num: string
   title: string
   description: string
@@ -91,7 +90,7 @@ export type ProjectCardVM = {
   description: string
   image: ImageVM
   href?: string
-  /** Country and vertical, shown on the projects index. */
+  /** Country and space, shown on the projects index. */
   meta?: string
 }
 
@@ -104,7 +103,7 @@ export type HomeVM = {
   sectors: string[]
   products: ProductCardVM[]
   events: EventVM[]
-  areas: AreaCardVM[]
+  solutions: SolutionCardVM[]
   brands: BrandVM[]
   projects: ProjectCardVM[]
   offices: OfficeVM[]

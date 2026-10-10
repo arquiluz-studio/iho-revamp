@@ -22,7 +22,7 @@ export default async function DashboardPage() {
         <PageHeader title={`Hola, ${session.profile.full_name || session.email}`} />
         {session.canManageCatalog ? (
           <Notice>
-            Tienes acceso al catálogo global. Usa el menú <strong>Global</strong> para editar marcas, áreas y espacios.
+            Tienes acceso al catálogo global. Usa el menú <strong>Global</strong> para editar marcas, soluciones y espacios.
           </Notice>
         ) : (
           <Notice tone="amber">Aún no tienes países asignados. Pide a un administrador que te dé acceso.</Notice>

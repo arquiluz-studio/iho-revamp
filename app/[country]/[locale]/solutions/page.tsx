@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { AreasGrid } from '@/components/site/AreasGrid'
+import { SolutionsGrid } from '@/components/site/SolutionsGrid'
 import { EmptyNote, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { legacyMedia } from '@/lib/content/legacy-media'
@@ -13,16 +13,16 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
-  const th = await getTranslations({ locale, namespace: 'home.areas' })
-  return { title: `${th('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/areas', country, locale }) }
+  const th = await getTranslations({ locale, namespace: 'home.solutions' })
+  return { title: `${th('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/solutions', country, locale }) }
 }
 
-export default async function AreasPage({ params }: { params: Promise<SiteParams> }) {
+export default async function SolutionsPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
   const [tp, th, lines, chrome] = await Promise.all([
-    getTranslations({ locale, namespace: 'pages.areas' }),
-    getTranslations({ locale, namespace: 'home.areas' }),
+    getTranslations({ locale, namespace: 'pages.solutions' }),
+    getTranslations({ locale, namespace: 'home.solutions' }),
     getBusinessLines(),
     innerChrome(country, locale, paths),
   ])
@@ -31,12 +31,12 @@ export default async function AreasPage({ params }: { params: Promise<SiteParams
     title: t(line, 'name', locale),
     description: t(line, 'description', locale),
     image: imageOf(line.cover, locale, t(line, 'name', locale), legacyMedia.businessLineCover(line.slug), 'md'),
-    href: paths.area(localSlug(line, locale)),
+    href: paths.solution(localSlug(line, locale)),
   }))
   return (
     <PageShell chrome={chrome}>
       <PageHero label={tp('label')} title={th('title')} />
-      {cards.length ? <AreasGrid areas={cards} heading={false} /> : <section className="iho-page-section"><EmptyNote>{tp('empty')}</EmptyNote></section>}
+      {cards.length ? <SolutionsGrid solutions={cards} heading={false} /> : <section className="iho-page-section"><EmptyNote>{tp('empty')}</EmptyNote></section>}
     </PageShell>
   )
 }

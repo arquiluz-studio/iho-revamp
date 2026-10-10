@@ -28,5 +28,5 @@ export default async function HomePage({ params }: { params: Promise<SiteParams>
     getHomeVM(country, locale, paths),
     siteChrome({ country, locale, paths, contactHref: '#contacto' }),
   ])
-  return <HomeView data={data} countryCode={country} areasHref={paths.areas} contactHref="#contacto" chrome={chrome} />
+  return <HomeView data={data} countryCode={country} solutionsHref={paths.solutions} contactHref="#contacto" chrome={chrome} />
 }

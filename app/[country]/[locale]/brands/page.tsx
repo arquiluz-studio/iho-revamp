@@ -30,7 +30,7 @@ export default async function BrandsPage({ params }: { params: Promise<SiteParam
     <PageShell chrome={chrome}>
       <PageHero label={tp('label')} title={tp('title')} intro={th('intro')}>
         <div style={{ marginTop: 32 }} className="iho-chips-dark">
-          <Chips links={lines.map(l => ({ href: paths.area(localSlug(l, locale)), label: t(l, 'name', locale) }))} />
+          <Chips links={lines.map(l => ({ href: paths.solution(localSlug(l, locale)), label: t(l, 'name', locale) }))} />
         </div>
       </PageHero>
       <section className="iho-page-section">

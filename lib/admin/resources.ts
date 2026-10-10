@@ -50,7 +50,7 @@ export type ResourceConfig = {
   /** The primary key is typed by the user on creation (countries.code). */
   pkInput?: boolean
   /** Localized public route used by "Ver en el sitio" / preview. */
-  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/products/[slug]' | '/areas/[businessLine]' | '/spaces/[sector]' | '/'
+  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/products/[slug]' | '/solutions/[businessLine]' | '/spaces/[sector]' | '/'
   /** Datetime fields are entered in this row field's timezone (falls back to the country timezone). */
   timezoneField?: string
 }
@@ -197,7 +197,7 @@ const projects: ResourceConfig = {
     { name: 'body', label: 'Descripción', type: 'textarea', i18n: true, max: 20000, rows: 10 },
     {
       name: 'business_lines',
-      label: 'Áreas',
+      label: 'Soluciones',
       type: 'multi',
       source: 'business_lines',
       through: { table: 'project_business_lines', selfKey: 'project_id', otherKey: 'business_line_id' },
@@ -395,7 +395,7 @@ const brands: ResourceConfig = {
     { name: 'description', label: 'Descripción', type: 'textarea', i18n: true, max: 4000, rows: 6 },
     {
       name: 'business_lines',
-      label: 'Áreas',
+      label: 'Soluciones',
       type: 'multi',
       source: 'business_lines',
       through: { table: 'brand_business_lines', selfKey: 'brand_id', otherKey: 'business_line_id' },
@@ -425,23 +425,23 @@ const taxonomyColumns: Column[] = [
   { key: 'sort', label: 'Orden', format: 'number' },
 ]
 
-const businessLines: ResourceConfig = {
-  key: 'business-lines',
+const solutions: ResourceConfig = {
+  key: 'solutions',
   table: 'business_lines',
   scope: 'global',
   pk: 'id',
-  title: 'Áreas de negocio',
-  singular: 'área',
+  title: 'Soluciones',
+  singular: 'solución',
   globalWrite: 'catalog',
   globalTag: 'taxonomies',
-  publicPath: '/areas/[businessLine]',
-  fields: taxonomyFields('Portada del área'),
+  publicPath: '/solutions/[businessLine]',
+  fields: taxonomyFields('Portada de la solución'),
   columns: taxonomyColumns,
   order: [{ column: 'sort', ascending: true }],
 }
 
-const sectors: ResourceConfig = {
-  key: 'sectors',
+const spaces: ResourceConfig = {
+  key: 'spaces',
   table: 'sectors',
   scope: 'global',
   pk: 'id',
@@ -474,7 +474,7 @@ const products: ResourceConfig = {
     { name: 'slug_en', label: 'Slug en inglés (URL)', type: 'slug', help: 'Opcional. Si queda vacío, la versión en inglés usa el slug en español.' },
     { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
     { name: 'brand_id', label: 'Marca', type: 'reference', source: 'brands', required: true },
-    { name: 'business_line_id', label: 'Área', type: 'reference', source: 'business_lines' },
+    { name: 'business_line_id', label: 'Solución', type: 'reference', source: 'business_lines' },
     { name: 'designer', label: 'Diseñador', type: 'text', max: 160 },
     { name: 'erp_ref', label: 'Referencia ERP', type: 'text', max: 120 },
     { name: 'description', label: 'Descripción', type: 'textarea', i18n: true, max: 8000, rows: 6 },
@@ -564,13 +564,13 @@ export const RESOURCES = {
   countries,
   brands,
   products,
-  'business-lines': businessLines,
-  sectors,
+  solutions,
+  spaces,
 }
 export type ResourceKey = keyof typeof RESOURCES
 
 export const COUNTRY_RESOURCES: ResourceKey[] = ['events', 'projects', 'socials', 'offices', 'team', 'price-lists', 'warehouses']
-export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'brands', 'products', 'business-lines', 'sectors']
+export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'brands', 'products', 'solutions', 'spaces']
 
 export function getResource(key: string): ResourceConfig | null {
   return key in RESOURCES ? RESOURCES[key as ResourceKey] : null

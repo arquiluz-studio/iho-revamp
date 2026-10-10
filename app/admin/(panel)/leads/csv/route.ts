@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const { data } = await query
 
   const csv = toCsv(
-    ['fecha', 'estado', 'origen', 'nombre', 'apellido', 'email', 'telefono', 'empresa', 'area', 'espacio', 'mensaje', 'idioma', 'acepta_marketing'],
+    ['fecha', 'estado', 'origen', 'nombre', 'apellido', 'email', 'telefono', 'empresa', 'solucion', 'espacio', 'mensaje', 'idioma', 'acepta_marketing'],
     (data ?? []).map(l => [
       l.created_at,
       l.status,

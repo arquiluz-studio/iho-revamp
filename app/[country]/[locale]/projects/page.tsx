@@ -39,25 +39,25 @@ export default async function ProjectsPage({ params }: { params: Promise<SitePar
     rows.map(project => {
       const card = toProjectCardVM(project, locale, paths)
       const path = paths.project(localSlug(project, locale))
-      const vertical = project.sector ? t(project.sector, 'name', locale) : ''
+      const space = project.sector ? t(project.sector, 'name', locale) : ''
       return {
         ...card,
         href: code === country ? path : crossCountryUrl(code, { protocol, host }, path),
-        meta: [COUNTRIES[code].name[locale], vertical].filter(Boolean).join(' · '),
+        meta: [COUNTRIES[code].name[locale], space].filter(Boolean).join(' · '),
         country: code,
-        verticalId: project.sector?.id ?? null,
-        areaIds: project.business_lines.flatMap(link => (link.business_line ? [link.business_line.id] : [])),
+        spaceId: project.sector?.id ?? null,
+        solutionIds: project.business_lines.flatMap(link => (link.business_line ? [link.business_line.id] : [])),
       }
     }),
   )
   const countries = sortByCountry(COUNTRY_CODES, country, locale, code => code).map(code => ({ id: code, label: COUNTRIES[code].name[locale] }))
-  const verticals = sectors.map(sector => ({ id: sector.id, label: t(sector, 'name', locale) }))
-  const areas = lines.map(line => ({ id: line.id, label: t(line, 'name', locale) }))
+  const spaces = sectors.map(sector => ({ id: sector.id, label: t(sector, 'name', locale) }))
+  const solutions = lines.map(line => ({ id: line.id, label: t(line, 'name', locale) }))
 
   return (
     <PageShell chrome={chrome}>
       <PageHero label={tp('label')} title={tp('title')} intro={th('intro')} image={projects.find(project => project.country === country)?.image ?? projects[0]?.image} />
-      <ProjectBrowser projects={projects} countries={countries} verticals={verticals} areas={areas} />
+      <ProjectBrowser projects={projects} countries={countries} spaces={spaces} solutions={solutions} />
     </PageShell>
   )
 }

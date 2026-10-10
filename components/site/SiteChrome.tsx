@@ -44,11 +44,11 @@ export async function siteChrome({ country, locale, paths, threshold, contactHre
 }): Promise<SiteChrome> {
   const [socials, tn] = await Promise.all([getSocialAccounts(country), getTranslations({ locale, namespace: 'nav' })])
   const links: NavLink[] = [
-    { href: paths.about, label: tn('about'), activeOn: ['/about'] },
-    { href: paths.areas, label: tn('areas'), activeOn: ['/areas'] },
-    { href: paths.verticals, label: tn('verticals'), activeOn: ['/verticals', '/spaces'] },
-    { href: paths.projects, label: tn('projects'), activeOn: ['/projects'] },
-    { href: paths.events, label: tn('events'), activeOn: ['/events'] },
+    { href: paths.about, label: tn('about') },
+    { href: paths.solutions, label: tn('solutions') },
+    { href: paths.spaces, label: tn('spaces') },
+    { href: paths.projects, label: tn('projects') },
+    { href: paths.events, label: tn('events') },
   ]
   const cta: NavLink = { href: paths.contact, label: tn('contact') }
   return {

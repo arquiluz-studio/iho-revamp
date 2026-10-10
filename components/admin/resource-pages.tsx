@@ -70,7 +70,7 @@ function publicHref(config: ResourceConfig, row: AnyRow | null) {
     case '/brands/[slug]':
     case '/products/[slug]':
       return slug ? { pathname: config.publicPath, params: { slug } } : null
-    case '/areas/[businessLine]':
+    case '/solutions/[businessLine]':
       return slug ? { pathname: config.publicPath, params: { businessLine: slug } } : null
     case '/spaces/[sector]':
       return slug ? { pathname: config.publicPath, params: { sector: slug } } : null

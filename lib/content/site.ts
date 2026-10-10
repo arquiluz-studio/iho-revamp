@@ -11,7 +11,7 @@ import { getEventBySlug, getEvents, type EventDetailRow, type EventListRow } fro
 import { getProjects, type ProjectListRow } from '@/lib/queries/projects'
 import { getBusinessLines, getCountries, getCountrySettings, getOffices, getSectors, getTeam } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
-import type { AreaCardVM, BrandVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
+import type { SolutionCardVM, BrandVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
 import { cityChip, cityDisplay } from './cities'
 import { legacyMedia } from './legacy-media'
 import type { SitePaths } from './paths'
@@ -208,13 +208,13 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
     sectors: sectors.map(s => t(s, 'name', locale).toUpperCase()),
     products,
     events: events.map(e => toEventVM(e, locale, countryName, labels, paths)),
-    areas: businessLines.map(
-      (b, i): AreaCardVM => ({
+    solutions: businessLines.map(
+      (b, i): SolutionCardVM => ({
         num: String(i + 1).padStart(2, '0'),
         title: t(b, 'name', locale),
         description: t(b, 'description', locale),
         image: imageOf(b.cover, locale, t(b, 'name', locale), legacyMedia.businessLineCover(b.slug), 'md'),
-        href: paths.area(localSlug(b, locale)),
+        href: paths.solution(localSlug(b, locale)),
       }),
     ),
     brands: brands.map(b => toBrandVM(b, locale, paths)),

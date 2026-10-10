@@ -40,15 +40,15 @@ export const MEDIA_REFERENCES: Reference[] = [
     table: 'business_lines',
     column: 'cover_media_id',
     select: 'id, name_es',
-    where: 'Portada de área',
-    describe: r => ({ label: String(r.name_es), href: `/admin/global/business-lines/${r.id}`, tags: [cacheTags.taxonomies] }),
+    where: 'Portada de solución',
+    describe: r => ({ label: String(r.name_es), href: `/admin/global/solutions/${r.id}`, tags: [cacheTags.taxonomies] }),
   },
   {
     table: 'sectors',
     column: 'cover_media_id',
     select: 'id, name_es',
     where: 'Portada de espacio',
-    describe: r => ({ label: String(r.name_es), href: `/admin/global/sectors/${r.id}`, tags: [cacheTags.taxonomies] }),
+    describe: r => ({ label: String(r.name_es), href: `/admin/global/spaces/${r.id}`, tags: [cacheTags.taxonomies] }),
   },
   ...(['hero_video_media_id', 'hero_image_media_id', 'contact_image_media_id'] as const).map(column => ({
     table: 'country_settings',

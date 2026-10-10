@@ -598,8 +598,12 @@
         .iho-nav-link[aria-current="page"]::after {
           transform: scaleX(1);
         }
+        .iho-nav-link[aria-current="page"],
+        .iho-nav-link[aria-current="page"]::after {
+          transition: none;
+        }
         /* AreaCard hover */
-        .iho-area-card {
+        .iho-solution-card {
           position: relative;
           width: 100%;
           height: 300px;
@@ -607,7 +611,7 @@
           overflow: hidden;
           cursor: pointer;
         }
-        .iho-area-card .ac-wash {
+        .iho-solution-card .ac-wash {
           position: absolute;
           inset: 0;
           background: #ef483d;
@@ -616,10 +620,10 @@
           transition: opacity 0.5s ease;
           pointer-events: none;
         }
-        .iho-area-card:hover .ac-wash {
+        .iho-solution-card:hover .ac-wash {
           opacity: 0.62;
         }
-        .iho-area-card .ac-num {
+        .iho-solution-card .ac-num {
           position: absolute;
           left: 22px;
           top: 22px;
@@ -630,10 +634,10 @@
           transition: opacity 0.4s ease;
           pointer-events: none;
         }
-        .iho-area-card:hover .ac-num {
+        .iho-solution-card:hover .ac-num {
           opacity: 0;
         }
-        .iho-area-card .ac-desc {
+        .iho-solution-card .ac-desc {
           font-family: "Source Sans 3", sans-serif;
           font-size: 13px;
           line-height: 1.5;
@@ -647,12 +651,12 @@
             opacity 0.5s ease,
             margin-top 0.5s ease;
         }
-        .iho-area-card:hover .ac-desc {
+        .iho-solution-card:hover .ac-desc {
           max-height: 90px;
           opacity: 1;
           margin-top: 10px;
         }
-        .iho-area-card .ac-arrow {
+        .iho-solution-card .ac-arrow {
           position: absolute;
           right: 22px;
           bottom: 22px;
@@ -662,7 +666,7 @@
             color 0.3s ease,
             transform 0.3s ease;
         }
-        .iho-area-card:hover .ac-arrow {
+        .iho-solution-card:hover .ac-arrow {
           color: #ffffff;
           transform: translateX(4px);
         }
@@ -840,10 +844,10 @@
           #iho-map-frame {
             height: 420px !important;
           }
-          #areas > div {
+          #soluciones > div {
             padding: 60px 28px !important;
           }
-          #iho-areas-grid {
+          #iho-solutions-grid {
             grid-template-columns: repeat(2, 1fr) !important;
           }
           #proyectos {
@@ -973,21 +977,21 @@
             padding: 16px 0 0 !important;
           }
 
-          /* Áreas: 2 columnas en tablet, 1 en mobile pequeño */
-          #areas > div {
+          /* Soluciones: 2 columnas en tablet, 1 en mobile pequeño */
+          #soluciones > div {
             padding: 48px 20px !important;
           }
-          #areas > div > div:first-child {
+          #soluciones > div > div:first-child {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 12px !important;
             margin-bottom: 28px !important;
           }
-          #iho-areas-grid {
+          #iho-solutions-grid {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 12px !important;
           }
-          .iho-area-card {
+          .iho-solution-card {
             height: 180px !important;
           }
 
@@ -1064,11 +1068,11 @@
             height: 280px !important;
           }
 
-          /* Áreas: 1 columna en mobile pequeño */
-          #iho-areas-grid {
+          /* Soluciones: 1 columna en mobile pequeño */
+          #iho-solutions-grid {
             grid-template-columns: 1fr !important;
           }
-          .iho-area-card {
+          .iho-solution-card {
             height: 160px !important;
           }
 

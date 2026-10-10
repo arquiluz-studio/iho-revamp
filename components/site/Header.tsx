@@ -1,9 +1,10 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { useTranslations } from 'next-intl'
 import { ButtonArrow } from '@/components/ui/Arrow'
-import { usePathname } from '@/i18n/navigation'
 import type { NavLink } from '@/lib/types/site'
+
+const noopSubscribe = () => () => {}
 
 type Props = {
   logoHref: string
@@ -19,8 +20,9 @@ export function Header({ logoHref, links, cta, threshold = 0.75, tools }: Props)
   const t = useTranslations('common')
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const pathname = usePathname()
-  const isActive = (link: NavLink) => (link.activeOn ?? []).some(p => pathname === p || pathname.startsWith(`${p}/`))
+  // Read from the browser: on the server the pathname is the internal rewritten route, not the visible URL.
+  const pathname = useSyncExternalStore(noopSubscribe, () => window.location.pathname, () => null)
+  const isActive = (link: NavLink) => pathname !== null && (pathname === link.href || pathname.startsWith(`${link.href}/`))
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * threshold)

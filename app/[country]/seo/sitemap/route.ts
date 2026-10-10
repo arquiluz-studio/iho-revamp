@@ -44,8 +44,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cou
   const hrefs: PageHref[] = [
     '/',
     '/about',
-    '/areas',
-    '/verticals',
+    '/solutions',
+    '/spaces',
     '/events',
     '/projects',
     '/brands',
@@ -55,7 +55,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cou
     ...events.map(e => (l: AppLocale) => ({ pathname: '/events/[slug]' as const, params: { slug: localSlug(e, l) } })),
     ...projects.map(p => (l: AppLocale) => ({ pathname: '/projects/[slug]' as const, params: { slug: localSlug(p, l) } })),
     ...brands.map(b => ({ pathname: '/brands/[slug]' as const, params: { slug: b.slug } })),
-    ...lines.map(line => (l: AppLocale) => ({ pathname: '/areas/[businessLine]' as const, params: { businessLine: localSlug(line, l) } })),
+    ...lines.map(line => (l: AppLocale) => ({ pathname: '/solutions/[businessLine]' as const, params: { businessLine: localSlug(line, l) } })),
     ...sectors.map(s => (l: AppLocale) => ({ pathname: '/spaces/[sector]' as const, params: { sector: localSlug(s, l) } })),
     ...products.map(p => (l: AppLocale) => ({ pathname: '/products/[slug]' as const, params: { slug: localSlug(p, l) } })),
   ]

@@ -21,7 +21,7 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
     <>
       <PageHeader
         title="Biblioteca de media"
-        description={global ? 'Archivos globales (logos de marcas, productos, áreas y espacios).' : `Archivos de ${country.name_es}.`}
+        description={global ? 'Archivos globales (logos de marcas, productos, soluciones y espacios).' : `Archivos de ${country.name_es}.`}
       />
       <MediaLibrary
         key={`${scopeCountry}-${kind}-${status}-${params.q ?? ''}`}
