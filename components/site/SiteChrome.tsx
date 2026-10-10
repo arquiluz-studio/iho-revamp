@@ -59,7 +59,6 @@ export async function siteChrome({ country, locale, paths, threshold, contactHre
         contactHref={contactHref ?? paths.homeSection('contacto')}
         privacyHref={paths.privacy}
         socials={socials.map(s => ({ platform: s.platform, url: s.url, label: PLATFORM_LABELS[s.platform] ?? s.platform }))}
-        tools={<SiteTools country={country} placement="footer" localeHrefs={localeHrefs} />}
       />
     ),
   }

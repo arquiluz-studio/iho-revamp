@@ -1,6 +1,6 @@
 import 'server-only'
 import { getTranslations } from 'next-intl/server'
-import { countryOrigin, type AppLocale, type CountryCode } from '@/config/countries'
+import { countryOrigin, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
 import { dayOfMonth, isPastDate, longDate, shortMonth, timeOfDay, timeRange, type Locale } from '@/lib/dates'
 import { plainTitle } from '@/lib/events/ics'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
@@ -132,7 +132,7 @@ function toStats(value: unknown, locale: AppLocale): StatVM[] {
 
 async function mapCountries(current: CountryCode, locale: AppLocale): Promise<MapCountryVM[]> {
   const [countries, offices] = await Promise.all([getCountries(), getOffices()])
-  return countries
+  return sortByCountry(countries, current, locale, c => c.code)
     .map(c => {
       const own = offices.filter(o => o.country_code === c.code)
       const main = own.filter(o => o.is_main).map(o => cityDisplay(o.city))
@@ -145,15 +145,17 @@ async function mapCountries(current: CountryCode, locale: AppLocale): Promise<Ma
       // Single-office countries are labelled with the country name, as on the map legend.
       return { code: c.code, name, cities: cities.length > 1 ? cities : [name], isCurrent: c.code === current, hasSite: true }
     })
-    .sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent))
 }
 
-/** Current country's offices first, then the rest, muted. */
-export async function officesFor(current: CountryCode): Promise<OfficeVM[]> {
+/** Offices grouped by country in site order (see `sortByCountry`), cities alphabetical within each country; other countries muted. */
+export async function officesFor(current: CountryCode, locale: AppLocale): Promise<OfficeVM[]> {
   const offices = await getOffices()
-  const own = offices.filter(o => o.country_code === current)
-  const others = offices.filter(o => o.country_code !== current)
-  return [...own.map(o => ({ city: o.city, address: o.address })), ...others.map(o => ({ city: o.city, address: o.address, muted: true }))]
+  const byCity = [...offices].sort((a, b) => a.city.localeCompare(b.city, locale))
+  return sortByCountry(byCity, current, locale, o => o.country_code).map(o => ({
+    city: o.city,
+    address: o.address,
+    ...(o.country_code === current ? {} : { muted: true }),
+  }))
 }
 
 /** Group copy, map, brands, team and featured projects for the About page. */
@@ -190,7 +192,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
     getBusinessLines(),
     getCountryBrands(country),
     getProjects(country, { featured: true }),
-    officesFor(country),
+    officesFor(country, locale),
     getCountries().then(rows => rows.find(c => c.code === country)),
     featuredProducts(country, locale, paths),
   ])

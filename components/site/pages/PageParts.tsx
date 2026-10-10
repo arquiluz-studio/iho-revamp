@@ -70,15 +70,18 @@ export function SectionHeading({ label, title }: { label: string; title?: string
   )
 }
 
-export function ProjectCards({ projects }: { projects: ProjectCardVM[] }) {
+export function ProjectCards({ projects, twoColumns }: { projects: ProjectCardVM[]; twoColumns?: boolean }) {
   return (
-    <div className="iho-card-grid">
+    <div className={twoColumns ? 'iho-card-grid iho-card-grid--two' : 'iho-card-grid'}>
       {projects.map(p => (
         <a key={p.key} href={p.href} style={{ display: 'block', color: 'inherit' }}>
           <div className="iho-proj-card">
             <MediaImage image={p.image} sizes="(max-width: 768px) 100vw, 33vw" />
             <div className="pc-grad" />
             <div style={{ position: 'absolute', left: 22, right: 22, bottom: 20, pointerEvents: 'none' }}>
+              {p.meta && (
+                <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '1.2px', color: '#ef483d', marginBottom: 8 }}>{p.meta}</div>
+              )}
               <div
                 className="pc-title"
                 style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 24, lineHeight: 1, color: '#fff', textTransform: 'uppercase' }}

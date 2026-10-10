@@ -4,10 +4,10 @@ import { LocaleSwitcher } from './LocaleSwitcher'
 
 export type LocaleHrefs = Partial<Record<AppLocale, string>>
 
-export function SiteTools({ country, placement = 'header', localeHrefs }: { country: CountryCode; placement?: 'header' | 'footer'; localeHrefs?: LocaleHrefs }) {
+export function SiteTools({ country, localeHrefs }: { country: CountryCode; localeHrefs?: LocaleHrefs }) {
   return (
     <>
-      <CountrySwitcher current={country} countries={[...COUNTRY_CODES]} placement={placement} />
+      <CountrySwitcher current={country} countries={[...COUNTRY_CODES]} />
       <LocaleSwitcher hrefs={localeHrefs} />
     </>
   )

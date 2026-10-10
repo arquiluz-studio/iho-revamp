@@ -111,6 +111,20 @@ export function crossCountryUrl(code: CountryCode, current: { protocol: string; 
   return `${current.protocol}//${current.host}${path}${separator}country=${code}`
 }
 
+/** Site-wide country order: the country being visited first, then the rest alphabetically by localized name. */
+export function sortByCountry<T>(items: readonly T[], current: CountryCode, locale: AppLocale, codeOf: (item: T) => string): T[] {
+  const name = (item: T) => {
+    const code = codeOf(item)
+    return isCountryCode(code) ? COUNTRIES[code].name[locale] : code
+  }
+  return [...items].sort((a, b) => {
+    const aCurrent = codeOf(a) === current
+    const bCurrent = codeOf(b) === current
+    if (aCurrent !== bCurrent) return aCurrent ? -1 : 1
+    return name(a).localeCompare(name(b), locale)
+  })
+}
+
 export function htmlLang(locale: AppLocale, country: CountryCode): string {
   return `${locale}-${COUNTRIES[country].region}`
 }

@@ -3,12 +3,11 @@ import type { NavLink } from '@/lib/types/site'
 
 type Social = { platform: string; url: string; label: string }
 
-export function Footer({ homeHref, contactHref, privacyHref = '#', socials = [], tools }: {
+export function Footer({ homeHref, contactHref, privacyHref = '#', socials = [] }: {
   homeHref: string
   contactHref: string
   privacyHref?: string
   socials?: Social[]
-  tools?: React.ReactNode
 }) {
   const t = useTranslations('footer')
   const links: NavLink[] = [
@@ -28,7 +27,6 @@ export function Footer({ homeHref, contactHref, privacyHref = '#', socials = [],
             <a key={s.url} href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: '#c9c4ba' }}>{s.label}</a>
           ))}
           {links.map(l => <a key={l.label} href={l.href} style={{ color: '#c9c4ba' }}>{l.label}</a>)}
-          {tools}
         </div>
       </div>
     </footer>

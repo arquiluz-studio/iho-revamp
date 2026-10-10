@@ -32,7 +32,7 @@
   "switchers": {
     "country": "Country",
     "language": "Language",
-    "geoBanner": "Looks like you're in {country}.",
+    "selectCountry": "Select your country",    "geoBanner": "Looks like you're in {country}.",
     "geoBannerCta": "Go to IHO {country}",
     "dismiss": "Dismiss"
   },
@@ -158,7 +158,7 @@
   "pages": {
     "events": { "label": "— EVENTS", "title": "Events and\nlaunches.", "upcoming": "Upcoming", "past": "Past", "empty": "No events right now." },
     "about": { "label": "— ABOUT" },
-    "projects": { "label": "— PROJECTS", "title": "IHO\nprojects.", "empty": "No published projects yet.", "client": "Client", "year": "Year", "city": "City", "sector": "Vertical", "brandsUsed": "Brands", "gallery": "Gallery", "download": "Download high resolution", "areas": "Areas", "related": "— MORE PROJECTS" },
+    "projects": { "label": "— PROJECTS", "title": "IHO\nprojects.", "empty": "No published projects yet.", "noMatch": "No projects match these filters.", "count": "{count} projects", "filters": "Filters", "clear": "Clear", "filterCountry": "Country", "filterVertical": "Vertical", "filterArea": "Area", "client": "Client", "year": "Year", "city": "City", "sector": "Vertical", "brandsUsed": "Brands", "gallery": "Gallery", "download": "Download high resolution", "areas": "Areas", "related": "— MORE PROJECTS" },
     "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand", "origin": "Origin" },
     "areas": { "label": "— AREAS", "empty": "No areas published yet.", "brands": "Brands in this area", "projects": "Projects" },
     "verticals": { "label": "— VERTICALS", "title": "IHO\nverticals.", "empty": "No verticals published yet." },

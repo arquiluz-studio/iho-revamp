@@ -32,7 +32,7 @@
   "switchers": {
     "country": "País",
     "language": "Idioma",
-    "geoBanner": "Parece que estás en {country}.",
+    "selectCountry": "Selecciona tu país",    "geoBanner": "Parece que estás en {country}.",
     "geoBannerCta": "Ir a IHO {country}",
     "dismiss": "Cerrar"
   },
@@ -158,7 +158,7 @@
   "pages": {
     "events": { "label": "— EVENTOS", "title": "Eventos y\nlanzamientos.", "upcoming": "Próximos", "past": "Realizados", "empty": "No hay eventos por ahora." },
     "about": { "label": "— NOSOTROS" },
-    "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Vertical", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "areas": "Áreas", "related": "— MÁS PROYECTOS" },
+    "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "noMatch": "Ningún proyecto coincide con estos filtros.", "count": "{count} proyectos", "filters": "Filtros", "clear": "Limpiar", "filterCountry": "País", "filterVertical": "Vertical", "filterArea": "Área", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Vertical", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "areas": "Áreas", "related": "— MÁS PROYECTOS" },
     "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
     "areas": { "label": "— ÁREAS", "empty": "Aún no hay áreas publicadas.", "brands": "Marcas del área", "projects": "Proyectos" },
     "verticals": { "label": "— VERTICALES", "title": "Verticales\nIHO.", "empty": "Aún no hay verticales publicadas." },

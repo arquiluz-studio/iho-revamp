@@ -24,7 +24,7 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
     getTranslations({ locale, namespace: 'contact' }),
     getTranslations({ locale, namespace: 'pages.contact' }),
     getCountrySettings(country),
-    officesFor(country),
+    officesFor(country, locale),
     getCountry(country),
     innerChrome(country, locale, paths),
   ])

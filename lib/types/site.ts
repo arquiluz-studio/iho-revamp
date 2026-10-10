@@ -90,6 +90,8 @@ export type ProjectCardVM = {
   description: string
   image: ImageVM
   href?: string
+  /** Country and vertical, shown on the projects index. */
+  meta?: string
 }
 
 export type StatVM = { value: number; prefix: string; suffix: string; label: string }

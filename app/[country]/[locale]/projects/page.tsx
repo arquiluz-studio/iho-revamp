@@ -1,12 +1,15 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
-import { Chips, EmptyNote, PageHero, PageShell, ProjectCards } from '@/components/site/pages/PageParts'
+import { PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ProjectBrowser, type BrowserProject } from '@/components/site/ProjectBrowser'
 import { innerChrome } from '@/components/site/SiteChrome'
+import { COUNTRIES, COUNTRY_CODES, crossCountryUrl, sortByCountry } from '@/config/countries'
 import { sitePaths } from '@/lib/content/paths'
 import { toProjectCardVM } from '@/lib/content/site'
 import { localSlug, t } from '@/lib/i18n-fields'
 import { getProjects } from '@/lib/queries/projects'
-import { getSectors } from '@/lib/queries/site'
+import { getBusinessLines, getSectors } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
@@ -19,25 +22,42 @@ export async function generateMetadata({ params }: { params: Promise<SiteParams>
 export default async function ProjectsPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
-  const [tp, th, projects, sectors, chrome] = await Promise.all([
+  const h = await headers()
+  const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost'
+  const proto = h.get('x-forwarded-proto') ?? 'http'
+  const protocol = proto.endsWith(':') ? proto : `${proto}:`
+  const [tp, th, grouped, sectors, lines, chrome] = await Promise.all([
     getTranslations({ locale, namespace: 'pages.projects' }),
     getTranslations({ locale, namespace: 'home.projects' }),
-    getProjects(country),
+    Promise.all(COUNTRY_CODES.map(async code => ({ code, rows: await getProjects(code) }))),
     getSectors(),
+    getBusinessLines(),
     innerChrome(country, locale, paths),
   ])
-  const usedSectors = sectors.filter(s => projects.some(p => p.sector?.id === s.id))
-  const cards = projects.map(p => toProjectCardVM(p, locale, paths))
+
+  const projects: BrowserProject[] = grouped.flatMap(({ code, rows }) =>
+    rows.map(project => {
+      const card = toProjectCardVM(project, locale, paths)
+      const path = paths.project(localSlug(project, locale))
+      const vertical = project.sector ? t(project.sector, 'name', locale) : ''
+      return {
+        ...card,
+        href: code === country ? path : crossCountryUrl(code, { protocol, host }, path),
+        meta: [COUNTRIES[code].name[locale], vertical].filter(Boolean).join(' · '),
+        country: code,
+        verticalId: project.sector?.id ?? null,
+        areaIds: project.business_lines.flatMap(link => (link.business_line ? [link.business_line.id] : [])),
+      }
+    }),
+  )
+  const countries = sortByCountry(COUNTRY_CODES, country, locale, code => code).map(code => ({ id: code, label: COUNTRIES[code].name[locale] }))
+  const verticals = sectors.map(sector => ({ id: sector.id, label: t(sector, 'name', locale) }))
+  const areas = lines.map(line => ({ id: line.id, label: t(line, 'name', locale) }))
+
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={tp('title')} intro={th('intro')} image={cards[0]?.image}>
-        {usedSectors.length > 1 && (
-          <div style={{ marginTop: 32 }} className="iho-chips-dark">
-            <Chips links={usedSectors.map(s => ({ href: paths.space(localSlug(s, locale)), label: t(s, 'name', locale) }))} />
-          </div>
-        )}
-      </PageHero>
-      <section className="iho-page-section">{cards.length ? <ProjectCards projects={cards} /> : <EmptyNote>{tp('empty')}</EmptyNote>}</section>
+      <PageHero label={tp('label')} title={tp('title')} intro={th('intro')} image={projects.find(project => project.country === country)?.image ?? projects[0]?.image} />
+      <ProjectBrowser projects={projects} countries={countries} verticals={verticals} areas={areas} />
     </PageShell>
   )
 }
