@@ -11,7 +11,8 @@ export type ImageVM = {
   color?: string | null
 }
 
-export type NavLink = { href: string; label: string }
+/** `activeOn`: internal (unlocalized) pathname prefixes under which the link shows as current, e.g. `/projects`. */
+export type NavLink = { href: string; label: string; activeOn?: string[] }
 
 export type EventVM = {
   slug: string

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
+import { preload } from 'react-dom'
 import { GeoBanner } from '@/components/site/GeoBanner'
 import { COUNTRY_CODES, countryOrigin, htmlLang } from '@/config/countries'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
@@ -22,6 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<SiteParams>
 
 export default async function SiteLayout({ children, params }: { children: React.ReactNode; params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
+  preload('/fonts/119f296f.woff2', { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' })
   return (
     <html lang={htmlLang(locale, country)}>
       <body>
