@@ -1827,6 +1827,23 @@ export type Database = {
           price_list_id: string
         }[]
       }
+      register_for_event: {
+        Args: {
+          p_companions: number
+          p_company: string
+          p_consent_marketing: boolean
+          p_email: string
+          p_event_id: string
+          p_full_name: string
+          p_locale: string
+          p_pass_type: string
+          p_phone: string
+        }
+        Returns: {
+          registration_id: string
+          registration_status: Database["public"]["Enums"]["registration_status"]
+        }[]
+      }
     }
     Enums: {
       content_status: "draft" | "published" | "archived"

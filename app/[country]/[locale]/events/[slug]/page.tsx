@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { EventView } from '@/components/site/event/EventView'
 import { siteChrome } from '@/components/site/SiteChrome'
+import { registerForEvent } from '@/lib/actions/events'
 import { sitePaths } from '@/lib/content/paths'
 import { getEventDetailVM } from '@/lib/content/site'
+import { plainTitle } from '@/lib/events/ics'
 import { t } from '@/lib/i18n-fields'
 import { getEventBySlug, getEvents } from '@/lib/queries/events'
 import { buildAlternates } from '@/lib/seo'
@@ -26,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const event = await getEventBySlug(country, slug)
   if (!event) return {}
   return {
-    title: `${t(event, 'title', locale).replace(/[\n*]/g, ' ').replace(/\s+/g, ' ').trim()} — IHO`,
+    title: `${plainTitle(t(event, 'title', locale))} — IHO`,
     description: t(event, 'summary', locale) || undefined,
     alternates: buildAlternates({ href: { pathname: '/events/[slug]', params: { slug } }, country, locale, availableIn: [country] }),
   }
@@ -52,5 +54,5 @@ export default async function EventPage({ params }: { params: Promise<Params> })
     ],
     cta: showRegistration ? { href: '#registro', label: tn('requestPass') } : { href: paths.homeSection('contacto'), label: tn('contact') },
   })
-  return <EventView event={event} contactHref={paths.homeSection('contacto')} privacyHref={paths.privacy} chrome={chrome} />
+  return <EventView event={event} contactHref={paths.homeSection('contacto')} privacyHref={paths.privacy} chrome={chrome} register={registerForEvent} />
 }

@@ -1,17 +1,19 @@
 import 'server-only'
 import { getTranslations } from 'next-intl/server'
-import type { AppLocale, CountryCode } from '@/config/countries'
+import { countryOrigin, type AppLocale, type CountryCode } from '@/config/countries'
 import { dayOfMonth, isPastDate, longDate, shortMonth, timeOfDay, timeRange, type Locale } from '@/lib/dates'
+import { plainTitle } from '@/lib/events/ics'
 import { paragraphs, t } from '@/lib/i18n-fields'
 import { toImageVM, videoUrl, type ImageVariant, type MediaRef } from '@/lib/media'
 import { getCountryBrands, type CountryBrandRow } from '@/lib/queries/brands'
 import { formatPrice, getCatalog, type CatalogRow } from '@/lib/queries/catalog'
-import { getEventBySlug, getEvents, type EventListRow } from '@/lib/queries/events'
+import { getEventBySlug, getEvents, type EventDetailRow, type EventListRow } from '@/lib/queries/events'
 import { getProjects, type ProjectListRow } from '@/lib/queries/projects'
 import { getBusinessLines, getCountries, getCountrySettings, getOffices, getSectors, getTeam } from '@/lib/queries/site'
+import { buildAlternates } from '@/lib/seo'
 import type { AreaCardVM, BrandVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
 import { cityChip, cityDisplay } from './cities'
-import { LEGACY_PRODUCTS, legacyMedia } from './legacy-media'
+import { legacyMedia } from './legacy-media'
 import type { SitePaths } from './paths'
 
 const PLACEHOLDER_COLOR = '#d9d4ca'
@@ -83,10 +85,6 @@ export function toProjectCardVM(p: ProjectListRow, locale: AppLocale, paths: Sit
   }
 }
 
-function placeholderProducts(href: string): ProductCardVM[] {
-  return LEGACY_PRODUCTS.map((p, i) => ({ key: `p${i}`, name: p.name, category: p.category, href, image: { src: `/${p.image}`, alt: p.name } }))
-}
-
 /** Price label of a catalog row, or null when the product is quote-only in the country. */
 export function priceLabels(offer: { amount: number | null; compareAt: number | null; currency: string | null } | null, locale: AppLocale, country: string) {
   if (!offer || offer.amount == null || !offer.currency) return null
@@ -104,7 +102,7 @@ export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: strin
     key: p.id,
     name,
     category: category ? t(category, 'name', locale).toUpperCase() : undefined,
-    href: paths.product(p.slug),
+    href: labels ? paths.product(p.slug) : `${paths.product(p.slug)}#cotizar`,
     image: imageOf(p.cover, locale, name, legacyMedia.productCover(p.slug), 'md'),
     price: labels?.price,
     compareAt: labels?.compareAt,
@@ -213,8 +211,61 @@ export async function getEventsVM(country: CountryCode, locale: AppLocale, paths
   return events.map(e => toEventVM(e, locale, countryName, labels, paths))
 }
 
+const EVENT_PRODUCT_LIMIT = 8
+
+/** Curated `event_products` first, then products of the linked brands; only those visible in the country. */
+function eventProducts(event: EventDetailRow, catalog: CatalogRow[]): CatalogRow[] {
+  const byId = new Map(catalog.map(p => [p.id, p]))
+  const picked = new Map<string, CatalogRow>()
+  for (const { product_id } of event.products) {
+    const p = byId.get(product_id)
+    if (p) picked.set(p.id, p)
+  }
+  const brandIds = new Set(event.brands.flatMap(b => (b.brand ? [b.brand.id] : [])))
+  for (const p of catalog) {
+    if (picked.size >= EVENT_PRODUCT_LIMIT) break
+    if (p.brand && brandIds.has(p.brand.id)) picked.set(p.id, p)
+  }
+  return [...picked.values()].slice(0, EVENT_PRODUCT_LIMIT)
+}
+
+const absoluteUrl = (src: string, origin: string) => (src.startsWith('/') ? `${origin}${src}` : src)
+
+function eventJsonLd(event: EventDetailRow, vm: { title: string; description: string; url: string; image: ImageVM }, country: CountryCode, currency: string, open: boolean) {
+  const origin = countryOrigin(country)
+  const location = event.is_online
+    ? { '@type': 'VirtualLocation', url: event.online_url ?? vm.url }
+    : {
+        '@type': 'Place',
+        name: event.venue_name ?? event.city ?? undefined,
+        address: { '@type': 'PostalAddress', streetAddress: event.address ?? undefined, addressLocality: event.city ?? undefined, addressCountry: country.toUpperCase() },
+      }
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: plainTitle(vm.title),
+    description: vm.description || undefined,
+    startDate: event.starts_at,
+    endDate: event.ends_at ?? undefined,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: event.is_online ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
+    location,
+    image: vm.image.src.startsWith('data:') ? undefined : [absoluteUrl(vm.image.src, origin)],
+    url: vm.url,
+    organizer: { '@type': 'Organization', name: 'Grupo IHO', url: origin },
+    ...(open && {
+      offers: { '@type': 'Offer', price: 0, priceCurrency: currency, availability: 'https://schema.org/InStock', url: `${vm.url}#registro`, validFrom: event.created_at },
+    }),
+  }
+}
+
 export async function getEventDetailVM(country: CountryCode, locale: AppLocale, slug: string, paths: SitePaths): Promise<EventDetailVM | null> {
-  const [labels, event, countryRow] = await Promise.all([eventLabels(locale), getEventBySlug(country, slug), getCountries().then(r => r.find(c => c.code === country))])
+  const [labels, event, countryRow, catalog] = await Promise.all([
+    eventLabels(locale),
+    getEventBySlug(country, slug),
+    getCountries().then(r => r.find(c => c.code === country)),
+    getCatalog(country),
+  ])
   if (!event) return null
   const countryName = countryRow ? t(countryRow, 'name', locale) : country.toUpperCase()
   const base = toEventVM(event, locale, countryName, labels, paths)
@@ -227,7 +278,9 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
   const gallery = event.gallery.length
     ? event.gallery.flatMap(g => (g.media ? [imageOf(g.media, locale, base.title, null, 'lg')] : []))
     : legacyGallery.map((src, i) => ({ src, alt: `${base.title} ${i + 1}` }))
-  const closesAt = event.registration_closes_at ? new Date(event.registration_closes_at) : null
+  const enabled = event.registration_enabled && event.access_type !== 'invite_only'
+  const closed = new Date(event.registration_closes_at ?? event.starts_at) < new Date()
+  const url = String(buildAlternates({ href: { pathname: '/events/[slug]', params: { slug } }, country, locale, availableIn: [country] }).canonical)
 
   return {
     ...base,
@@ -241,7 +294,9 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
     agenda: event.agenda.map((a, i) => ({ num: a.time_label || String(i + 1).padStart(2, '0'), text: t(a, 'text', locale) })),
     gallery,
     brands: event.brands.flatMap(b => (b.brand && b.brand.is_active ? [toBrandVM(b.brand, locale, paths)] : [])),
-    products: legacyGallery.length ? placeholderProducts(paths.products) : [],
-    registration: { enabled: event.registration_enabled, closed: closesAt ? closesAt < new Date() : false },
+    products: eventProducts(event, catalog).map(p => toProductCardVM(p, locale, country, paths)),
+    registration: { enabled, closed },
+    icsHref: `/api/events/${event.id}/ics?lang=${locale}`,
+    jsonLd: eventJsonLd(event, { title: base.title, description: t(event, 'summary', locale) || body.slice(0, 300), url, image: base.image }, country, countryRow?.currency ?? 'USD', enabled && !closed && !base.isPast),
   }
 }

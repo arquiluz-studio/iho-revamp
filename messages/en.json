@@ -132,7 +132,21 @@
       "submit": "Submit registration",
       "success": "REGISTRATION SENT · WE'LL CONFIRM BY EMAIL",
       "waitlist": "EVENT FULL · YOU'RE ON THE WAITLIST",
-      "closed": "Registration for this event is closed."
+      "closed": "Registration for this event is closed.",
+      "duplicate": "This email is already registered for the event.",
+      "unavailable": "Registration is not available.",
+      "confirmationEmail": {
+        "confirmedSubject": "Registration confirmed · {event}",
+        "waitlistSubject": "Waitlist · {event}",
+        "greeting": "Hi {name},",
+        "confirmedBody": "Your registration for {event} is confirmed. See you there.",
+        "waitlistBody": "{event} is full, so you are on the waitlist. We will email you if a spot opens up.",
+        "when": "Date",
+        "where": "Venue",
+        "calendar": "Add to calendar",
+        "details": "View the event",
+        "signature": "Grupo IHO"
+      }
     },
     "brands": { "label": "— PARTICIPATING BRANDS" },
     "products": { "label": "— EVENT CATALOG", "title": "Products on\ndisplay.", "count": "{count} PIECES", "quote": "Request a quote" },
@@ -145,7 +159,8 @@
     "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand", "origin": "Origin" },
     "areas": { "label": "— AREAS", "brands": "Brands in this area", "projects": "Projects" },
     "spaces": { "label": "— SPACES", "projects": "Projects" },
-    "products": { "label": "— PRODUCTS", "title": "Catalog.", "empty": "No products available in this country.", "all": "All", "brand": "Brand", "designer": "Designer", "specs": "Specifications", "variants": "Variants", "leadTime": "Ships in {days} days", "onRequest": "Made to order", "inStock": "In stock", "inquiry": "Request a quote", "inquirySent": "We received your request.", "price": "Price", "availability": "Availability", "sale": "Sale", "from": "From {price}", "inquiryTitle": "Interested in this product?", "inquiryMessage": "I would like a quote for {product}." },
+    "products": { "label": "— PRODUCTS", "title": "Catalog.", "empty": "No products available in this country.", "all": "All", "brand": "Brand", "designer": "Designer", "specs": "Specifications", "variants": "Variants", "leadTime": "Ships in {days} days", "onRequest": "Made to order", "inStock": "In stock", "inquiry": "Request a quote", "inquirySent": "We received your request.", "price": "Price", "availability": "Availability", "sale": "Sale", "from": "From {price}", "quote": "Request a quote",
+      "inquiryTitle": "Interested in this product?", "inquiryMessage": "I would like a quote for {product}." },
     "contact": { "label": "— CONTACT", "offices": "Offices" },
     "privacy": {
       "label": "— LEGAL",

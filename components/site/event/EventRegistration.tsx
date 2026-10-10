@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { ButtonArrow } from '@/components/ui/Arrow'
 import { RichText } from '@/components/ui/Section'
+import { Turnstile } from '@/components/ui/Turnstile'
 import { ACUMIN } from '@/components/ui/tokens'
 
 const MONO = '"Space Mono", monospace'
@@ -50,6 +51,7 @@ function DarkSelect({ label, name, value, onChange, options }: { label: string; 
 export function EventRegistration({ eventId, closed = false, privacyHref = '#', action }: Props) {
   const t = useTranslations('event.registration')
   const tc = useTranslations('common')
+  const locale = useLocale()
   const [form, setForm] = useState({ fullName: '', company: '', email: '', phone: '', passType: 'general', companions: '0', website: '' })
   const [consentPrivacy, setConsentPrivacy] = useState(false)
   const [consentMarketing, setConsentMarketing] = useState(false)
@@ -86,6 +88,7 @@ export function EventRegistration({ eventId, closed = false, privacyHref = '#', 
       fd.set('consentPrivacy', consentPrivacy ? 'on' : '')
       fd.set('consentMarketing', consentMarketing ? 'on' : '')
       if (eventId) fd.set('eventId', eventId)
+      fd.set('locale', locale)
       const res = await action(fd)
       if (res.ok) setResult(res.status)
       else {
@@ -135,6 +138,7 @@ export function EventRegistration({ eventId, closed = false, privacyHref = '#', 
               <input type="checkbox" checked={consentMarketing} onChange={e => setConsentMarketing(e.target.checked)} style={{ width: 17, height: 17, accentColor: '#ef483d', marginTop: 2, flexShrink: 0, cursor: 'pointer' }} />
               <span style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.6)' }}>{t('marketing')}</span>
             </label>
+            <Turnstile />
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
               <button type="submit" disabled={submitting || result !== null} className="iho-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#ef483d', color: '#fff', border: 'none', padding: '16px 30px', borderRadius: 32, fontFamily: SANS, fontWeight: 600, fontSize: 15, cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
                 {submitting ? tc('sending') : t('submit')}

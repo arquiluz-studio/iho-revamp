@@ -175,7 +175,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                 </ul>
               </div>
             )}
-            <div style={{ background: '#f1ece3', borderRadius: 4, padding: 28 }}>
+            <div id="cotizar" style={{ background: '#f1ece3', borderRadius: 4, padding: 28, scrollMarginTop: 96 }}>
               <h2 style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 26, textTransform: 'uppercase', margin: '0 0 20px', color: '#17150f' }}>
                 {tp('inquiryTitle')}
               </h2>

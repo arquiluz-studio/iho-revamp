@@ -334,4 +334,40 @@ begin
 end $$;
 reset role;
 
+-- event registration: capacity → waitlist, duplicates, closing time, service role only ------------------
+insert into public.events (id, country_code, slug, title_es, starts_at, status, registration_enabled, capacity, access_type) values
+  ('10000000-0000-4000-8000-0000000000aa', 'mx', 'test-capacity', 'Cupo', now() + interval '5 days', 'published', true, 3, 'registration_required');
+
+do $$
+declare s public.registration_status;
+begin
+  select registration_status into s from public.register_for_event('10000000-0000-4000-8000-0000000000aa', 'A', null, 'A@test.iho', '1', 'general', 1, 'es', false);
+  if s <> 'confirmed' then raise exception 'registration: first should be confirmed'; end if;
+  select registration_status into s from public.register_for_event('10000000-0000-4000-8000-0000000000aa', 'B', null, 'b@test.iho', '1', 'general', 1, 'es', false);
+  if s <> 'waitlist' then raise exception 'registration: 2 + 2 seats > 3 should be waitlisted'; end if;
+  select registration_status into s from public.register_for_event('10000000-0000-4000-8000-0000000000aa', 'C', null, 'c@test.iho', '1', 'general', 0, 'es', false);
+  if s <> 'confirmed' then raise exception 'registration: 2 + 1 seats = 3 should fit'; end if;
+  begin
+    perform public.register_for_event('10000000-0000-4000-8000-0000000000aa', 'A2', null, 'a@TEST.iho', '1', 'general', 0, 'es', false);
+    raise exception 'registration: duplicate email should fail';
+  exception when unique_violation then null;
+  end;
+  update public.events set registration_closes_at = now() - interval '1 hour' where id = '10000000-0000-4000-8000-0000000000aa';
+  begin
+    perform public.register_for_event('10000000-0000-4000-8000-0000000000aa', 'D', null, 'd@test.iho', '1', 'general', 0, 'es', false);
+    raise exception 'registration: closed registration should fail';
+  exception when raise_exception then
+    if sqlerrm <> 'registration_closed' then raise; end if;
+  end;
+end $$;
+
+set local role anon;
+do $$
+begin
+  perform public.register_for_event('10000000-0000-4000-8000-0000000000aa', 'X', null, 'x@test.iho', '1', 'general', 0, 'es', false);
+  raise exception 'anon: must not register directly';
+exception when insufficient_privilege then null;
+end $$;
+reset role;
+
 rollback;

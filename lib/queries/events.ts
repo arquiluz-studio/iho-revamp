@@ -25,7 +25,7 @@ export async function getUpcomingEvents(country: string, now: Date = new Date())
 }
 
 export function getEventBySlug(country: string, slug: string) {
-  return cachedQuery(['event', country, slug], [cacheTags.country(country, 'events')], async ({ db, draft }) => {
+  return cachedQuery(['event-detail', country, slug], [cacheTags.country(country, 'events')], async ({ db, draft }) => {
     const event = maybe(
       await db
         .from('events')
@@ -33,7 +33,8 @@ export function getEventBySlug(country: string, slug: string) {
           `*, cover:${media('events_cover_media_id_fkey')},
           agenda:event_agenda_items(sort, time_label, text_es, text_en),
           gallery:event_media(sort, media:${media('event_media_media_id_fkey')}),
-          brands:event_brands(brand:brands(id, slug, name, logo_is_thin, is_active, logo:${media('brands_logo_media_id_fkey')}))` as const,
+          brands:event_brands(brand:brands(id, slug, name, logo_is_thin, is_active, logo:${media('brands_logo_media_id_fkey')})),
+          products:event_products(sort, product_id)` as const,
         )
         .eq('country_code', country)
         .eq('slug', slug)
@@ -46,6 +47,7 @@ export function getEventBySlug(country: string, slug: string) {
       ...event,
       agenda: [...event.agenda].sort((a, b) => a.sort - b.sort),
       gallery: [...event.gallery].sort((a, b) => a.sort - b.sort),
+      products: [...event.products].sort((a, b) => a.sort - b.sort),
     }
   })
 }

@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl'
 import { MediaImage } from '@/components/ui/MediaImage'
 import type { ProductCardVM } from '@/lib/types/site'
 
 type Props = { product: ProductCardVM; showCategory?: boolean; ariaHidden?: boolean }
 
 export function ProductCard({ product, showCategory = false, ariaHidden }: Props) {
+  const t = useTranslations('pages.products')
   const category = showCategory ? product.category : undefined
   return (
     <a
@@ -34,7 +36,7 @@ export function ProductCard({ product, showCategory = false, ariaHidden }: Props
         <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 12, letterSpacing: '0.5px', color: '#17150f', marginTop: 6, display: 'flex', gap: 10, alignItems: 'baseline' }}>
           {product.price && <span>{product.price}</span>}
           {product.compareAt && <span style={{ color: '#8a8478', textDecoration: 'line-through' }}>{product.compareAt}</span>}
-          {!product.price && product.inquiry && <span style={{ color: '#ef483d' }}>→</span>}
+          {!product.price && product.inquiry && <span style={{ color: '#ef483d', textTransform: 'uppercase' }}>{t('quote')} →</span>}
         </div>
       )}
     </a>

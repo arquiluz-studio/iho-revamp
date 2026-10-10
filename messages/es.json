@@ -132,7 +132,21 @@
       "submit": "Enviar registro",
       "success": "REGISTRO ENVIADO · TE CONFIRMAMOS POR CORREO",
       "waitlist": "CUPO LLENO · QUEDASTE EN LISTA DE ESPERA",
-      "closed": "El registro para este evento está cerrado."
+      "closed": "El registro para este evento está cerrado.",
+      "duplicate": "Este correo ya está registrado para el evento.",
+      "unavailable": "El registro no está disponible.",
+      "confirmationEmail": {
+        "confirmedSubject": "Registro confirmado · {event}",
+        "waitlistSubject": "Lista de espera · {event}",
+        "greeting": "Hola {name},",
+        "confirmedBody": "Tu registro para {event} está confirmado. Te esperamos.",
+        "waitlistBody": "El cupo de {event} está lleno; quedaste en lista de espera. Te escribiremos si se libera un lugar.",
+        "when": "Fecha",
+        "where": "Lugar",
+        "calendar": "Agregar al calendario",
+        "details": "Ver el evento",
+        "signature": "Grupo IHO"
+      }
     },
     "brands": { "label": "— MARCAS PARTICIPANTES" },
     "products": { "label": "— CATÁLOGO DEL EVENTO", "title": "Productos en\nexhibición.", "count": "{count} PIEZAS", "quote": "Cotizar" },
@@ -145,7 +159,8 @@
     "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
     "areas": { "label": "— ÁREAS", "brands": "Marcas del área", "projects": "Proyectos" },
     "spaces": { "label": "— ESPACIOS", "projects": "Proyectos" },
-    "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud.", "price": "Precio", "availability": "Disponibilidad", "sale": "Oferta", "from": "Desde {price}", "inquiryTitle": "¿Te interesa este producto?", "inquiryMessage": "Me interesa cotizar {product}." },
+    "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud.", "price": "Precio", "availability": "Disponibilidad", "sale": "Oferta", "from": "Desde {price}", "quote": "Cotizar",
+      "inquiryTitle": "¿Te interesa este producto?", "inquiryMessage": "Me interesa cotizar {product}." },
     "contact": { "label": "— CONTACTO", "offices": "Oficinas" },
     "privacy": {
       "label": "— LEGAL",

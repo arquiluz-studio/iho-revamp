@@ -6,8 +6,6 @@ import { COUNTRY_CODES, countryOrigin, htmlLang } from '@/config/countries'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
 import '../../globals.css'
 
-export const dynamicParams = false
-
 export function generateStaticParams() {
   return siteStaticParams()
 }
