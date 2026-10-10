@@ -2,6 +2,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { useTranslations } from 'next-intl'
 import type { NavLink } from '@/lib/types/site'
+import { SubnavBar, SubnavProvider, useSubnav } from './SubnavBar'
 
 const noopSubscribe = () => () => {}
 
@@ -17,13 +18,23 @@ type Props = {
   tools?: React.ReactNode
 }
 
-export function Header({ logoHref, links, cta, shop, threshold = 0.75, tools }: Props) {
+export function Header(props: Props) {
+  return (
+    <SubnavProvider>
+      <HeaderBar {...props} />
+    </SubnavProvider>
+  )
+}
+
+function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, tools }: Props) {
   const t = useTranslations('common')
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const subnav = useSubnav()
   // Read from the browser: on the server the pathname is the internal rewritten route, not the visible URL.
   const pathname = useSyncExternalStore(noopSubscribe, () => window.location.pathname, () => null)
-  const isActive = (link: NavLink) => pathname !== null && (pathname === link.href || pathname.startsWith(`${link.href}/`))
+  const matches = (href: string) => pathname !== null && (pathname === href || pathname.startsWith(`${href}/`))
+  const isActive = (link: NavLink) => matches(link.href)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * threshold)
@@ -43,9 +54,30 @@ export function Header({ logoHref, links, cta, shop, threshold = 0.75, tools }: 
           <img src={scrolled ? '/images/logo-iho-black.png' : '/images/logo-iho-white.png'} alt="IHO" style={{ height: 36, display: 'block' }} />
         </a>
         <nav className={menuOpen ? 'iho-nav-open' : ''} style={{ display: 'flex', alignItems: 'center', gap: 34, fontFamily: '"Source Sans 3", sans-serif', fontSize: 15, fontWeight: 500, color: navColor }}>
-          {links.map(l => (
-            <a key={l.href} href={l.href} className="iho-nav-link" aria-current={isActive(l) ? 'page' : undefined} onClick={close}>{l.label}</a>
-          ))}
+          {links.map(l => {
+            if (!l.items) {
+              return <a key={l.href} href={l.href} className="iho-nav-link" aria-current={isActive(l) ? 'page' : undefined} onClick={close}>{l.label}</a>
+            }
+            const id = `iho-subnav-${l.href.split('/').filter(Boolean).pop() ?? 'menu'}`
+            const isOpen = subnav.open === id
+            return (
+              <div key={l.href} className={`iho-nav-group${isOpen ? ' is-open' : ''}`}>
+                <button type="button" className="iho-nav-link iho-nav-toggle" aria-current={isActive(l) ? 'page' : undefined} aria-expanded={isOpen} aria-controls={id} onClick={() => subnav.toggle(id)}>
+                  {l.label}
+                </button>
+                {isOpen && (
+                  <SubnavBar
+                    id={id}
+                    label={l.label}
+                    items={[
+                      ...l.items.map(item => ({ href: item.href, label: item.label, current: matches(item.href) })),
+                      ...(l.allLabel ? [{ href: l.href, label: l.allLabel, current: pathname === l.href }] : []),
+                    ]}
+                  />
+                )}
+              </div>
+            )
+          })}
           {shop && (
             <a href={shop.href} className="iho-nav-link" aria-current={isActive(shop) ? 'page' : undefined} onClick={close} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <svg aria-hidden="true" width={10} height={10} viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="square" style={{ display: 'block', flex: 'none' }}>

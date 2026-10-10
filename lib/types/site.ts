@@ -11,7 +11,8 @@ export type ImageVM = {
   color?: string | null
 }
 
-export type NavLink = { href: string; label: string }
+/** With `items`, the link opens a secondary bar listing them (plus `allLabel` → `href`) instead of navigating. */
+export type NavLink = { href: string; label: string; items?: NavLink[]; allLabel?: string }
 
 export type EventVM = {
   slug: string

@@ -2,7 +2,8 @@ import 'server-only'
 import { getTranslations } from 'next-intl/server'
 import type { AppLocale, CountryCode } from '@/config/countries'
 import type { SitePaths } from '@/lib/content/paths'
-import { getSocialAccounts } from '@/lib/queries/site'
+import { localSlug, t } from '@/lib/i18n-fields'
+import { getBusinessLines, getSectors, getSocialAccounts } from '@/lib/queries/site'
 import type { NavLink } from '@/lib/types/site'
 import { Footer } from './Footer'
 import { Header } from './Header'
@@ -42,11 +43,26 @@ export async function siteChrome({ country, locale, paths, threshold, contactHre
   /** Language switcher targets when the page slug differs per locale. */
   localeHrefs?: LocaleHrefs
 }): Promise<SiteChrome> {
-  const [socials, tn] = await Promise.all([getSocialAccounts(country), getTranslations({ locale, namespace: 'nav' })])
+  const [socials, tn, lines, sectors] = await Promise.all([
+    getSocialAccounts(country),
+    getTranslations({ locale, namespace: 'nav' }),
+    getBusinessLines(),
+    getSectors(),
+  ])
   const links: NavLink[] = [
     { href: paths.group, label: tn('group') },
-    { href: paths.solutions, label: tn('solutions') },
-    { href: paths.spaces, label: tn('spaces') },
+    {
+      href: paths.solutions,
+      label: tn('solutions'),
+      allLabel: tn('allSolutions'),
+      items: lines.map(line => ({ href: paths.solution(localSlug(line, locale)), label: t(line, 'name', locale) })),
+    },
+    {
+      href: paths.spaces,
+      label: tn('spaces'),
+      allLabel: tn('allSpaces'),
+      items: sectors.map(sector => ({ href: paths.space(localSlug(sector, locale)), label: t(sector, 'name', locale) })),
+    },
     { href: paths.projects, label: tn('projects') },
     { href: paths.events, label: tn('events') },
   ]
