@@ -32,8 +32,7 @@ export function Header({ logoHref, links, cta, shop, threshold = 0.75, tools }: 
     return () => window.removeEventListener('scroll', onScroll)
   }, [threshold])
 
-  const solid = menuOpen || scrolled
-  const navColor = solid ? '#2c2920' : '#ffffff'
+  const navColor = menuOpen || scrolled ? '#2c2920' : '#ffffff'
   const close = () => setMenuOpen(false)
 
   return (
@@ -48,11 +47,14 @@ export function Header({ logoHref, links, cta, shop, threshold = 0.75, tools }: 
             <a key={l.href} href={l.href} className="iho-nav-link" aria-current={isActive(l) ? 'page' : undefined} onClick={close}>{l.label}</a>
           ))}
           {shop && (
-            <a href={shop.href} className="iho-btn" onClick={close} style={{ display: 'inline-flex', alignItems: 'center', background: solid ? '#17150f' : '#ffffff', color: solid ? '#ffffff' : '#17150f', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none', transition: 'background 0.4s ease, color 0.4s ease' }}>
+            <a href={shop.href} className="iho-nav-link" aria-current={isActive(shop) ? 'page' : undefined} onClick={close} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <svg aria-hidden="true" width={10} height={10} viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="square" style={{ display: 'block', flex: 'none' }}>
+                <path d="M1.5 8.5 8 2M3 1.5h5.5V7" />
+              </svg>
               {shop.label}
             </a>
           )}
-          <a href={cta.href} className={shop ? 'iho-btn iho-btn-pair' : 'iho-btn'} onClick={close} style={{ display: 'inline-flex', alignItems: 'center', background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
+          <a href={cta.href} className="iho-btn" onClick={close} style={{ display: 'inline-flex', alignItems: 'center', background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
             {cta.label}
           </a>
           {tools && <div className="iho-header-tools" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>{tools}</div>}

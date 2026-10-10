@@ -602,10 +602,6 @@
         .iho-nav-link[aria-current="page"]::after {
           transition: none;
         }
-        /* Second of the two header buttons sits closer than the regular nav gap. */
-        .iho-btn-pair {
-          margin-left: -22px;
-        }
         /* AreaCard hover */
         .iho-solution-card {
           position: relative;
@@ -812,9 +808,6 @@
           header nav {
             gap: 24px !important;
           }
-          .iho-btn-pair {
-            margin-left: -14px;
-          }
         }
 
         /* ===== ≤1024px ===== */
@@ -848,9 +841,6 @@
           }
           header nav a:last-child {
             border-bottom: none !important;
-          }
-          .iho-btn-pair {
-            margin-left: 0;
           }
           #iho-menu-btn {
             display: flex !important;
