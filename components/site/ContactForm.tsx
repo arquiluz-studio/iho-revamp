@@ -9,7 +9,10 @@ const inputStyle: React.CSSProperties = { border: 'none', borderBottom: '1px sol
 
 type Status = { kind: 'idle' } | { kind: 'sent' } | { kind: 'error'; message: string }
 
-export function ContactForm({ countryCode }: { countryCode: string }) {
+type Inquiry = { productId: string; message: string; submitLabel: string; successText: string }
+
+/** Contact form; with `inquiry` it becomes a product quote request (prefilled message, `product_inquiry` lead). */
+export function ContactForm({ countryCode, inquiry }: { countryCode: string; inquiry?: Inquiry }) {
   const t = useTranslations('contact')
   const tc = useTranslations('common')
   const locale = useLocale()
@@ -31,6 +34,7 @@ export function ContactForm({ countryCode }: { countryCode: string }) {
         phone: field('phone'),
         message: field('message'),
         website: field('website'),
+        ...(inquiry && { source: 'product_inquiry' as const, sourceRef: inquiry.productId }),
         turnstileToken: (data.get('cf-turnstile-response') as string | null) ?? null,
       })
       if (result.ok) {
@@ -54,16 +58,16 @@ export function ContactForm({ countryCode }: { countryCode: string }) {
         <input type="email" name="email" required autoComplete="email" placeholder={t('email')} aria-label={t('email')} style={inputStyle} />
         <input type="tel" name="phone" autoComplete="tel" placeholder={t('phone')} aria-label={t('phone')} style={inputStyle} />
       </div>
-      <textarea name="message" required placeholder={t('message')} aria-label={t('message')} rows={2} style={{ ...inputStyle, width: '100%', resize: 'none', marginBottom: 30 }} />
+      <textarea name="message" required defaultValue={inquiry?.message} placeholder={t('message')} aria-label={t('message')} rows={2} style={{ ...inputStyle, width: '100%', resize: 'none', marginBottom: 30 }} />
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }} />
       <Turnstile />
       <button type="submit" disabled={pending} className="iho-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#ef483d', color: '#fff', border: 'none', padding: '14px 30px', borderRadius: 32, fontFamily: 'inherit', fontWeight: 600, fontSize: 15, cursor: pending ? 'wait' : 'pointer' }}>
-        {pending ? tc('sending') : t('submit')}
+        {pending ? tc('sending') : (inquiry?.submitLabel ?? t('submit'))}
         <ButtonArrow />
       </button>
       {status.kind !== 'idle' && (
         <p role="status" style={{ margin: '18px 0 0', fontSize: 14, color: status.kind === 'sent' ? '#2c2920' : '#ef483d' }}>
-          {status.kind === 'sent' ? t('success') : status.message}
+          {status.kind === 'sent' ? (inquiry?.successText ?? t('success')) : status.message}
         </p>
       )}
     </form>

@@ -145,7 +145,7 @@
     "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
     "areas": { "label": "— ÁREAS", "brands": "Marcas del área", "projects": "Proyectos" },
     "spaces": { "label": "— ESPACIOS", "projects": "Proyectos" },
-    "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud." },
+    "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud.", "price": "Precio", "availability": "Disponibilidad", "sale": "Oferta", "from": "Desde {price}", "inquiryTitle": "¿Te interesa este producto?", "inquiryMessage": "Me interesa cotizar {product}." },
     "contact": { "label": "— CONTACTO", "offices": "Oficinas" },
     "privacy": {
       "label": "— LEGAL",

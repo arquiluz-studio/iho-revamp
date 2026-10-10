@@ -8,6 +8,7 @@ import { previewUrl, publicUrl } from '@/lib/admin/public-url'
 import { hasRole, requireAdminSession, type AdminSession } from '@/lib/admin/session'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { AgendaEditor } from './AgendaEditor'
+import { PriceListExtras, ProductExtras, WarehouseExtras } from './catalog/CatalogExtras'
 import { formatDateTime } from '@/lib/admin/format'
 import { DataTable } from './DataTable'
 import { GalleryEditor, type GalleryItem } from './GalleryEditor'
@@ -67,6 +68,7 @@ function publicHref(config: ResourceConfig, row: AnyRow | null) {
     case '/events/[slug]':
     case '/projects/[slug]':
     case '/brands/[slug]':
+    case '/products/[slug]':
       return slug ? { pathname: config.publicPath, params: { slug } } : null
     case '/areas/[businessLine]':
       return slug ? { pathname: config.publicPath, params: { businessLine: slug } } : null
@@ -161,6 +163,13 @@ export async function ResourceEditPage({
       {id && countryCode && (resource === 'events' || resource === 'projects') && (
         <div className="mt-6 space-y-6 lg:max-w-[calc(100%-304px)]">
           <ContentExtras owner={resource === 'events' ? 'event' : 'project'} id={id} countryCode={countryCode} coverId={(row?.cover_media_id as string) ?? null} canEdit={canWrite} />
+        </div>
+      )}
+      {id && (resource === 'products' || resource === 'price-lists' || resource === 'warehouses') && (
+        <div className="mt-6 space-y-6 lg:max-w-[calc(100%-304px)]">
+          {resource === 'products' && <ProductExtras productId={id} coverId={(row?.cover_media_id as string) ?? null} canEdit={canWrite} />}
+          {resource === 'price-lists' && <PriceListExtras priceListId={id} currency={String(row?.currency ?? '')} canEdit={canWrite} />}
+          {resource === 'warehouses' && <WarehouseExtras warehouseId={id} canEdit={canWrite} />}
         </div>
       )}
     </>

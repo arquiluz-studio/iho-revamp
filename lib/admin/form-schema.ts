@@ -17,6 +17,13 @@ export const statSchema = z.object({
 })
 export type StatValue = z.infer<typeof statSchema>
 
+export const specSchema = z.object({
+  label_es: z.string().trim().min(1, 'Requerido').max(80),
+  label_en: z.string().trim().max(80),
+  value: z.string().trim().min(1, 'Requerido').max(200),
+})
+export type SpecValue = z.infer<typeof specSchema>
+
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATETIME_LOCAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 const INTEGER = /^-?\d+$/
@@ -66,6 +73,8 @@ function fieldSchema(field: Field, column: string, required: boolean): z.ZodType
       return z.array(z.string())
     case 'stats':
       return z.array(statSchema).max(8)
+    case 'specs':
+      return z.array(specSchema).max(40)
     default:
       return textSchema(field, required && column.endsWith('_en') === false)
   }
@@ -74,7 +83,7 @@ function fieldSchema(field: Field, column: string, required: boolean): z.ZodType
 export function buildSchema(config: ResourceConfig) {
   const shape: Record<string, z.ZodType> = {}
   for (const field of config.fields) {
-    if (field.type === 'multi' || field.type === 'stats') {
+    if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs') {
       shape[field.name] = fieldSchema(field, field.name, false)
       continue
     }
@@ -104,6 +113,10 @@ export function toRow(config: ResourceConfig, values: FormValues, fallbackTimezo
     }
     if (field.type === 'stats') {
       row[field.name] = ((values[field.name] as StatValue[]) ?? []).map(s => ({ ...s, value: Number(s.value) }))
+      continue
+    }
+    if (field.type === 'specs') {
+      row[field.name] = ((values[field.name] as SpecValue[]) ?? []).map(s => ({ ...s, label_en: s.label_en || null }))
       continue
     }
     for (const column of fieldColumns(field)) {
@@ -142,6 +155,11 @@ export function toFormValues(
         label_es: String(s.label_es ?? ''),
         label_en: String(s.label_en ?? ''),
       }))
+      continue
+    }
+    if (field.type === 'specs') {
+      const specs = Array.isArray(row[field.name]) ? (row[field.name] as Record<string, unknown>[]) : []
+      values[field.name] = specs.map(s => ({ label_es: String(s.label_es ?? ''), label_en: String(s.label_en ?? ''), value: String(s.value ?? '') }))
       continue
     }
     for (const column of fieldColumns(field)) {

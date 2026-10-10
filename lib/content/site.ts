@@ -5,6 +5,7 @@ import { dayOfMonth, isPastDate, longDate, shortMonth, timeOfDay, timeRange, typ
 import { paragraphs, t } from '@/lib/i18n-fields'
 import { toImageVM, videoUrl, type ImageVariant, type MediaRef } from '@/lib/media'
 import { getCountryBrands, type CountryBrandRow } from '@/lib/queries/brands'
+import { formatPrice, getCatalog, type CatalogRow } from '@/lib/queries/catalog'
 import { getEventBySlug, getEvents, type EventListRow } from '@/lib/queries/events'
 import { getProjects, type ProjectListRow } from '@/lib/queries/projects'
 import { getBusinessLines, getCountries, getCountrySettings, getOffices, getSectors, getTeam } from '@/lib/queries/site'
@@ -86,6 +87,37 @@ function placeholderProducts(href: string): ProductCardVM[] {
   return LEGACY_PRODUCTS.map((p, i) => ({ key: `p${i}`, name: p.name, category: p.category, href, image: { src: `/${p.image}`, alt: p.name } }))
 }
 
+/** Price label of a catalog row, or null when the product is quote-only in the country. */
+export function priceLabels(offer: { amount: number | null; compareAt: number | null; currency: string | null } | null, locale: AppLocale, country: string) {
+  if (!offer || offer.amount == null || !offer.currency) return null
+  return {
+    price: formatPrice(offer.amount, offer.currency, locale, country),
+    compareAt: offer.compareAt != null && offer.compareAt > offer.amount ? formatPrice(offer.compareAt, offer.currency, locale, country) : undefined,
+  }
+}
+
+export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: string, paths: SitePaths): ProductCardVM {
+  const name = t(p, 'name', locale)
+  const category = p.sectors[0] ?? p.business_line
+  const labels = p.is_purchasable ? priceLabels(p.price, locale, country) : null
+  return {
+    key: p.id,
+    name,
+    category: category ? t(category, 'name', locale).toUpperCase() : undefined,
+    href: paths.product(p.slug),
+    image: imageOf(p.cover, locale, name, legacyMedia.productCover(p.slug), 'md'),
+    price: labels?.price,
+    compareAt: labels?.compareAt,
+    inquiry: !labels,
+  }
+}
+
+async function featuredProducts(country: CountryCode, locale: AppLocale, paths: SitePaths): Promise<ProductCardVM[]> {
+  const catalog = await getCatalog(country)
+  const featured = catalog.filter(p => p.is_featured)
+  return (featured.length ? featured : catalog.slice(0, 8)).map(p => toProductCardVM(p, locale, country, paths))
+}
+
 type StatRow = { value?: number; prefix?: string; suffix?: string; label_es?: string; label_en?: string }
 
 function toStats(value: unknown, locale: AppLocale): StatVM[] {
@@ -124,7 +156,7 @@ async function officesFor(current: CountryCode): Promise<OfficeVM[]> {
 }
 
 export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: SitePaths): Promise<HomeVM> {
-  const [tr, labels, settings, events, sectors, businessLines, projects, brands, team, map, offices, countryRow] = await Promise.all([
+  const [tr, labels, settings, events, sectors, businessLines, projects, brands, team, map, offices, countryRow, products] = await Promise.all([
     getTranslations({ locale }),
     eventLabels(locale),
     getCountrySettings(country),
@@ -137,6 +169,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
     mapCountries(country, locale),
     officesFor(country),
     getCountries().then(rows => rows.find(c => c.code === country)),
+    featuredProducts(country, locale, paths),
   ])
   const countryName = countryRow ? t(countryRow, 'name', locale) : country.toUpperCase()
 
@@ -148,7 +181,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
       poster: settings?.hero_image ? toImageVM(settings.hero_image, locale, 'lg').src : null,
     },
     sectors: sectors.map(s => t(s, 'name', locale).toUpperCase()),
-    products: placeholderProducts(paths.products),
+    products,
     events: events.map(e => toEventVM(e, locale, countryName, labels, paths)),
     group: { stats: toStats(settings?.stats, locale), mapCountries: map },
     areas: businessLines.map(

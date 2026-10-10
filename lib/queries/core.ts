@@ -32,14 +32,19 @@ async function isDraft(): Promise<boolean> {
  * Runs a public read. Normally it's cached under `tags` with the anonymous client (RLS: published content
  * only). In Draft Mode it skips the cache and uses the service role so editors can preview drafts.
  */
-export async function cachedQuery<T>(key: (string | number | boolean | null | undefined)[], tags: string[], run: (ctx: QueryContext) => Promise<T>): Promise<T> {
+export async function cachedQuery<T>(
+  key: (string | number | boolean | null | undefined)[],
+  tags: string[],
+  run: (ctx: QueryContext) => Promise<T>,
+  revalidate = REVALIDATE_SECONDS,
+): Promise<T> {
   if (await isDraft()) {
     const db = hasServiceRole() ? createSupabaseAdminClient() : createSupabasePublicClient()
     return run({ db, draft: true })
   }
   const cached = unstable_cache(() => run({ db: createSupabasePublicClient(), draft: false }), ['q', ...key.map(k => String(k ?? ''))], {
     tags,
-    revalidate: REVALIDATE_SECONDS,
+    revalidate,
   })
   return cached()
 }

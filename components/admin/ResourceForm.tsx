@@ -118,7 +118,7 @@ export function ResourceForm({ resource, id, countryCode, initialValues, options
         <Card className="p-5">
           <div className={cn('grid gap-4 sm:grid-cols-2', tab !== 'general' && 'hidden')}>
             {general.map(field => (
-              <div key={field.name} className={cn((field.wide || field.type === 'textarea' || field.type === 'stats') && 'sm:col-span-2')}>
+              <div key={field.name} className={cn((field.wide || field.type === 'textarea' || field.type === 'stats' || field.type === 'specs') && 'sm:col-span-2')}>
                 {fieldColumns(field).length ? fieldColumns(field).map(c => renderField(field, c)) : renderField(field, field.name)}
               </div>
             ))}
@@ -247,6 +247,8 @@ function FieldInput({
       )
     case 'stats':
       return shell(<StatsEditor control={control} register={register} name={field.name} disabled={disabled} />)
+    case 'specs':
+      return shell(<SpecsEditor control={control} register={register} name={field.name} disabled={disabled} />)
     default:
       return shell(
         <Input
@@ -409,6 +411,44 @@ function StatsEditor({
           onClick={() => append({ prefix: '', value: '0', suffix: '', label_es: '', label_en: '' } as never)}
         >
           Agregar estadística
+        </Button>
+      )}
+    </div>
+  )
+}
+
+function SpecsEditor({
+  control,
+  register,
+  name,
+  disabled,
+}: {
+  control: Control<FormValues>
+  register: UseFormRegister<FormValues>
+  name: string
+  disabled: boolean
+}) {
+  const { fields, append, remove, move } = useFieldArray({ control, name: name as never })
+  return (
+    <div className="space-y-2">
+      {fields.map((item, index) => (
+        <div key={item.id} className="grid grid-cols-[1fr_1fr_1.4fr_auto] items-center gap-2">
+          <Input placeholder="Etiqueta ES" disabled={disabled} {...register(`${name}.${index}.label_es`)} />
+          <Input placeholder="Label EN" disabled={disabled} {...register(`${name}.${index}.label_en`)} />
+          <Input placeholder="Valor (ej. 2700–4000 K)" disabled={disabled} {...register(`${name}.${index}.value`)} />
+          <div className="flex">
+            <Button variant="ghost" size="sm" disabled={disabled || index === 0} onClick={() => move(index, index - 1)} aria-label="Subir">
+              ↑
+            </Button>
+            <Button variant="ghost" size="sm" disabled={disabled} onClick={() => remove(index)} aria-label="Quitar">
+              ✕
+            </Button>
+          </div>
+        </div>
+      ))}
+      {!disabled && fields.length < 40 && (
+        <Button variant="outline" size="sm" onClick={() => append({ label_es: '', label_en: '', value: '' } as never)}>
+          Agregar especificación
         </Button>
       )}
     </div>

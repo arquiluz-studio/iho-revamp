@@ -48,13 +48,18 @@ export const LEGACY_BRAND_SLUGS = [
 
 export const LEGACY_PROJECT_SLUGS = ['entretenimiento-digital', 'ecommerce', 'hyundai', 'ios', 'isuzu', 'technology-center']
 
-/** Placeholder product cards shown on the home until the catalog has featured products. */
+/** Catalog seed products and the stock photo each one used before the media library. */
 export const LEGACY_PRODUCTS = [
   ['Smart Conference', 'WORKSPACE'], ['Float Gather', 'WORKSPACE'], ['Float Micro', 'SPECIALTY'], ['Silla Path Alta', 'WORKSPACE'],
   ['Lounge Soft', 'HOSPITALITY'], ['Occhio Sento', 'LIGHTING'], ['Kris Cadena', 'SPECIALTY'], ['Vitra Eames Chair', 'WORKSPACE'],
   ['Fritz Chair', 'HOSPITALITY'], ['Allermuir Loop', 'WORKSPACE'], ['Brokis Globe', 'LIGHTING'], ['Delta Focus', 'LIGHTING'],
   ['Unifor System', 'WORKSPACE'], ['Andreu World Stool', 'HOSPITALITY'], ['Parachilna Aro', 'LIGHTING'], ['Targetti Slim', 'LIGHTING'],
-].map(([name, category], i) => ({ name, category, image: `images/productos/producto-${(i % 4) + 1}.webp` }))
+].map(([name, category], i) => ({
+  slug: name.toLowerCase().replace(/\s+/g, '-'),
+  name,
+  category,
+  image: `images/productos/producto-${(i % 4) + 1}.webp`,
+}))
 
 export const LEGACY_CONTACT_IMAGE = 'images/contacto/contacto.webp'
 export const LEGACY_HERO_VIDEO = 'video/hero.mp4'
@@ -69,6 +74,10 @@ export const legacyMedia = {
   eventCover: (slug: string) => (LEGACY_EVENT_COVERS[slug] ? url(`images/eventos/${LEGACY_EVENT_COVERS[slug]}.webp`) : null),
   eventGallery: () => LEGACY_EVENT_GALLERY.map(url),
   businessLineCover: (slug: string) => (LEGACY_BUSINESS_LINE_COVERS[slug] ? url(`images/areas/${LEGACY_BUSINESS_LINE_COVERS[slug]}.webp`) : null),
+  productCover: (slug: string) => {
+    const product = LEGACY_PRODUCTS.find(p => p.slug === slug)
+    return product ? url(product.image) : null
+  },
   sectorCover: (slug: string) => (LEGACY_SECTOR_COVERS[slug] ? url(`images/areas/${LEGACY_SECTOR_COVERS[slug]}.webp`) : null),
   contactImage: () => url(LEGACY_CONTACT_IMAGE),
   heroVideo: () => url(LEGACY_HERO_VIDEO),

@@ -16,6 +16,7 @@ import {
   LEGACY_EVENT_COVERS,
   LEGACY_EVENT_GALLERY,
   LEGACY_HERO_VIDEO,
+  LEGACY_PRODUCTS,
   LEGACY_SECTOR_COVERS,
   LEGACY_TEAM_FILES,
 } from '@/lib/content/legacy-media'
@@ -95,6 +96,14 @@ async function main() {
   console.log('Products')
   for (const n of [1, 2, 3, 4]) {
     await importFile(`images/productos/producto-${n}.webp`, { kind: 'product_photo', country: null, alt: `Producto ${n}` })
+  }
+  const { data: products } = await check(admin.from('products').select('id, slug, cover_media_id'))
+  for (const product of products ?? []) {
+    const legacy = LEGACY_PRODUCTS.find(p => p.slug === product.slug)
+    if (!legacy || product.cover_media_id) continue
+    const mediaId = await importFile(legacy.image, { kind: 'product_photo', country: null, alt: legacy.name })
+    await check(admin.from('products').update({ cover_media_id: mediaId }).eq('id', product.id))
+    await check(admin.from('product_media').upsert({ product_id: product.id, media_id: mediaId, sort: 0 }, { ignoreDuplicates: true }))
   }
 
   // --- Brand logos (global) ---

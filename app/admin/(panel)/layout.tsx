@@ -22,6 +22,7 @@ export default async function PanelLayout({ children }: { children: ReactNode })
           { href: '/admin/calendar', label: 'Calendario' },
           { href: '/admin/projects', label: 'Proyectos' },
           { href: '/admin/country-brands', label: 'Marcas del país' },
+          { href: '/admin/catalog', label: 'Catálogo del país' },
           { href: '/admin/media', label: 'Biblioteca de media' },
           { href: '/admin/team', label: 'Equipo' },
           { href: '/admin/socials', label: 'Redes sociales' },
@@ -33,6 +34,17 @@ export default async function PanelLayout({ children }: { children: ReactNode })
             : []),
         ],
       },
+      ...(atLeast(role, 'admin')
+        ? [
+            {
+              title: 'Precios e inventario',
+              items: [
+                { href: '/admin/price-lists', label: 'Listas de precios' },
+                { href: '/admin/warehouses', label: 'Almacenes e inventario' },
+              ],
+            },
+          ]
+        : []),
       {
         title: 'Contactos',
         items: [{ href: '/admin/leads', label: 'Leads' }],
@@ -45,6 +57,7 @@ export default async function PanelLayout({ children }: { children: ReactNode })
       title: 'Global',
       items: [
         { href: '/admin/global/brands', label: 'Marcas' },
+        { href: '/admin/global/products', label: 'Productos' },
         { href: '/admin/global/business-lines', label: 'Áreas' },
         { href: '/admin/global/sectors', label: 'Espacios' },
         ...(session.isSuperAdmin

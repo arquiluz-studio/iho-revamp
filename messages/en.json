@@ -145,7 +145,7 @@
     "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand", "origin": "Origin" },
     "areas": { "label": "— AREAS", "brands": "Brands in this area", "projects": "Projects" },
     "spaces": { "label": "— SPACES", "projects": "Projects" },
-    "products": { "label": "— PRODUCTS", "title": "Catalog.", "empty": "No products available in this country.", "all": "All", "brand": "Brand", "designer": "Designer", "specs": "Specifications", "variants": "Variants", "leadTime": "Ships in {days} days", "onRequest": "Made to order", "inStock": "In stock", "inquiry": "Request a quote", "inquirySent": "We received your request." },
+    "products": { "label": "— PRODUCTS", "title": "Catalog.", "empty": "No products available in this country.", "all": "All", "brand": "Brand", "designer": "Designer", "specs": "Specifications", "variants": "Variants", "leadTime": "Ships in {days} days", "onRequest": "Made to order", "inStock": "In stock", "inquiry": "Request a quote", "inquirySent": "We received your request.", "price": "Price", "availability": "Availability", "sale": "Sale", "from": "From {price}", "inquiryTitle": "Interested in this product?", "inquiryMessage": "I would like a quote for {product}." },
     "contact": { "label": "— CONTACT", "offices": "Offices" },
     "privacy": {
       "label": "— LEGAL",

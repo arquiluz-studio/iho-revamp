@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { listMedia } from '@/app/admin/actions/media'
+import { saveProductGallery } from '@/app/admin/actions/catalog'
 import { saveGallery } from '@/app/admin/actions/content'
 import type { AdminMedia } from '@/lib/admin/media'
 import { MediaPicker, MediaThumb, UploadButton } from './MediaPicker'
@@ -10,7 +11,7 @@ import { Button, Card, CardHeader, Checkbox, Input, Notice, cn } from './ui'
 
 export type GalleryItem = { media: AdminMedia; captionEs: string; captionEn: string; isDownloadable: boolean }
 
-/** Ordered gallery with drag & drop, cover selection and (projects) captions + per-photo download toggle. */
+/** Ordered gallery with drag & drop, cover selection (projects, products) and project captions + per-photo download toggle. */
 export function GalleryEditor({
   owner,
   ownerId,
@@ -19,9 +20,9 @@ export function GalleryEditor({
   initialCoverId,
   canEdit,
 }: {
-  owner: 'event' | 'project'
+  owner: 'event' | 'project' | 'product'
   ownerId: string
-  countryCode: string
+  countryCode: string | null
   initialItems: GalleryItem[]
   initialCoverId: string | null
   canEdit: boolean
@@ -35,7 +36,8 @@ export function GalleryEditor({
   const [message, setMessage] = useState<{ tone: 'green' | 'red'; text: string } | null>(null)
   const [pending, startTransition] = useTransition()
   const isProject = owner === 'project'
-  const kind = isProject ? 'project_photo' : 'event_photo'
+  const hasCover = owner !== 'event'
+  const kind = owner === 'project' ? 'project_photo' : owner === 'product' ? 'product_photo' : 'event_photo'
 
   const update = (next: GalleryItem[]) => {
     setItems(next)
@@ -47,7 +49,7 @@ export function GalleryEditor({
     if (!fresh.length) return
     const next = [...items, ...fresh.map(m => ({ media: m, captionEs: '', captionEn: '', isDownloadable: m.isDownloadable }))]
     update(next)
-    if (isProject && !coverId) setCoverId(fresh[0].id)
+    if (hasCover && !coverId) setCoverId(fresh[0].id)
   }
   const move = (from: number, to: number) => {
     if (from === to || to < 0 || to >= items.length) return
@@ -56,22 +58,28 @@ export function GalleryEditor({
     next.splice(to, 0, moved)
     update(next)
   }
-  const patch = (index: number, value: Partial<GalleryItem>) =>
-    update(items.map((item, i) => (i === index ? { ...item, ...value } : item)))
+  const patch = (index: number, value: Partial<GalleryItem>) => update(items.map((item, i) => (i === index ? { ...item, ...value } : item)))
 
   const save = () =>
     startTransition(async () => {
-      const result = await saveGallery(
-        owner,
-        ownerId,
-        items.map(i => ({
-          mediaId: i.media.id,
-          captionEs: i.captionEs,
-          captionEn: i.captionEn,
-          isDownloadable: i.isDownloadable,
-        })),
-        isProject ? coverId : undefined,
-      )
+      const result =
+        owner === 'product'
+          ? await saveProductGallery(
+              ownerId,
+              items.map(i => i.media.id),
+              coverId,
+            )
+          : await saveGallery(
+              owner,
+              ownerId,
+              items.map(i => ({
+                mediaId: i.media.id,
+                captionEs: i.captionEs,
+                captionEn: i.captionEn,
+                isDownloadable: i.isDownloadable,
+              })),
+              isProject ? coverId : undefined,
+            )
       setMessage(result.ok ? { tone: 'green', text: 'Galería guardada.' } : { tone: 'red', text: result.error })
       if (result.ok) {
         setDirty(false)
@@ -86,7 +94,9 @@ export function GalleryEditor({
         description={
           isProject
             ? 'Arrastra para ordenar. La estrella marca la portada. "Descargable" permite bajar la foto en alta resolución tras dejar sus datos.'
-            : 'Arrastra para ordenar. La portada del evento se elige en el formulario.'
+            : hasCover
+              ? 'Arrastra para ordenar. La estrella marca la foto principal.'
+              : 'Arrastra para ordenar. La portada del evento se elige en el formulario.'
         }
         actions={
           canEdit && (
@@ -124,15 +134,11 @@ export function GalleryEditor({
                   if (dragIndex !== null) move(dragIndex, index)
                   setDragIndex(null)
                 }}
-                className={cn(
-                  'rounded-md border border-zinc-200 bg-white p-2',
-                  canEdit && 'cursor-grab',
-                  dragIndex === index && 'opacity-50',
-                )}
+                className={cn('rounded-md border border-zinc-200 bg-white p-2', canEdit && 'cursor-grab', dragIndex === index && 'opacity-50')}
               >
                 <div className="relative">
                   <MediaThumb media={item.media} className="aspect-[4/3] w-full" />
-                  {isProject && (
+                  {hasCover && (
                     <button
                       type="button"
                       disabled={!canEdit}
@@ -180,13 +186,7 @@ export function GalleryEditor({
                 {canEdit && (
                   <div className="mt-2 flex justify-between">
                     <div className="flex">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => move(index, index - 1)}
-                        disabled={index === 0}
-                        aria-label="Mover antes"
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => move(index, index - 1)} disabled={index === 0} aria-label="Mover antes">
                         ←
                       </Button>
                       <Button

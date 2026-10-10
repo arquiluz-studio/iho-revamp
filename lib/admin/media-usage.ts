@@ -30,6 +30,13 @@ export const MEDIA_REFERENCES: Reference[] = [
     describe: r => ({ label: String(r.name), href: `/admin/global/brands/${r.id}`, tags: [cacheTags.brands, cacheTags.brand(String(r.id))] }),
   },
   {
+    table: 'products',
+    column: 'cover_media_id',
+    select: 'id, name_es',
+    where: 'Foto principal de producto',
+    describe: r => ({ label: String(r.name_es), href: `/admin/global/products/${r.id}`, tags: [cacheTags.products, cacheTags.product(String(r.id))] }),
+  },
+  {
     table: 'business_lines',
     column: 'cover_media_id',
     select: 'id, name_es',
@@ -102,6 +109,17 @@ export const MEDIA_REFERENCES: Reference[] = [
         tags: [...countryTag(project, 'projects'), cacheTags.project(String(r.project_id))],
       }
     },
+  },
+  {
+    table: 'product_media',
+    column: 'media_id',
+    select: 'product_id, products(name_es)',
+    where: 'Galería de producto',
+    describe: r => ({
+      label: String(((r.products ?? {}) as AnyRow).name_es ?? ''),
+      href: `/admin/global/products/${r.product_id}`,
+      tags: [cacheTags.products, cacheTags.product(String(r.product_id))],
+    }),
   },
 ]
 

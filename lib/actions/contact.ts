@@ -65,13 +65,17 @@ export async function submitContact(input: ContactInput): Promise<ContactResult>
   const { data: country } = await admin.from('countries').select('email').eq('code', data.countryCode).maybeSingle()
   const inbox = notificationInbox(country?.email)
   if (inbox) {
-    const title = `Nuevo contacto · IHO ${COUNTRIES[data.countryCode as keyof typeof COUNTRIES].name.es}`
+    const isInquiry = data.source === 'product_inquiry'
+    const product =
+      isInquiry && data.sourceRef ? (await admin.from('products').select('name_es, slug').eq('id', data.sourceRef).maybeSingle()).data : null
+    const title = `${isInquiry ? 'Nueva cotización' : 'Nuevo contacto'} · IHO ${COUNTRIES[data.countryCode as keyof typeof COUNTRIES].name.es}`
     const rows: [string, string | null][] = [
+      ['Producto', product ? `${product.name_es} (${product.slug})` : null],
       ['Nombre', [data.firstName, data.lastName].filter(Boolean).join(' ')],
       ['Correo', data.email],
       ['Teléfono', data.phone],
       ['Empresa', data.company],
-      ['Origen', data.source === 'product_inquiry' ? 'Cotización de producto' : 'Formulario de contacto'],
+      ['Origen', isInquiry ? 'Cotización de producto' : 'Formulario de contacto'],
       ['Mensaje', data.message],
     ]
     await sendEmail({ to: inbox, subject: title, text: detailsText(title, rows), html: detailsHtml(title, rows), replyTo: data.email })

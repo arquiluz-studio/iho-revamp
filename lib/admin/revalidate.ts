@@ -20,6 +20,7 @@ export function revalidateResource(config: ResourceConfig, countryCode: string |
     if (config.table === 'events') tags.push(cacheTags.event(id))
     if (config.table === 'projects') tags.push(cacheTags.project(id))
     if (config.table === 'brands') tags.push(cacheTags.brand(id))
+    if (config.table === 'products') tags.push(cacheTags.product(id))
   }
   revalidateTags(tags)
 }

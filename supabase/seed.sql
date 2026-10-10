@@ -214,3 +214,86 @@ from (values
 join public.events e on e.country_code = 'mx' and e.slug = v.event_slug
 join public.brands b on b.slug = v.brand_slug
 on conflict do nothing;
+
+-- Catalog samples (the placeholder products of the original home) ---------------
+insert into public.products (slug, brand_id, business_line_id, name_es, name_en, designer, description_es, description_en, specs, status)
+select v.slug, b.id, bl.id, v.name, coalesce(v.name_en_override, v.name), v.designer, v.desc_es, v.desc_en, v.specs::jsonb, 'published'
+from (values
+  ('smart-conference', 'allsteel', 'furniture', 'Smart Conference', null, null, 'Mesa de juntas modular con electrificación integrada.', 'Modular conference table with built-in power.', '[{"label_es":"Dimensiones","label_en":"Dimensions","value":"360 × 120 × 74 cm"}]'),
+  ('float-gather', 'the-senator-group', 'furniture', 'Float Gather', null, null, 'Sistema de mesas colaborativas para espacios abiertos.', 'Collaborative table system for open spaces.', '[]'),
+  ('float-micro', 'bolon', 'specialty', 'Float Micro', null, null, 'Recubrimiento tejido de alto tráfico.', 'High-traffic woven flooring.', '[{"label_es":"Formato","label_en":"Format","value":"Rollo 2 m"}]'),
+  ('silla-path-alta', 'andreu-world', 'furniture', 'Silla Path Alta', 'Path High Chair', 'Lievore Altherr', 'Silla de respaldo alto en madera maciza.', 'High-back chair in solid wood.', '[]'),
+  ('lounge-soft', 'fritz-hansen', 'furniture', 'Lounge Soft', null, null, 'Sillón lounge tapizado para hospitality.', 'Upholstered lounge chair for hospitality.', '[]'),
+  ('occhio-sento', 'occhio', 'lighting', 'Occhio Sento', null, 'Axel Meise', 'Luminaria de suspensión con control gestual.', 'Pendant luminaire with gesture control.', '[{"label_es":"Temperatura","label_en":"Color temperature","value":"2700–4000 K"},{"label_es":"Potencia","label_en":"Power","value":"30 W"}]'),
+  ('kris-cadena', 'kriskadecor', 'specialty', 'Kris Cadena', 'Kris Chain', null, 'Cortina decorativa de eslabones de aluminio.', 'Decorative aluminium link curtain.', '[]'),
+  ('vitra-eames-chair', 'vitra', 'furniture', 'Vitra Eames Chair', null, 'Charles & Ray Eames', 'Silla icónica de carcasa de plástico.', 'Iconic plastic shell chair.', '[]'),
+  ('fritz-chair', 'fritz-hansen', 'furniture', 'Fritz Chair', null, null, 'Silla apilable de madera laminada.', 'Stackable laminated wood chair.', '[]'),
+  ('allermuir-loop', 'allermuir', 'furniture', 'Allermuir Loop', null, null, 'Sofá modular para áreas de espera.', 'Modular sofa for waiting areas.', '[]'),
+  ('brokis-globe', 'brokis', 'lighting', 'Brokis Globe', null, null, 'Lámpara de vidrio soplado artesanal.', 'Hand-blown glass lamp.', '[]'),
+  ('delta-focus', 'delta-light', 'lighting', 'Delta Focus', null, null, 'Proyector de riel de alta precisión.', 'High-precision track spotlight.', '[{"label_es":"Haz","label_en":"Beam","value":"15° / 30° / 50°"}]'),
+  ('unifor-system', 'unifor', 'furniture', 'Unifor System', null, null, 'Sistema de mobiliario operativo.', 'Office furniture system.', '[]'),
+  ('andreu-world-stool', 'andreu-world', 'furniture', 'Andreu World Stool', null, null, 'Taburete alto de madera.', 'Wooden bar stool.', '[]'),
+  ('parachilna-aro', 'parachilna', 'lighting', 'Parachilna Aro', null, null, 'Luminaria circular de suspensión.', 'Circular pendant luminaire.', '[]'),
+  ('targetti-slim', 'targetti', 'lighting', 'Targetti Slim', null, null, 'Perfil lineal LED empotrable.', 'Recessed linear LED profile.', '[]')
+) as v (slug, brand_slug, line_slug, name, name_en_override, designer, desc_es, desc_en, specs)
+join public.brands b on b.slug = v.brand_slug
+join public.business_lines bl on bl.slug = v.line_slug
+on conflict (slug) do nothing;
+
+-- Every product is visible in every country; the home shows them as featured in Mexico.
+insert into public.country_products (country_code, product_id, is_visible, is_featured, is_purchasable, lead_time_days, sort)
+select c.code, p.id, true, c.code = 'mx',
+  c.code = 'mx' and bl.slug = 'lighting',
+  case when bl.slug = 'lighting' then 21 else 45 end,
+  row_number() over (partition by c.code order by p.created_at, p.slug)
+from public.products p
+join public.business_lines bl on bl.id = p.business_line_id
+cross join public.countries c
+on conflict do nothing;
+
+update public.product_variants v set sku = upper(replace(p.slug, '-', '')) || '-STD'
+from public.products p where p.id = v.product_id and v.sku is null;
+
+insert into public.price_lists (country_code, currency, name, kind, priority, is_active)
+select 'mx', 'MXN', 'Base MX 2026', 'base', 0, true
+where not exists (select 1 from public.price_lists where country_code = 'mx' and name = 'Base MX 2026');
+
+insert into public.price_list_items (price_list_id, variant_id, amount)
+select l.id, v.id, x.amount
+from (values ('occhio-sento', 18900), ('brokis-globe', 24500), ('delta-focus', 6800), ('parachilna-aro', 32400), ('targetti-slim', 4200)) as x (slug, amount)
+join public.products p on p.slug = x.slug
+join public.product_variants v on v.product_id = p.id
+join public.price_lists l on l.country_code = 'mx' and l.name = 'Base MX 2026'
+on conflict do nothing;
+
+insert into public.price_lists (country_code, currency, name, kind, priority, starts_at, ends_at, is_active)
+select 'mx', 'MXN', 'Venta Otoño 2026', 'sale', 10, '2026-10-01T00:00:00-06:00', '2026-11-30T23:59:59-06:00', true
+where not exists (select 1 from public.price_lists where country_code = 'mx' and name = 'Venta Otoño 2026');
+
+insert into public.price_list_items (price_list_id, variant_id, amount)
+select l.id, v.id, 15900
+from public.products p
+join public.product_variants v on v.product_id = p.id
+join public.price_lists l on l.country_code = 'mx' and l.name = 'Venta Otoño 2026'
+where p.slug = 'occhio-sento'
+on conflict do nothing;
+
+insert into public.warehouses (country_code, name, is_active)
+select 'mx', 'CDMX', true
+where not exists (select 1 from public.warehouses where country_code = 'mx' and name = 'CDMX');
+
+insert into public.inventory_levels (warehouse_id, variant_id, on_hand)
+select w.id, v.id, x.on_hand
+from (values ('occhio-sento', 12), ('delta-focus', 40), ('targetti-slim', 0)) as x (slug, on_hand)
+join public.products p on p.slug = x.slug
+join public.product_variants v on v.product_id = p.id
+join public.warehouses w on w.country_code = 'mx' and w.name = 'CDMX'
+on conflict do nothing;
+
+-- Products on display at the showroom night.
+insert into public.event_products (event_id, product_id, sort)
+select e.id, p.id, x.sort
+from (values ('vitra-eames-chair', 1), ('lounge-soft', 2), ('silla-path-alta', 3), ('occhio-sento', 4)) as x (slug, sort)
+join public.products p on p.slug = x.slug
+join public.events e on e.country_code = 'mx' and e.slug = 'showroom-abierto'
+on conflict do nothing;

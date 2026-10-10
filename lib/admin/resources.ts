@@ -9,7 +9,7 @@ import type { CountryRole } from './roles'
 export type TableName = keyof Database['public']['Tables']
 export type MediaKind = Database['public']['Enums']['media_kind']
 export type Option = { value: string; label: string }
-export type ReferenceSource = 'brands' | 'business_lines' | 'sectors'
+export type ReferenceSource = 'brands' | 'business_lines' | 'sectors' | 'products'
 export type Bridge = { table: TableName; selfKey: string; otherKey: string }
 
 type FieldBase = { name: string; label: string; required?: boolean; help?: string; wide?: boolean }
@@ -23,6 +23,7 @@ export type Field =
   | (FieldBase & { type: 'multi'; source: ReferenceSource; through: Bridge })
   | (FieldBase & { type: 'media'; kind: MediaKind; video?: boolean })
   | (FieldBase & { type: 'stats' })
+  | (FieldBase & { type: 'specs' })
 
 export type ColumnFormat = 'text' | 'datetime' | 'status' | 'boolean' | 'number' | 'enum'
 export type Column = { key: string; label: string; format?: ColumnFormat; options?: Option[] }
@@ -43,13 +44,13 @@ export type ResourceConfig = {
   columns: Column[]
   order: { column: string; ascending: boolean }[]
   section?: CountrySection
-  globalTag?: 'countries' | 'taxonomies' | 'brands'
+  globalTag?: 'countries' | 'taxonomies' | 'brands' | 'products'
   /** One row per country keyed by country_code (home settings). */
   singleton?: boolean
   /** The primary key is typed by the user on creation (countries.code). */
   pkInput?: boolean
   /** Localized public route used by "Ver en el sitio" / preview. */
-  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/areas/[businessLine]' | '/spaces/[sector]' | '/'
+  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/products/[slug]' | '/areas/[businessLine]' | '/spaces/[sector]' | '/'
   /** Datetime fields are entered in this row field's timezone (falls back to the country timezone). */
   timezoneField?: string
 }
@@ -148,6 +149,15 @@ const events: ResourceConfig = {
       type: 'multi',
       source: 'brands',
       through: { table: 'event_brands', selfKey: 'event_id', otherKey: 'brand_id' },
+      wide: true,
+    },
+    {
+      name: 'products',
+      label: 'Productos en exhibición',
+      help: 'Se muestran primero en la página del evento; se completa con productos de las marcas participantes.',
+      type: 'multi',
+      source: 'products',
+      through: { table: 'event_products', selfKey: 'event_id', otherKey: 'product_id' },
       wide: true,
     },
   ],
@@ -442,11 +452,121 @@ const sectors: ResourceConfig = {
   order: [{ column: 'sort', ascending: true }],
 }
 
-export const RESOURCES = { events, projects, socials, offices, team, home, countries, brands, 'business-lines': businessLines, sectors }
+export const PRICE_KIND_OPTIONS = enumOptions(Constants.public.Enums.price_list_kind, { base: 'Base', sale: 'Promoción' })
+
+const products: ResourceConfig = {
+  key: 'products',
+  table: 'products',
+  scope: 'global',
+  pk: 'id',
+  title: 'Productos (catálogo global)',
+  singular: 'producto',
+  description: 'Ficha global del producto. Visibilidad, precios e inventario se definen en cada país.',
+  globalWrite: 'catalog',
+  globalTag: 'products',
+  publicPath: '/products/[slug]',
+  fields: [
+    { name: 'name', label: 'Nombre', type: 'text', i18n: true, required: true, max: 200 },
+    { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true },
+    { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
+    { name: 'brand_id', label: 'Marca', type: 'reference', source: 'brands', required: true },
+    { name: 'business_line_id', label: 'Área', type: 'reference', source: 'business_lines' },
+    { name: 'designer', label: 'Diseñador', type: 'text', max: 160 },
+    { name: 'erp_ref', label: 'Referencia ERP', type: 'text', max: 120 },
+    { name: 'description', label: 'Descripción', type: 'textarea', i18n: true, max: 8000, rows: 6 },
+    { name: 'specs', label: 'Especificaciones', type: 'specs', wide: true },
+    {
+      name: 'sectors',
+      label: 'Espacios',
+      type: 'multi',
+      source: 'sectors',
+      through: { table: 'product_sectors', selfKey: 'product_id', otherKey: 'sector_id' },
+    },
+  ],
+  columns: [
+    { key: 'name_es', label: 'Nombre' },
+    { key: 'slug', label: 'Slug' },
+    { key: 'designer', label: 'Diseñador' },
+    STATUS_COLUMN,
+  ],
+  order: [{ column: 'name_es', ascending: true }],
+}
+
+const priceLists: ResourceConfig = {
+  key: 'price-lists',
+  table: 'price_lists',
+  scope: 'country',
+  pk: 'id',
+  title: 'Listas de precios',
+  singular: 'lista de precios',
+  description: 'Rige el precio vigente de mayor prioridad; una promoción activa reemplaza al precio base y lo muestra tachado.',
+  writeRole: 'admin',
+  section: 'catalog',
+  fields: [
+    { name: 'name', label: 'Nombre', type: 'text', required: true, max: 160 },
+    { name: 'kind', label: 'Tipo', type: 'select', options: PRICE_KIND_OPTIONS, required: true },
+    { name: 'currency', label: 'Moneda (ISO 4217)', type: 'text', required: true, max: 3, help: 'Ej. MXN, USD.' },
+    { name: 'priority', label: 'Prioridad', type: 'number', min: 0, max: 1000, help: 'Mayor número gana si dos listas del mismo tipo coinciden.' },
+    { name: 'starts_at', label: 'Vigente desde', type: 'datetime' },
+    { name: 'ends_at', label: 'Vigente hasta', type: 'datetime' },
+    { name: 'is_active', label: 'Activa', type: 'boolean' },
+  ],
+  columns: [
+    { key: 'name', label: 'Nombre' },
+    { key: 'kind', label: 'Tipo', format: 'enum', options: PRICE_KIND_OPTIONS },
+    { key: 'currency', label: 'Moneda' },
+    { key: 'starts_at', label: 'Desde', format: 'datetime' },
+    { key: 'ends_at', label: 'Hasta', format: 'datetime' },
+    { key: 'is_active', label: 'Activa', format: 'boolean' },
+  ],
+  order: [
+    { column: 'kind', ascending: true },
+    { column: 'priority', ascending: false },
+  ],
+}
+
+const warehouses: ResourceConfig = {
+  key: 'warehouses',
+  table: 'warehouses',
+  scope: 'country',
+  pk: 'id',
+  title: 'Almacenes e inventario',
+  singular: 'almacén',
+  description: 'El inventario disponible (existencia − apartado) de todos los almacenes activos se suma por variante.',
+  writeRole: 'admin',
+  section: 'catalog',
+  fields: [
+    { name: 'name', label: 'Nombre', type: 'text', required: true, max: 160 },
+    { name: 'erp_ref', label: 'Referencia ERP', type: 'text', max: 120 },
+    { name: 'is_active', label: 'Activo', type: 'boolean' },
+  ],
+  columns: [
+    { key: 'name', label: 'Nombre' },
+    { key: 'erp_ref', label: 'ERP' },
+    { key: 'is_active', label: 'Activo', format: 'boolean' },
+  ],
+  order: [{ column: 'name', ascending: true }],
+}
+
+export const RESOURCES = {
+  events,
+  projects,
+  socials,
+  offices,
+  team,
+  home,
+  'price-lists': priceLists,
+  warehouses,
+  countries,
+  brands,
+  products,
+  'business-lines': businessLines,
+  sectors,
+}
 export type ResourceKey = keyof typeof RESOURCES
 
-export const COUNTRY_RESOURCES: ResourceKey[] = ['events', 'projects', 'socials', 'offices', 'team']
-export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'brands', 'business-lines', 'sectors']
+export const COUNTRY_RESOURCES: ResourceKey[] = ['events', 'projects', 'socials', 'offices', 'team', 'price-lists', 'warehouses']
+export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'brands', 'products', 'business-lines', 'sectors']
 
 export function getResource(key: string): ResourceConfig | null {
   return key in RESOURCES ? RESOURCES[key as ResourceKey] : null
@@ -464,10 +584,11 @@ export function emptyValues(config: ResourceConfig): Record<string, unknown> {
   const values: Record<string, unknown> = {}
   for (const field of config.fields) {
     if (field.type === 'boolean') values[field.name] = ['is_active', 'is_published', 'registration_enabled'].includes(field.name)
-    else if (field.type === 'multi' || field.type === 'stats') values[field.name] = []
+    else if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs') values[field.name] = []
     else if (field.type === 'select') values[field.name] = field.required ? field.options[0]?.value ?? '' : ''
     else for (const column of fieldColumns(field)) values[column] = ''
   }
   if ('sort' in values) values.sort = '0'
+  if ('priority' in values) values.priority = '0'
   return values
 }

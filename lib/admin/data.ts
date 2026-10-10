@@ -47,6 +47,7 @@ const SOURCES: Record<ReferenceSource, { table: string; label: string; order: st
   brands: { table: 'brands', label: 'name', order: 'name' },
   business_lines: { table: 'business_lines', label: 'name_es', order: 'sort' },
   sectors: { table: 'sectors', label: 'name_es', order: 'sort' },
+  products: { table: 'products', label: 'name_es', order: 'name_es' },
 }
 
 export async function loadOptions(config: ResourceConfig): Promise<Record<string, Option[]>> {
