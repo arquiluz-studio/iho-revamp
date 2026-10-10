@@ -6,23 +6,27 @@ import { ACUMIN } from '@/components/ui/tokens'
 import type { AreaCardVM } from '@/lib/types/site'
 import { StaggerGrid } from './StaggerGrid'
 
-export function AreasGrid({ areas, ctaHref }: { areas: AreaCardVM[]; ctaHref: string }) {
+export function AreasGrid({ areas, ctaHref, heading = true, background = '#f1ece3' }: { areas: AreaCardVM[]; ctaHref?: string; heading?: boolean; background?: string }) {
   const t = useTranslations('home.areas')
   // In a 3-column grid the first card spans 2 columns when that fills the last row.
   const firstSpans = areas.length % 3 === 2
   return (
-    <section id="areas" style={{ background: '#f1ece3' }}>
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 40px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 44 }}>
-          <div>
-            <SectionLabel>{t('label')}</SectionLabel>
-            <DisplayTitle><RichText text={t('title')} /></DisplayTitle>
+    <section id={heading ? 'areas' : undefined} style={{ background }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: heading ? '88px 40px' : '72px 40px' }}>
+        {heading && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 44 }}>
+            <div>
+              <SectionLabel>{t('label')}</SectionLabel>
+              <DisplayTitle><RichText text={t('title')} /></DisplayTitle>
+            </div>
+            {ctaHref && (
+              <a href={ctaHref} className="iho-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: '#ef483d', color: '#fff', padding: '13px 24px', borderRadius: 32, fontFamily: '"Source Sans 3", sans-serif', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
+                {t('cta')}
+                <ButtonArrow w={14} h={12} />
+              </a>
+            )}
           </div>
-          <a href={ctaHref} className="iho-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: '#ef483d', color: '#fff', padding: '13px 24px', borderRadius: 32, fontFamily: '"Source Sans 3", sans-serif', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
-            {t('cta')}
-            <ButtonArrow w={14} h={12} />
-          </a>
-        </div>
+        )}
         <StaggerGrid id="iho-areas-grid" delay={120} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
           {areas.map((a, i) => (
             <div key={`${a.num}-${a.title}`} className="iho-stagger" style={i === 0 && firstSpans ? { gridColumn: 'span 2' } : {}}>

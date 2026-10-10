@@ -43,6 +43,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cou
   ])
   const hrefs: PageHref[] = [
     '/',
+    '/about',
+    '/areas',
+    '/verticals',
     '/events',
     '/projects',
     '/brands',

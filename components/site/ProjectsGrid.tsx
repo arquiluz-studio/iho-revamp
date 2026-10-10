@@ -15,10 +15,10 @@ const SLOTS = [
   { col: '4 / 5', row: '3 / 4', sizes: '(max-width: 768px) 100vw, 25vw' },
 ]
 
-export function ProjectsGrid({ projects }: { projects: ProjectCardVM[] }) {
+export function ProjectsGrid({ projects, background }: { projects: ProjectCardVM[]; background?: string }) {
   const t = useTranslations('home.projects')
   if (projects.length === 0) return null
-  return (
+  const section = (
     <section id="proyectos" style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 40px' }}>
       <div style={{ textAlign: 'center', marginBottom: 44 }}>
         <SectionLabel>{t('label')}</SectionLabel>
@@ -47,4 +47,5 @@ export function ProjectsGrid({ projects }: { projects: ProjectCardVM[] }) {
       </StaggerGrid>
     </section>
   )
+  return background ? <div style={{ background }}>{section}</div> : section
 }

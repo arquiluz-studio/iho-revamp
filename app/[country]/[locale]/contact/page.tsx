@@ -6,8 +6,8 @@ import { innerChrome } from '@/components/site/SiteChrome'
 import { MONO, SANS } from '@/components/ui/tokens'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { sitePaths } from '@/lib/content/paths'
-import { imageOf } from '@/lib/content/site'
-import { getCountry, getCountrySettings, getOffices } from '@/lib/queries/site'
+import { imageOf, officesFor } from '@/lib/content/site'
+import { getCountry, getCountrySettings } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
@@ -24,11 +24,10 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
     getTranslations({ locale, namespace: 'contact' }),
     getTranslations({ locale, namespace: 'pages.contact' }),
     getCountrySettings(country),
-    getOffices(),
+    officesFor(country),
     getCountry(country),
     innerChrome(country, locale, paths),
   ])
-  const own = offices.filter(o => o.country_code === country)
   const channels = [
     countryRow?.phone && { label: tc('phone'), href: `tel:${countryRow.phone.replace(/\s/g, '')}`, value: countryRow.phone },
     countryRow?.whatsapp && { label: 'WhatsApp', href: `https://wa.me/${countryRow.whatsapp.replace(/\D/g, '')}`, value: countryRow.whatsapp },
@@ -51,7 +50,7 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
       </PageHero>
       <ContactSection
         countryCode={country}
-        offices={own.map(o => ({ city: o.city, address: o.address }))}
+        offices={offices}
         image={imageOf(settings?.contact_image, locale, tc('imageAlt'), legacyMedia.contactImage(), 'md')}
       />
     </PageShell>

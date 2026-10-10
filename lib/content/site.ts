@@ -65,12 +65,14 @@ function toEventVM(e: EventListRow, locale: AppLocale, countryName: string, labe
 }
 
 export function toBrandVM(b: Pick<CountryBrandRow, 'slug' | 'name' | 'logo_is_thin' | 'logo'>, locale: AppLocale, paths?: SitePaths): BrandVM {
+  const logo = imageOf(b.logo, locale, b.name, legacyMedia.brandLogo(b.slug), 'thumb')
   return {
     slug: b.slug,
     name: b.name,
     thin: b.logo_is_thin,
     href: paths?.brand(b.slug),
-    logo: imageOf(b.logo, locale, b.name, legacyMedia.brandLogo(b.slug), 'thumb'),
+    // Logos are cutouts. A sampled background (often near-white) would show through the transparent pixels.
+    logo: { ...logo, color: null, placeholder: null },
   }
 }
 
@@ -146,25 +148,48 @@ async function mapCountries(current: CountryCode, locale: AppLocale): Promise<Ma
     .sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent))
 }
 
-async function officesFor(current: CountryCode): Promise<OfficeVM[]> {
+/** Current country's offices first, then the rest, muted. */
+export async function officesFor(current: CountryCode): Promise<OfficeVM[]> {
   const offices = await getOffices()
   const own = offices.filter(o => o.country_code === current)
   const others = offices.filter(o => o.country_code !== current)
   return [...own.map(o => ({ city: o.city, address: o.address })), ...others.map(o => ({ city: o.city, address: o.address, muted: true }))]
 }
 
+/** Group copy, map, brands, team and featured projects for the About page. */
+export async function getGroupVM(country: CountryCode, locale: AppLocale, paths: SitePaths) {
+  const [settings, members, countries, brands, projects] = await Promise.all([
+    getCountrySettings(country),
+    getTeam(country),
+    mapCountries(country, locale),
+    getCountryBrands(country),
+    getProjects(country, { featured: true }),
+  ])
+  return {
+    stats: toStats(settings?.stats, locale),
+    mapCountries: countries,
+    brands: brands.map(b => toBrandVM(b, locale, paths)),
+    projects: projects.map(p => toProjectCardVM(p, locale, paths)),
+    team: members.map(m => ({
+      name: m.full_name,
+      role: t(m, 'role', locale),
+      objectPosition: m.photo_position ?? undefined,
+      linkedinUrl: m.linkedin_url,
+      photo: imageOf(m.photo, locale, m.full_name, legacyMedia.teamPhoto(m.full_name), 'md'),
+    })),
+  }
+}
+
 export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: SitePaths): Promise<HomeVM> {
-  const [tr, labels, settings, events, sectors, businessLines, projects, brands, team, map, offices, countryRow, products] = await Promise.all([
+  const [tr, labels, settings, events, sectors, businessLines, brands, projects, offices, countryRow, products] = await Promise.all([
     getTranslations({ locale }),
     eventLabels(locale),
     getCountrySettings(country),
     getEvents(country),
     getSectors(),
     getBusinessLines(),
-    getProjects(country, { featured: true }),
     getCountryBrands(country),
-    getTeam(country),
-    mapCountries(country, locale),
+    getProjects(country, { featured: true }),
     officesFor(country),
     getCountries().then(rows => rows.find(c => c.code === country)),
     featuredProducts(country, locale, paths),
@@ -181,7 +206,6 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
     sectors: sectors.map(s => t(s, 'name', locale).toUpperCase()),
     products,
     events: events.map(e => toEventVM(e, locale, countryName, labels, paths)),
-    group: { stats: toStats(settings?.stats, locale), mapCountries: map },
     areas: businessLines.map(
       (b, i): AreaCardVM => ({
         num: String(i + 1).padStart(2, '0'),
@@ -191,15 +215,8 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
         href: paths.area(localSlug(b, locale)),
       }),
     ),
-    projects: projects.map(p => toProjectCardVM(p, locale, paths)),
     brands: brands.map(b => toBrandVM(b, locale, paths)),
-    team: team.map(m => ({
-      name: m.full_name,
-      role: t(m, 'role', locale),
-      objectPosition: m.photo_position ?? undefined,
-      linkedinUrl: m.linkedin_url,
-      photo: imageOf(m.photo, locale, m.full_name, legacyMedia.teamPhoto(m.full_name), 'md'),
-    })),
+    projects: projects.map(p => toProjectCardVM(p, locale, paths)),
     offices,
     contactImage: imageOf(settings?.contact_image, locale, tr('contact.imageAlt'), legacyMedia.contactImage(), 'md'),
   }

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
-import { HomeView, homeNav } from '@/components/site/HomeView'
+import { HomeView } from '@/components/site/HomeView'
 import { siteChrome } from '@/components/site/SiteChrome'
 import { sitePaths } from '@/lib/content/paths'
 import { getHomeVM } from '@/lib/content/site'
@@ -24,12 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<SiteParams>
 
 export default async function HomePage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
-  const tn = await getTranslations('nav')
-  const nav = homeNav(tn)
   const paths = sitePaths(locale)
   const [data, chrome] = await Promise.all([
     getHomeVM(country, locale, paths),
-    siteChrome({ country, locale, paths, links: nav.links, cta: nav.cta, contactHref: '#contacto' }),
+    siteChrome({ country, locale, paths, contactHref: '#contacto' }),
   ])
-  return <HomeView data={data} countryCode={country} areasHref="#areas" chrome={chrome} />
+  return <HomeView data={data} countryCode={country} areasHref={paths.areas} contactHref="#contacto" chrome={chrome} />
 }

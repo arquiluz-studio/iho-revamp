@@ -101,11 +101,9 @@ export type HomeVM = {
   sectors: string[]
   products: ProductCardVM[]
   events: EventVM[]
-  group: { stats: StatVM[]; mapCountries: MapCountryVM[] }
   areas: AreaCardVM[]
-  projects: ProjectCardVM[]
   brands: BrandVM[]
-  team: TeamMemberVM[]
+  projects: ProjectCardVM[]
   offices: OfficeVM[]
   contactImage: ImageVM
 }

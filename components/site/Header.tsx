@@ -40,11 +40,11 @@ export function Header({ logoHref, links, cta, threshold = 0.75, tools }: Props)
           {links.map(l => (
             <a key={l.href} href={l.href} className="iho-nav-link" onClick={close}>{l.label}</a>
           ))}
-          {tools && <div className="iho-header-tools" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>{tools}</div>}
           <a href={cta.href} className="iho-btn" onClick={close} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
             {cta.label}
             <ButtonArrow w={15} h={13} />
           </a>
+          {tools && <div className="iho-header-tools" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>{tools}</div>}
         </nav>
         <button id="iho-menu-btn" className={menuOpen ? 'is-open' : ''} aria-label={t('menu')} aria-expanded={menuOpen} onClick={() => setMenuOpen(o => !o)}>
           <span /><span /><span />

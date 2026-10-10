@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import { signOut } from '@/app/admin/actions/session'
 import { CountrySelector } from '@/components/admin/CountrySelector'
 import { AdminNav, type NavSection } from '@/components/admin/AdminNav'
@@ -80,8 +81,10 @@ export default async function PanelLayout({ children }: { children: ReactNode })
     <div className="flex min-h-dvh">
       <aside className="sticky top-0 flex h-dvh w-60 shrink-0 flex-col border-r border-zinc-200 bg-white">
         <div className="border-b border-zinc-100 px-5 py-4">
-          <p className="text-[11px] font-semibold tracking-[0.2em] text-zinc-500">GRUPO IHO</p>
-          <p className="text-sm font-semibold">Admin</p>
+          <Link href="/admin" className="inline-flex items-end gap-2.5">
+            <img src="/images/logo-iho-red.png" alt="IHO" className="h-8 w-auto" />
+            <span className="text-2xl font-bold leading-none tracking-wide text-zinc-900">CMS</span>
+          </Link>
         </div>
         {session.countries.length > 0 && (
           <div className="border-b border-zinc-100 px-4 py-3">

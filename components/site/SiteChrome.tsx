@@ -20,39 +20,37 @@ const PLATFORM_LABELS: Record<string, string> = {
   whatsapp: 'WhatsApp',
 }
 
-/** Chrome for listing and detail pages (events, projects, brands, areas, spaces, contact, privacy). */
+/** Chrome for every public page except the home hero, which keeps a taller transparent header. */
 export async function innerChrome(country: CountryCode, locale: AppLocale, paths: SitePaths, localeHrefs?: LocaleHrefs): Promise<SiteChrome> {
-  const tn = await getTranslations({ locale, namespace: 'nav' })
   return siteChrome({
     country,
     locale,
     paths,
     threshold: 0.3,
-    links: [
-      { href: paths.events, label: tn('events') },
-      { href: paths.projects, label: tn('projects') },
-      { href: paths.brands, label: tn('brands') },
-      { href: paths.homeSection('grupo'), label: tn('group') },
-    ],
-    cta: { href: paths.contact, label: tn('contact') },
     contactHref: paths.contact,
     localeHrefs,
   })
 }
 
-/** Header + footer shared by every public page; footer social links come from the country's `social_accounts`. */
-export async function siteChrome({ country, paths, links, cta, threshold, contactHref, localeHrefs }: {
+/** Header + footer shared by every public page. The nav is the same on every page. */
+export async function siteChrome({ country, locale, paths, threshold, contactHref, localeHrefs }: {
   country: CountryCode
   locale: AppLocale
   paths: SitePaths
-  links: NavLink[]
-  cta: NavLink
   threshold?: number
   contactHref?: string
   /** Language switcher targets when the page slug differs per locale. */
   localeHrefs?: LocaleHrefs
 }): Promise<SiteChrome> {
-  const socials = await getSocialAccounts(country)
+  const [socials, tn] = await Promise.all([getSocialAccounts(country), getTranslations({ locale, namespace: 'nav' })])
+  const links: NavLink[] = [
+    { href: paths.about, label: tn('about') },
+    { href: paths.areas, label: tn('areas') },
+    { href: paths.verticals, label: tn('verticals') },
+    { href: paths.projects, label: tn('projects') },
+    { href: paths.events, label: tn('events') },
+  ]
+  const cta: NavLink = { href: paths.contact, label: tn('contact') }
   return {
     header: <Header logoHref={paths.home} threshold={threshold} links={links} cta={cta} tools={<SiteTools country={country} localeHrefs={localeHrefs} />} />,
     footer: (

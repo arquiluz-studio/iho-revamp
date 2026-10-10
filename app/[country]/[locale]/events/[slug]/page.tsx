@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
 import { EventView } from '@/components/site/event/EventView'
 import { siteChrome } from '@/components/site/SiteChrome'
 import { registerForEvent } from '@/lib/actions/events'
@@ -43,19 +42,11 @@ export default async function EventPage({ params }: { params: Promise<Params> })
   if (localSlug(row, locale) !== slug) permanentRedirect(paths.event(localSlug(row, locale)))
   const event = await getEventDetailVM(country, locale, slug, paths)
   if (!event) notFound()
-  const tn = await getTranslations('nav')
-  const showRegistration = !event.isPast && event.registration.enabled
   const chrome = await siteChrome({
     country,
     locale,
     paths,
     threshold: 0.6,
-    links: [
-      { href: paths.homeSection('eventos'), label: tn('events') },
-      ...(event.products.length ? [{ href: '#productos', label: tn('products') }] : []),
-      ...(event.gallery.length ? [{ href: '#galeria', label: tn('gallery') }] : []),
-    ],
-    cta: showRegistration ? { href: '#registro', label: tn('requestPass') } : { href: paths.homeSection('contacto'), label: tn('contact') },
     localeHrefs: localeHrefs(l => ({ pathname: '/events/[slug]', params: { slug: localSlug(row, l) } })),
   })
   return <EventView event={event} contactHref={paths.homeSection('contacto')} privacyHref={paths.privacy} chrome={chrome} register={registerForEvent} />

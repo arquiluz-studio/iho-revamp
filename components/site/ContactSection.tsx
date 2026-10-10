@@ -17,8 +17,8 @@ export function ContactSection({ offices, image, countryCode }: { offices: Offic
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 54, paddingTop: 30, borderTop: '1px solid rgba(20,18,12,0.12)' }}>
             {offices.map(a => (
               <div key={a.city}>
-                <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 11, letterSpacing: '1px', color: a.muted ? '#8a8478' : '#17150f', fontWeight: 700, marginBottom: 10 }}>{a.city}</div>
-                <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 13, lineHeight: 1.6, color: a.muted ? '#8a8478' : '#7a756a' }}>{a.address}</div>
+                <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 11, letterSpacing: '1px', color: a.muted ? '#8a8478' : '#17150f', fontWeight: a.muted ? 400 : 700, marginBottom: 10 }}>{a.city}</div>
+                <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 13, lineHeight: 1.6, color: a.muted ? '#8a8478' : '#17150f', fontWeight: a.muted ? 400 : 700 }}>{a.address}</div>
               </div>
             ))}
           </div>
