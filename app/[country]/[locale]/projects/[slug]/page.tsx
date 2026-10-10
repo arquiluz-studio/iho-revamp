@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { DownloadButton } from '@/components/site/DownloadButton'
 import { BrandLogos, Facts, PageHero, PageShell, ProjectCards, Prose, SectionHeading } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MediaImage } from '@/components/ui/MediaImage'
 import { SANS } from '@/components/ui/tokens'
-import { sitePaths } from '@/lib/content/paths'
+import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { imageOf, toBrandVM, toProjectCardVM } from '@/lib/content/site'
-import { paragraphs, t } from '@/lib/i18n-fields'
+import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getProjectBySlug, getProjects } from '@/lib/queries/projects'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
@@ -18,19 +18,19 @@ type Params = SiteParams & { slug: string }
 
 export async function generateStaticParams() {
   const params = siteStaticParams()
-  const slugs = new Map(await Promise.all([...new Set(params.map(p => p.country))].map(async c => [c, (await getProjects(c)).map(p => p.slug)] as const)))
-  return params.flatMap(p => (slugs.get(p.country) ?? []).map(slug => ({ ...p, slug })))
+  const projects = new Map(await Promise.all([...new Set(params.map(p => p.country))].map(async c => [c, await getProjects(c)] as const)))
+  return params.flatMap(p => (projects.get(p.country) ?? []).map(project => ({ ...p, slug: localSlug(project, p.locale) })))
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
-  const project = await getProjectBySlug(country, slug)
+  const project = await getProjectBySlug(country, slug, locale)
   if (!project) return {}
   return {
     title: `${t(project, 'title', locale)} — IHO`,
     description: t(project, 'summary', locale) || undefined,
-    alternates: buildAlternates({ href: { pathname: '/projects/[slug]', params: { slug } }, country, locale, availableIn: [country] }),
+    alternates: buildAlternates({ href: l => ({ pathname: '/projects/[slug]', params: { slug: localSlug(project, l) } }), country, locale, availableIn: [country] }),
   }
 }
 
@@ -38,12 +38,13 @@ export default async function ProjectPage({ params }: { params: Promise<Params> 
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
   const paths = sitePaths(locale)
-  const [project, tp, chrome] = await Promise.all([
-    getProjectBySlug(country, slug),
-    getTranslations({ locale, namespace: 'pages.projects' }),
-    innerChrome(country, locale, paths),
-  ])
+  const project = await getProjectBySlug(country, slug, locale)
   if (!project) notFound()
+  if (localSlug(project, locale) !== slug) permanentRedirect(paths.project(localSlug(project, locale)))
+  const [tp, chrome] = await Promise.all([
+    getTranslations({ locale, namespace: 'pages.projects' }),
+    innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/projects/[slug]', params: { slug: localSlug(project, l) } }))),
+  ])
 
   const title = t(project, 'title', locale)
   const cover = imageOf(project.cover, locale, title, legacyMedia.projectCover(project.slug))
@@ -63,10 +64,10 @@ export default async function ProjectPage({ params }: { params: Promise<Params> 
               { label: tp('client'), value: project.client_name },
               { label: tp('year'), value: project.year },
               { label: tp('city'), value: project.city },
-              { label: tp('sector'), value: project.sector && link(paths.space(project.sector.slug), t(project.sector, 'name', locale)) },
+              { label: tp('sector'), value: project.sector && link(paths.space(localSlug(project.sector, locale)), t(project.sector, 'name', locale)) },
               {
                 label: tp('areas'),
-                value: lines.length > 0 && lines.map((l, i) => <span key={l.id}>{i > 0 && ', '}{link(paths.area(l.slug), t(l, 'name', locale))}</span>),
+                value: lines.length > 0 && lines.map((l, i) => <span key={l.id}>{i > 0 && ', '}{link(paths.area(localSlug(l, locale)), t(l, 'name', locale))}</span>),
               },
             ]}
           />

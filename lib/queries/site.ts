@@ -66,7 +66,7 @@ export function getBusinessLines() {
     must(
       await db
         .from('business_lines')
-        .select(`id, slug, name_es, name_en, description_es, description_en, sort, cover:${media('business_lines_cover_media_id_fkey')}` as const)
+        .select(`id, slug, slug_en, name_es, name_en, description_es, description_en, sort, cover:${media('business_lines_cover_media_id_fkey')}` as const)
         .order('sort'),
       'business_lines',
     ),
@@ -78,7 +78,7 @@ export function getSectors() {
     must(
       await db
         .from('sectors')
-        .select(`id, slug, name_es, name_en, description_es, description_en, sort, cover:${media('sectors_cover_media_id_fkey')}` as const)
+        .select(`id, slug, slug_en, name_es, name_en, description_es, description_en, sort, cover:${media('sectors_cover_media_id_fkey')}` as const)
         .order('sort'),
       'sectors',
     ),

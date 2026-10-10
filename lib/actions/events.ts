@@ -6,7 +6,7 @@ import { countryOrigin, isCountryCode, isLocale, type AppLocale } from '@/config
 import { longDate, timeRange, type Locale } from '@/lib/dates'
 import { detailsHtml, detailsText, notificationInbox, sendEmail } from '@/lib/email'
 import { plainTitle } from '@/lib/events/ics'
-import { t } from '@/lib/i18n-fields'
+import { localSlug, t } from '@/lib/i18n-fields'
 import { isRateLimited, verifyTurnstile } from '@/lib/security/spam'
 import { buildAlternates } from '@/lib/seo'
 import { createSupabaseAdminClient, hasServiceRole } from '@/lib/supabase/admin'
@@ -89,7 +89,7 @@ async function notify(
 ) {
   const { data: event } = await admin
     .from('events')
-    .select('id, slug, country_code, title_es, title_en, starts_at, ends_at, timezone, venue_name, address, city, is_online, online_url, countries(email, name_es)')
+    .select('id, slug, slug_en, country_code, title_es, title_en, starts_at, ends_at, timezone, venue_name, address, city, is_online, online_url, countries(email, name_es)')
     .eq('id', data.eventId)
     .maybeSingle()
   if (!event || !isCountryCode(event.country_code)) return
@@ -99,7 +99,7 @@ async function notify(
   const when = `${longDate(event.starts_at, event.timezone, locale as Locale)} · ${timeRange(event.starts_at, event.ends_at, event.timezone)}`
   const where = event.is_online ? event.online_url : [event.venue_name, event.address, event.city].filter(Boolean).join(', ')
   const eventUrl = String(
-    buildAlternates({ href: { pathname: '/events/[slug]', params: { slug: event.slug } }, country: event.country_code, locale, availableIn: [event.country_code] })
+    buildAlternates({ href: { pathname: '/events/[slug]', params: { slug: localSlug(event, locale) } }, country: event.country_code, locale, availableIn: [event.country_code] })
       .canonical,
   )
   const icsUrl = `${countryOrigin(event.country_code)}/api/events/${event.id}/ics?lang=${locale}`

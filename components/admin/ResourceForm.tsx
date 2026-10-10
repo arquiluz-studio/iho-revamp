@@ -27,6 +27,14 @@ type Props = {
 
 type Tab = 'general' | 'es' | 'en'
 
+const slugify = (text: string) =>
+  text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
 export function ResourceForm({ resource, id, countryCode, initialValues, options, media, canEdit, canDelete, basePath, aside }: Props) {
   const config = RESOURCES[resource]
   const router = useRouter()
@@ -71,6 +79,15 @@ export function ResourceForm({ resource, id, countryCode, initialValues, options
     })
   }
 
+  const titleField = localized.find(f => f.type === 'text')?.name
+  /** `slug` comes from the Spanish title, `slug_en` from the English one. */
+  const generateSlug = (column: string) => {
+    if (!titleField) return
+    const source = form.getValues(`${titleField}_${column === 'slug_en' ? 'en' : 'es'}`)
+    const slug = slugify(typeof source === 'string' ? source : '')
+    if (slug) form.setValue(column, slug, { shouldDirty: true, shouldValidate: true })
+  }
+
   const renderField = (field: Field, column: string) => (
     <FieldInput
       key={column}
@@ -85,6 +102,7 @@ export function ResourceForm({ resource, id, countryCode, initialValues, options
       countryCode={config.scope === 'country' ? countryCode : null}
       disabled={!canEdit || (config.pkInput === true && column === config.pk && Boolean(id))}
       projectId={resource === 'projects' ? id : null}
+      onGenerate={field.type === 'slug' && titleField ? () => generateSlug(column) : undefined}
     />
   )
 
@@ -162,6 +180,7 @@ function FieldInput({
   countryCode,
   disabled,
   projectId,
+  onGenerate,
 }: {
   field: Field
   column: string
@@ -174,6 +193,7 @@ function FieldInput({
   countryCode: string | null
   disabled: boolean
   projectId: string | null
+  onGenerate?: () => void
 }) {
   const lang = column.endsWith('_en') ? ' (EN)' : column.endsWith('_es') ? ' (ES)' : ''
   const label = (
@@ -249,6 +269,17 @@ function FieldInput({
       return shell(<StatsEditor control={control} register={register} name={field.name} disabled={disabled} />)
     case 'specs':
       return shell(<SpecsEditor control={control} register={register} name={field.name} disabled={disabled} />)
+    case 'slug':
+      return shell(
+        <div className="flex gap-2">
+          <Input id={column} disabled={disabled} {...register(column)} />
+          {onGenerate && (
+            <Button type="button" variant="ghost" disabled={disabled} onClick={onGenerate}>
+              Generar del título
+            </Button>
+          )}
+        </div>,
+      )
     default:
       return shell(
         <Input

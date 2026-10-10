@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { isCountryCode, isLocale } from '@/config/countries'
 import { buildIcs } from '@/lib/events/ics'
-import { t } from '@/lib/i18n-fields'
+import { localSlug, t } from '@/lib/i18n-fields'
 import { buildAlternates } from '@/lib/seo'
 import { createSupabasePublicClient } from '@/lib/supabase/server'
 
@@ -14,14 +14,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const { data: event } = await createSupabasePublicClient()
     .from('events')
-    .select('id, slug, country_code, title_es, title_en, summary_es, summary_en, starts_at, ends_at, is_online, online_url, venue_name, address, city')
+    .select('id, slug, slug_en, country_code, title_es, title_en, summary_es, summary_en, starts_at, ends_at, is_online, online_url, venue_name, address, city')
     .eq('id', id)
     .eq('status', 'published')
     .maybeSingle()
   if (!event || !isCountryCode(event.country_code)) return new Response('Not found', { status: 404 })
 
   const url = String(
-    buildAlternates({ href: { pathname: '/events/[slug]', params: { slug: event.slug } }, country: event.country_code, locale, availableIn: [event.country_code] })
+    buildAlternates({ href: { pathname: '/events/[slug]', params: { slug: localSlug(event, locale) } }, country: event.country_code, locale, availableIn: [event.country_code] })
       .canonical,
   )
   const location = event.is_online ? event.online_url : [event.venue_name, event.address, event.city].filter(Boolean).join(', ')

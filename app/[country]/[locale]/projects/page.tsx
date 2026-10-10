@@ -4,7 +4,7 @@ import { Chips, EmptyNote, PageHero, PageShell, ProjectCards } from '@/component
 import { innerChrome } from '@/components/site/SiteChrome'
 import { sitePaths } from '@/lib/content/paths'
 import { toProjectCardVM } from '@/lib/content/site'
-import { t } from '@/lib/i18n-fields'
+import { localSlug, t } from '@/lib/i18n-fields'
 import { getProjects } from '@/lib/queries/projects'
 import { getSectors } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
@@ -33,7 +33,7 @@ export default async function ProjectsPage({ params }: { params: Promise<SitePar
       <PageHero label={tp('label')} title={tp('title')} intro={th('intro')} image={cards[0]?.image}>
         {usedSectors.length > 1 && (
           <div style={{ marginTop: 32 }} className="iho-chips-dark">
-            <Chips links={usedSectors.map(s => ({ href: paths.space(s.slug), label: t(s, 'name', locale) }))} />
+            <Chips links={usedSectors.map(s => ({ href: paths.space(localSlug(s, locale)), label: t(s, 'name', locale) }))} />
           </div>
         )}
       </PageHero>

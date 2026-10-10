@@ -148,6 +148,7 @@ export type Database = {
           name_en: string | null
           name_es: string
           slug: string
+          slug_en: string | null
           sort: number
           updated_at: string
         }
@@ -160,6 +161,7 @@ export type Database = {
           name_en?: string | null
           name_es: string
           slug: string
+          slug_en?: string | null
           sort?: number
           updated_at?: string
         }
@@ -172,6 +174,7 @@ export type Database = {
           name_en?: string | null
           name_es?: string
           slug?: string
+          slug_en?: string | null
           sort?: number
           updated_at?: string
         }
@@ -725,6 +728,7 @@ export type Database = {
           registration_closes_at: string | null
           registration_enabled: boolean
           slug: string
+          slug_en: string | null
           starts_at: string
           status: Database["public"]["Enums"]["content_status"]
           summary_en: string | null
@@ -753,6 +757,7 @@ export type Database = {
           registration_closes_at?: string | null
           registration_enabled?: boolean
           slug: string
+          slug_en?: string | null
           starts_at: string
           status?: Database["public"]["Enums"]["content_status"]
           summary_en?: string | null
@@ -781,6 +786,7 @@ export type Database = {
           registration_closes_at?: string | null
           registration_enabled?: boolean
           slug?: string
+          slug_en?: string | null
           starts_at?: string
           status?: Database["public"]["Enums"]["content_status"]
           summary_en?: string | null
@@ -1242,6 +1248,7 @@ export type Database = {
           name_en: string | null
           name_es: string
           slug: string
+          slug_en: string | null
           specs: Json
           status: Database["public"]["Enums"]["content_status"]
           updated_at: string
@@ -1259,6 +1266,7 @@ export type Database = {
           name_en?: string | null
           name_es: string
           slug: string
+          slug_en?: string | null
           specs?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
@@ -1276,6 +1284,7 @@ export type Database = {
           name_en?: string | null
           name_es?: string
           slug?: string
+          slug_en?: string | null
           specs?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
@@ -1447,6 +1456,7 @@ export type Database = {
           published_at: string | null
           sector_id: string | null
           slug: string
+          slug_en: string | null
           sort: number
           status: Database["public"]["Enums"]["content_status"]
           summary_en: string | null
@@ -1469,6 +1479,7 @@ export type Database = {
           published_at?: string | null
           sector_id?: string | null
           slug: string
+          slug_en?: string | null
           sort?: number
           status?: Database["public"]["Enums"]["content_status"]
           summary_en?: string | null
@@ -1491,6 +1502,7 @@ export type Database = {
           published_at?: string | null
           sector_id?: string | null
           slug?: string
+          slug_en?: string | null
           sort?: number
           status?: Database["public"]["Enums"]["content_status"]
           summary_en?: string | null
@@ -1534,6 +1546,7 @@ export type Database = {
           name_en: string | null
           name_es: string
           slug: string
+          slug_en: string | null
           sort: number
           updated_at: string
         }
@@ -1546,6 +1559,7 @@ export type Database = {
           name_en?: string | null
           name_es: string
           slug: string
+          slug_en?: string | null
           sort?: number
           updated_at?: string
         }
@@ -1558,6 +1572,7 @@ export type Database = {
           name_en?: string | null
           name_es?: string
           slug?: string
+          slug_en?: string | null
           sort?: number
           updated_at?: string
         }

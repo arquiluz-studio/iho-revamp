@@ -7,7 +7,7 @@ import type { NavLink } from '@/lib/types/site'
 import { Footer } from './Footer'
 import { Header } from './Header'
 import type { SiteChrome } from './HomeView'
-import { SiteTools } from './SiteTools'
+import { SiteTools, type LocaleHrefs } from './SiteTools'
 
 const PLATFORM_LABELS: Record<string, string> = {
   instagram: 'Instagram',
@@ -21,7 +21,7 @@ const PLATFORM_LABELS: Record<string, string> = {
 }
 
 /** Chrome for listing and detail pages (events, projects, brands, areas, spaces, contact, privacy). */
-export async function innerChrome(country: CountryCode, locale: AppLocale, paths: SitePaths): Promise<SiteChrome> {
+export async function innerChrome(country: CountryCode, locale: AppLocale, paths: SitePaths, localeHrefs?: LocaleHrefs): Promise<SiteChrome> {
   const tn = await getTranslations({ locale, namespace: 'nav' })
   return siteChrome({
     country,
@@ -36,11 +36,12 @@ export async function innerChrome(country: CountryCode, locale: AppLocale, paths
     ],
     cta: { href: paths.contact, label: tn('contact') },
     contactHref: paths.contact,
+    localeHrefs,
   })
 }
 
 /** Header + footer shared by every public page; footer social links come from the country's `social_accounts`. */
-export async function siteChrome({ country, paths, links, cta, threshold, contactHref }: {
+export async function siteChrome({ country, paths, links, cta, threshold, contactHref, localeHrefs }: {
   country: CountryCode
   locale: AppLocale
   paths: SitePaths
@@ -48,17 +49,19 @@ export async function siteChrome({ country, paths, links, cta, threshold, contac
   cta: NavLink
   threshold?: number
   contactHref?: string
+  /** Language switcher targets when the page slug differs per locale. */
+  localeHrefs?: LocaleHrefs
 }): Promise<SiteChrome> {
   const socials = await getSocialAccounts(country)
   return {
-    header: <Header logoHref={paths.home} threshold={threshold} links={links} cta={cta} tools={<SiteTools country={country} />} />,
+    header: <Header logoHref={paths.home} threshold={threshold} links={links} cta={cta} tools={<SiteTools country={country} localeHrefs={localeHrefs} />} />,
     footer: (
       <Footer
         homeHref={paths.home}
         contactHref={contactHref ?? paths.homeSection('contacto')}
         privacyHref={paths.privacy}
         socials={socials.map(s => ({ platform: s.platform, url: s.url, label: PLATFORM_LABELS[s.platform] ?? s.platform }))}
-        tools={<SiteTools country={country} placement="footer" />}
+        tools={<SiteTools country={country} placement="footer" localeHrefs={localeHrefs} />}
       />
     ),
   }

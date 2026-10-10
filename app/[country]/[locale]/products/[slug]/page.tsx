@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { ContactForm } from '@/components/site/ContactForm'
 import { Chips, Facts, PageHero, PageShell, Prose, SectionHeading } from '@/components/site/pages/PageParts'
@@ -8,9 +8,9 @@ import { innerChrome } from '@/components/site/SiteChrome'
 import { MediaImage } from '@/components/ui/MediaImage'
 import { ACUMIN, MONO } from '@/components/ui/tokens'
 import { legacyMedia } from '@/lib/content/legacy-media'
-import { sitePaths } from '@/lib/content/paths'
+import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { imageOf, priceLabels, toProductCardVM } from '@/lib/content/site'
-import { paragraphs, t } from '@/lib/i18n-fields'
+import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getCatalog, getProductBySlug } from '@/lib/queries/catalog'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
@@ -21,21 +21,19 @@ export const revalidate = 3600
 
 export async function generateStaticParams() {
   const params = siteStaticParams()
-  const slugs = new Map(
-    await Promise.all([...new Set(params.map(p => p.country))].map(async c => [c, (await getCatalog(c)).map(p => p.slug)] as const)),
-  )
-  return params.flatMap(p => (slugs.get(p.country) ?? []).map(slug => ({ ...p, slug })))
+  const catalogs = new Map(await Promise.all([...new Set(params.map(p => p.country))].map(async c => [c, await getCatalog(c)] as const)))
+  return params.flatMap(p => (catalogs.get(p.country) ?? []).map(product => ({ ...p, slug: localSlug(product, p.locale) })))
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
-  const product = await getProductBySlug(country, slug)
+  const product = await getProductBySlug(country, slug, locale)
   if (!product) return {}
   return {
     title: `${t(product, 'name', locale)}${product.brand ? ` · ${product.brand.name}` : ''} — IHO`,
     description: t(product, 'description', locale).slice(0, 160) || undefined,
-    alternates: buildAlternates({ href: { pathname: '/products/[slug]', params: { slug } }, country, locale, availableIn: [country] }),
+    alternates: buildAlternates({ href: l => ({ pathname: '/products/[slug]', params: { slug: localSlug(product, l) } }), country, locale, availableIn: [country] }),
   }
 }
 
@@ -43,13 +41,14 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
   const paths = sitePaths(locale)
-  const [product, catalog, tp, chrome] = await Promise.all([
-    getProductBySlug(country, slug),
+  const product = await getProductBySlug(country, slug, locale)
+  if (!product) notFound()
+  if (localSlug(product, locale) !== slug) permanentRedirect(paths.product(localSlug(product, locale)))
+  const [catalog, tp, chrome] = await Promise.all([
     getCatalog(country),
     getTranslations({ locale, namespace: 'pages.products' }),
-    innerChrome(country, locale, paths),
+    innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/products/[slug]', params: { slug: localSlug(product, l) } }))),
   ])
-  if (!product) notFound()
 
   const name = t(product, 'name', locale)
   const cover = imageOf(product.cover, locale, name, legacyMedia.productCover(product.slug), 'lg')
@@ -64,8 +63,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const variants = product.variants.length > 1 ? product.variants : []
   const related = catalog.filter(p => p.id !== product.id && p.brand?.id === product.brand?.id).slice(0, 4)
   const chips = [
-    ...(product.business_line ? [{ href: paths.area(product.business_line.slug), label: t(product.business_line, 'name', locale) }] : []),
-    ...product.sectors.map(s => ({ href: paths.space(s.slug), label: t(s, 'name', locale) })),
+    ...(product.business_line ? [{ href: paths.area(localSlug(product.business_line, locale)), label: t(product.business_line, 'name', locale) }] : []),
+    ...product.sectors.map(s => ({ href: paths.space(localSlug(s, locale)), label: t(s, 'name', locale) })),
   ]
 
   return (

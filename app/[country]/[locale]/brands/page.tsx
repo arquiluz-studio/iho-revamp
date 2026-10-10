@@ -4,7 +4,7 @@ import { BrandLogos, Chips, PageHero, PageShell } from '@/components/site/pages/
 import { innerChrome } from '@/components/site/SiteChrome'
 import { sitePaths } from '@/lib/content/paths'
 import { toBrandVM } from '@/lib/content/site'
-import { t } from '@/lib/i18n-fields'
+import { localSlug, t } from '@/lib/i18n-fields'
 import { getCountryBrands } from '@/lib/queries/brands'
 import { getBusinessLines } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
@@ -30,7 +30,7 @@ export default async function BrandsPage({ params }: { params: Promise<SiteParam
     <PageShell chrome={chrome}>
       <PageHero label={tp('label')} title={tp('title')} intro={th('intro')}>
         <div style={{ marginTop: 32 }} className="iho-chips-dark">
-          <Chips links={lines.map(l => ({ href: paths.area(l.slug), label: t(l, 'name', locale) }))} />
+          <Chips links={lines.map(l => ({ href: paths.area(localSlug(l, locale)), label: t(l, 'name', locale) }))} />
         </div>
       </PageHero>
       <section className="iho-page-section">

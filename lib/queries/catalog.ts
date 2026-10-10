@@ -1,5 +1,7 @@
 import 'server-only'
+import type { AppLocale } from '@/config/countries'
 import { cacheTags } from '@/lib/cache-tags'
+import { pickBySlug } from '@/lib/i18n-fields'
 import { MEDIA_SELECT } from '@/lib/media'
 import { cachedQuery, maybe, media, must, visibleStatuses, type Db } from './core'
 
@@ -9,11 +11,11 @@ const CATALOG_REVALIDATE_SECONDS = 60 * 60
 const catalogTags = (country: string) => [cacheTags.country(country, 'catalog'), cacheTags.products, cacheTags.brands, cacheTags.taxonomies]
 
 const CATALOG_SELECT = `is_purchasable, is_featured, lead_time_days, sort,
-  product:products!inner(id, slug, name_es, name_en, designer, status,
+  product:products!inner(id, slug, slug_en, name_es, name_en, designer, status,
     cover:${media('products_cover_media_id_fkey')},
     brand:brands(id, slug, name, is_active),
-    business_line:business_lines(id, slug, name_es, name_en),
-    sectors:product_sectors(sector:sectors(id, slug, name_es, name_en)))` as const
+    business_line:business_lines(id, slug, slug_en, name_es, name_en),
+    sectors:product_sectors(sector:sectors(id, slug, slug_en, name_es, name_en)))` as const
 
 export type VariantOffer = {
   variantId: string
@@ -93,8 +95,9 @@ export function getCatalog(country: string) {
 
 export type CatalogRow = Awaited<ReturnType<typeof getCatalog>>[number]
 
-export async function getProductBySlug(country: string, slug: string) {
-  const listed = (await getCatalog(country)).find(p => p.slug === slug)
+/** Product addressed by its Spanish or English slug (see `pickBySlug`). */
+export async function getProductBySlug(country: string, slug: string, locale: AppLocale) {
+  const listed = pickBySlug(await getCatalog(country), slug, locale)
   if (!listed) return null
   // `listed` is merged outside the cached detail so one cache entry never freezes a stale copy of the other.
   const detail = await cachedQuery(

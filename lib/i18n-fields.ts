@@ -11,6 +11,21 @@ export function t(row: Row | null | undefined, field: string, locale: AppLocale 
   return typeof es === 'string' ? es : ''
 }
 
+/** URL slug for the locale: `slug` is Spanish, `slug_en` the optional English one. */
+export function localSlug(row: { slug: string; slug_en?: string | null }, locale: AppLocale | string): string {
+  return (locale === 'en' && row.slug_en) || row.slug
+}
+
+export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/
+
+/**
+ * Row addressed by a URL slug: the one whose slug for this locale matches, else one matching in the other
+ * language (the page then redirects to the canonical slug).
+ */
+export function pickBySlug<T extends { slug: string; slug_en?: string | null }>(rows: readonly T[], slug: string, locale: AppLocale | string): T | null {
+  return rows.find(r => localSlug(r, locale) === slug) ?? rows.find(r => r.slug === slug || r.slug_en === slug) ?? null
+}
+
 /** Splits a multi-paragraph text column into paragraphs (blank-line separated). */
 export function paragraphs(text: string): string[] {
   return text

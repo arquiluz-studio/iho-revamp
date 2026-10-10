@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { EventView } from '@/components/site/event/EventView'
 import { siteChrome } from '@/components/site/SiteChrome'
 import { registerForEvent } from '@/lib/actions/events'
-import { sitePaths } from '@/lib/content/paths'
+import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { getEventDetailVM } from '@/lib/content/site'
 import { plainTitle } from '@/lib/events/ics'
-import { t } from '@/lib/i18n-fields'
+import { localSlug, t } from '@/lib/i18n-fields'
 import { getEventBySlug, getEvents } from '@/lib/queries/events'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
@@ -18,19 +18,19 @@ export const revalidate = 3600
 
 export async function generateStaticParams() {
   const params = siteStaticParams()
-  const slugs = new Map(await Promise.all([...new Set(params.map(p => p.country))].map(async c => [c, (await getEvents(c)).map(e => e.slug)] as const)))
-  return params.flatMap(p => (slugs.get(p.country) ?? []).map(slug => ({ ...p, slug })))
+  const events = new Map(await Promise.all([...new Set(params.map(p => p.country))].map(async c => [c, await getEvents(c)] as const)))
+  return params.flatMap(p => (events.get(p.country) ?? []).map(e => ({ ...p, slug: localSlug(e, p.locale) })))
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
-  const event = await getEventBySlug(country, slug)
+  const event = await getEventBySlug(country, slug, locale)
   if (!event) return {}
   return {
     title: `${plainTitle(t(event, 'title', locale))} — IHO`,
     description: t(event, 'summary', locale) || undefined,
-    alternates: buildAlternates({ href: { pathname: '/events/[slug]', params: { slug } }, country, locale, availableIn: [country] }),
+    alternates: buildAlternates({ href: l => ({ pathname: '/events/[slug]', params: { slug: localSlug(event, l) } }), country, locale, availableIn: [country] }),
   }
 }
 
@@ -38,6 +38,9 @@ export default async function EventPage({ params }: { params: Promise<Params> })
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
   const paths = sitePaths(locale)
+  const row = await getEventBySlug(country, slug, locale)
+  if (!row) notFound()
+  if (localSlug(row, locale) !== slug) permanentRedirect(paths.event(localSlug(row, locale)))
   const event = await getEventDetailVM(country, locale, slug, paths)
   if (!event) notFound()
   const tn = await getTranslations('nav')
@@ -53,6 +56,7 @@ export default async function EventPage({ params }: { params: Promise<Params> })
       ...(event.gallery.length ? [{ href: '#galeria', label: tn('gallery') }] : []),
     ],
     cta: showRegistration ? { href: '#registro', label: tn('requestPass') } : { href: paths.homeSection('contacto'), label: tn('contact') },
+    localeHrefs: localeHrefs(l => ({ pathname: '/events/[slug]', params: { slug: localSlug(row, l) } })),
   })
   return <EventView event={event} contactHref={paths.homeSection('contacto')} privacyHref={paths.privacy} chrome={chrome} register={registerForEvent} />
 }

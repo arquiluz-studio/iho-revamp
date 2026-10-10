@@ -1,4 +1,4 @@
-import type { AppLocale } from '@/config/countries'
+import { LOCALES, type AppLocale } from '@/config/countries'
 import { getPathname } from '@/i18n/navigation'
 
 /** Localized pathnames of the public site for one locale (the country comes from the host). */
@@ -23,3 +23,10 @@ export function sitePaths(locale: AppLocale) {
 }
 
 export type SitePaths = ReturnType<typeof sitePaths>
+
+type Href = Parameters<typeof getPathname>[0]['href']
+
+/** Same page in every locale, for the language switcher of pages whose slug is localized. */
+export function localeHrefs(hrefFor: (locale: AppLocale) => Href): Record<AppLocale, string> {
+  return Object.fromEntries(LOCALES.map(l => [l, getPathname({ href: hrefFor(l), locale: l })])) as Record<AppLocale, string>
+}

@@ -1,10 +1,11 @@
 'use client'
 import { useParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
-import { LOCALES } from '@/config/countries'
+import { LOCALES, type AppLocale } from '@/config/countries'
 import { getPathname, usePathname } from '@/i18n/navigation'
 
-export function LocaleSwitcher() {
+/** `hrefs` overrides the target per locale on pages whose slug is localized. */
+export function LocaleSwitcher({ hrefs }: { hrefs?: Partial<Record<AppLocale, string>> }) {
   const t = useTranslations('switchers')
   const locale = useLocale()
   const pathname = usePathname()
@@ -19,9 +20,11 @@ export function LocaleSwitcher() {
             <span aria-current="true">{l.toUpperCase()}</span>
           ) : (
             <a
-              // Slugs are shared between locales, so the current route params are reused as-is.
-              // @ts-expect-error -- pathname and params come from the current route and always match.
-              href={getPathname({ href: { pathname, params }, locale: l })}
+              href={
+                hrefs?.[l] ??
+                // @ts-expect-error -- pathname and params come from the current route and always match.
+                getPathname({ href: { pathname, params }, locale: l })
+              }
               hrefLang={l}
             >
               {l.toUpperCase()}

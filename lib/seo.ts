@@ -22,16 +22,18 @@ export function localizedUrl(country: CountryCode, locale: AppLocale, href: Href
  * `canonical` always points to the current country's own domain.
  */
 export function buildAlternates({ href, country, locale, availableIn = [...COUNTRY_CODES] }: {
-  href: Href
+  /** A function when the path differs per locale (localized slugs). */
+  href: Href | ((locale: AppLocale) => Href)
   country: CountryCode
   locale: AppLocale
   availableIn?: readonly CountryCode[]
 }): NonNullable<Metadata['alternates']> {
+  const hrefFor = typeof href === 'function' ? href : () => href
   const languages: Record<string, string> = {}
   for (const c of availableIn) {
-    for (const l of LOCALES) languages[htmlLang(l, c)] = localizedUrl(c, l, href)
+    for (const l of LOCALES) languages[htmlLang(l, c)] = localizedUrl(c, l, hrefFor(l))
   }
   const defaultCountry = availableIn.includes(HEADQUARTERS) ? HEADQUARTERS : country
-  languages['x-default'] = localizedUrl(defaultCountry, DEFAULT_LOCALE, href)
-  return { canonical: localizedUrl(country, locale, href), languages }
+  languages['x-default'] = localizedUrl(defaultCountry, DEFAULT_LOCALE, hrefFor(DEFAULT_LOCALE))
+  return { canonical: localizedUrl(country, locale, hrefFor(locale)), languages }
 }

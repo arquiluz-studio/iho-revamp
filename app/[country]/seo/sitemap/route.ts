@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation'
-import { COUNTRY_CODES, LOCALES, htmlLang, isCountryCode, type CountryCode } from '@/config/countries'
+import { COUNTRY_CODES, LOCALES, htmlLang, isCountryCode, type AppLocale, type CountryCode } from '@/config/countries'
 import { getPathname } from '@/i18n/navigation'
 import { getCountryBrands } from '@/lib/queries/brands'
 import { getCatalog } from '@/lib/queries/catalog'
+import { localSlug } from '@/lib/i18n-fields'
 import { getEvents } from '@/lib/queries/events'
 import { getProjects } from '@/lib/queries/projects'
 import { getBusinessLines, getSectors } from '@/lib/queries/site'
@@ -15,8 +16,10 @@ export function generateStaticParams() {
 }
 
 type Href = Parameters<typeof getPathname>[0]['href']
+/** A function when the slug differs per locale. */
+type PageHref = Href | ((locale: AppLocale) => Href)
 
-function entry(country: CountryCode, href: Href): string {
+function entry(country: CountryCode, href: PageHref): string {
   return LOCALES.map(locale => {
     const { canonical, languages } = buildAlternates({ href, country, locale, availableIn: [country] })
     const links = LOCALES.map(l => {
@@ -38,7 +41,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cou
     getSectors(),
     getCatalog(country),
   ])
-  const hrefs: Href[] = [
+  const hrefs: PageHref[] = [
     '/',
     '/events',
     '/projects',
@@ -46,12 +49,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cou
     '/products',
     '/contact',
     '/privacy',
-    ...events.map(e => ({ pathname: '/events/[slug]' as const, params: { slug: e.slug } })),
-    ...projects.map(p => ({ pathname: '/projects/[slug]' as const, params: { slug: p.slug } })),
+    ...events.map(e => (l: AppLocale) => ({ pathname: '/events/[slug]' as const, params: { slug: localSlug(e, l) } })),
+    ...projects.map(p => (l: AppLocale) => ({ pathname: '/projects/[slug]' as const, params: { slug: localSlug(p, l) } })),
     ...brands.map(b => ({ pathname: '/brands/[slug]' as const, params: { slug: b.slug } })),
-    ...lines.map(l => ({ pathname: '/areas/[businessLine]' as const, params: { businessLine: l.slug } })),
-    ...sectors.map(s => ({ pathname: '/spaces/[sector]' as const, params: { sector: s.slug } })),
-    ...products.map(p => ({ pathname: '/products/[slug]' as const, params: { slug: p.slug } })),
+    ...lines.map(line => (l: AppLocale) => ({ pathname: '/areas/[businessLine]' as const, params: { businessLine: localSlug(line, l) } })),
+    ...sectors.map(s => (l: AppLocale) => ({ pathname: '/spaces/[sector]' as const, params: { sector: localSlug(s, l) } })),
+    ...products.map(p => (l: AppLocale) => ({ pathname: '/products/[slug]' as const, params: { slug: localSlug(p, l) } })),
   ]
   const body =
     '<?xml version="1.0" encoding="UTF-8"?>' +

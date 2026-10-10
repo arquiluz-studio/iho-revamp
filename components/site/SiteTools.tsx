@@ -1,12 +1,14 @@
-import { COUNTRY_CODES, type CountryCode } from '@/config/countries'
+import { COUNTRY_CODES, type AppLocale, type CountryCode } from '@/config/countries'
 import { CountrySwitcher } from './CountrySwitcher'
 import { LocaleSwitcher } from './LocaleSwitcher'
 
-export function SiteTools({ country, placement = 'header' }: { country: CountryCode; placement?: 'header' | 'footer' }) {
+export type LocaleHrefs = Partial<Record<AppLocale, string>>
+
+export function SiteTools({ country, placement = 'header', localeHrefs }: { country: CountryCode; placement?: 'header' | 'footer'; localeHrefs?: LocaleHrefs }) {
   return (
     <>
       <CountrySwitcher current={country} countries={[...COUNTRY_CODES]} placement={placement} />
-      <LocaleSwitcher />
+      <LocaleSwitcher hrefs={localeHrefs} />
     </>
   )
 }

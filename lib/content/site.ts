@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { countryOrigin, type AppLocale, type CountryCode } from '@/config/countries'
 import { dayOfMonth, isPastDate, longDate, shortMonth, timeOfDay, timeRange, type Locale } from '@/lib/dates'
 import { plainTitle } from '@/lib/events/ics'
-import { paragraphs, t } from '@/lib/i18n-fields'
+import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { toImageVM, videoUrl, type ImageVariant, type MediaRef } from '@/lib/media'
 import { getCountryBrands, type CountryBrandRow } from '@/lib/queries/brands'
 import { formatPrice, getCatalog, type CatalogRow } from '@/lib/queries/catalog'
@@ -50,8 +50,8 @@ function toEventVM(e: EventListRow, locale: AppLocale, countryName: string, labe
   const title = t(e, 'title', locale)
   const city = eventCity(e, countryName, labels)
   return {
-    slug: e.slug,
-    href: paths.event(e.slug),
+    slug: localSlug(e, locale),
+    href: paths.event(localSlug(e, locale)),
     startsAt: e.starts_at,
     isPast: isPastDate(e.ends_at ?? e.starts_at),
     day: dayOfMonth(e.starts_at, e.timezone),
@@ -81,7 +81,7 @@ export function toProjectCardVM(p: ProjectListRow, locale: AppLocale, paths: Sit
     title,
     description: t(p, 'summary', locale),
     image: imageOf(p.cover, locale, title, legacyMedia.projectCover(p.slug), largest),
-    href: paths.project(p.slug),
+    href: paths.project(localSlug(p, locale)),
   }
 }
 
@@ -102,7 +102,7 @@ export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: strin
     key: p.id,
     name,
     category: category ? t(category, 'name', locale).toUpperCase() : undefined,
-    href: labels ? paths.product(p.slug) : `${paths.product(p.slug)}#cotizar`,
+    href: labels ? paths.product(localSlug(p, locale)) : `${paths.product(localSlug(p, locale))}#cotizar`,
     image: imageOf(p.cover, locale, name, legacyMedia.productCover(p.slug), 'md'),
     price: labels?.price,
     compareAt: labels?.compareAt,
@@ -188,7 +188,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
         title: t(b, 'name', locale),
         description: t(b, 'description', locale),
         image: imageOf(b.cover, locale, t(b, 'name', locale), legacyMedia.businessLineCover(b.slug), 'md'),
-        href: paths.area(b.slug),
+        href: paths.area(localSlug(b, locale)),
       }),
     ),
     projects: projects.map(p => toProjectCardVM(p, locale, paths)),
@@ -262,7 +262,7 @@ function eventJsonLd(event: EventDetailRow, vm: { title: string; description: st
 export async function getEventDetailVM(country: CountryCode, locale: AppLocale, slug: string, paths: SitePaths): Promise<EventDetailVM | null> {
   const [labels, event, countryRow, catalog] = await Promise.all([
     eventLabels(locale),
-    getEventBySlug(country, slug),
+    getEventBySlug(country, slug, locale),
     getCountries().then(r => r.find(c => c.code === country)),
     getCatalog(country),
   ])
@@ -280,7 +280,7 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
     : legacyGallery.map((src, i) => ({ src, alt: `${base.title} ${i + 1}` }))
   const enabled = event.registration_enabled && event.access_type !== 'invite_only'
   const closed = new Date(event.registration_closes_at ?? event.starts_at) < new Date()
-  const url = String(buildAlternates({ href: { pathname: '/events/[slug]', params: { slug } }, country, locale, availableIn: [country] }).canonical)
+  const url = String(buildAlternates({ href: { pathname: '/events/[slug]', params: { slug: localSlug(event, locale) } }, country, locale, availableIn: [country] }).canonical)
 
   return {
     ...base,

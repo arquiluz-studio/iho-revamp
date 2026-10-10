@@ -125,7 +125,8 @@ const events: ResourceConfig = {
   timezoneField: 'timezone',
   fields: [
     { name: 'title', label: 'Título', type: 'text', i18n: true, required: true, max: 200 },
-    { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true },
+    { name: 'slug', label: 'Slug en español (URL)', type: 'slug', required: true },
+    { name: 'slug_en', label: 'Slug en inglés (URL)', type: 'slug', help: 'Opcional. Si queda vacío, la versión en inglés usa el slug en español.' },
     { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
     { name: 'type', label: 'Tipo', type: 'select', options: EVENT_TYPE_OPTIONS, required: true },
     { name: 'starts_at', label: 'Inicio', type: 'datetime', required: true },
@@ -183,7 +184,8 @@ const projects: ResourceConfig = {
   publicPath: '/projects/[slug]',
   fields: [
     { name: 'title', label: 'Título', type: 'text', i18n: true, required: true, max: 200 },
-    { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true },
+    { name: 'slug', label: 'Slug en español (URL)', type: 'slug', required: true },
+    { name: 'slug_en', label: 'Slug en inglés (URL)', type: 'slug', help: 'Opcional. Si queda vacío, la versión en inglés usa el slug en español.' },
     { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
     { name: 'is_featured', label: 'Destacado en home', type: 'boolean' },
     { name: 'client_name', label: 'Cliente', type: 'text', max: 200 },
@@ -410,7 +412,8 @@ const brands: ResourceConfig = {
 
 const taxonomyFields = (coverLabel: string): Field[] => [
   { name: 'name', label: 'Nombre', type: 'text', i18n: true, required: true, max: 120 },
-  { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true },
+  { name: 'slug', label: 'Slug en español (URL)', type: 'slug', required: true },
+  { name: 'slug_en', label: 'Slug en inglés (URL)', type: 'slug', help: 'Opcional. Si queda vacío, la versión en inglés usa el slug en español.' },
   SORT_FIELD,
   { name: 'cover_media_id', label: coverLabel, type: 'media', kind: 'generic' },
   { name: 'description', label: 'Descripción', type: 'textarea', i18n: true, max: 2000, rows: 4 },
@@ -467,7 +470,8 @@ const products: ResourceConfig = {
   publicPath: '/products/[slug]',
   fields: [
     { name: 'name', label: 'Nombre', type: 'text', i18n: true, required: true, max: 200 },
-    { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true },
+    { name: 'slug', label: 'Slug en español (URL)', type: 'slug', required: true },
+    { name: 'slug_en', label: 'Slug en inglés (URL)', type: 'slug', help: 'Opcional. Si queda vacío, la versión en inglés usa el slug en español.' },
     { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
     { name: 'brand_id', label: 'Marca', type: 'reference', source: 'brands', required: true },
     { name: 'business_line_id', label: 'Área', type: 'reference', source: 'business_lines' },

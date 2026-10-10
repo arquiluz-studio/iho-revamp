@@ -28,6 +28,9 @@ async function isDraft(): Promise<boolean> {
   }
 }
 
+/** The data cache outlives deployments, so entries are scoped per commit: a changed select never reads an old row shape. */
+const CACHE_NAMESPACE = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ?? 'local'
+
 /**
  * Runs a public read. Normally it's cached under `tags` with the anonymous client (RLS: published content
  * only). In Draft Mode it skips the cache and uses the service role so editors can preview drafts.
@@ -42,7 +45,7 @@ export async function cachedQuery<T>(
     const db = hasServiceRole() ? createSupabaseAdminClient() : createSupabasePublicClient()
     return run({ db, draft: true })
   }
-  const cached = unstable_cache(() => run({ db: createSupabasePublicClient(), draft: false }), ['q', ...key.map(k => String(k ?? ''))], {
+  const cached = unstable_cache(() => run({ db: createSupabasePublicClient(), draft: false }), ['q', CACHE_NAMESPACE, ...key.map(k => String(k ?? ''))], {
     tags,
     revalidate,
   })
