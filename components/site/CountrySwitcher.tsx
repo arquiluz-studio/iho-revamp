@@ -1,6 +1,6 @@
 'use client'
 import { useLocale, useTranslations } from 'next-intl'
-import { COUNTRIES, COUNTRY_PREF_COOKIE, HEADQUARTERS, crossCountryUrl, type AppLocale, type CountryCode } from '@/config/countries'
+import { COUNTRIES, COUNTRY_PREF_COOKIE, crossCountryUrl, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
 import { SubnavBar, useSubnav } from './SubnavBar'
 
 const ONE_YEAR = 60 * 60 * 24 * 365
@@ -20,9 +20,7 @@ export function CountrySwitcher({ current, countries }: {
     window.location.href = crossCountryUrl(code, window.location, '/?ref=selector')
   }
 
-  const sorted = [...countries].sort((a, b) =>
-    a === HEADQUARTERS ? -1 : b === HEADQUARTERS ? 1 : COUNTRIES[a].name[locale].localeCompare(COUNTRIES[b].name[locale], locale),
-  )
+  const sorted = sortByCountry(countries, locale, code => code)
 
   return (
     <div className={`iho-switcher${isOpen ? ' is-open' : ''}`}>

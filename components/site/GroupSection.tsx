@@ -6,8 +6,6 @@ import { StatsCounter } from './StatsCounter'
 
 export function GroupSection({ stats, mapCountries, showIntro = true }: { stats: StatVM[]; mapCountries: MapCountryVM[]; showIntro?: boolean }) {
   const t = useTranslations('home.group')
-  const current = mapCountries.filter(c => c.isCurrent)
-  const others = mapCountries.filter(c => !c.isCurrent)
   return (
     <section id="grupo" style={{ backgroundColor: '#ffffff' }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '84px 40px' }}>
@@ -23,8 +21,9 @@ export function GroupSection({ stats, mapCountries, showIntro = true }: { stats:
           <div style={{ position: 'relative', minHeight: 520 }}>
             <GroupMap countries={mapCountries} title={t('mapTitle')} />
             <div className="iho-ciudad-list" style={{ position: 'absolute', left: 20, top: '45%', fontFamily: '"Source Sans 3", sans-serif', fontSize: 15, lineHeight: 1.4, pointerEvents: 'none' }}>
-              {current.flatMap(c => c.cities).map((city, i) => <div key={city} style={{ color: '#3F3E3C', fontWeight: i === 0 ? 700 : 400 }}>{city}</div>)}
-              {others.map(c => <div key={c.code} style={{ color: '#B5B5B5' }}>{c.name}</div>)}
+              {mapCountries.map(c => c.isCurrent
+                ? c.cities.map((city, i) => <div key={`${c.code}-${city}`} style={{ color: '#3F3E3C', fontWeight: i === 0 ? 700 : 400 }}>{city}</div>)
+                : <div key={c.code} style={{ color: '#B5B5B5' }}>{c.name}</div>)}
             </div>
           </div>
           <StatsCounter stats={stats} />
