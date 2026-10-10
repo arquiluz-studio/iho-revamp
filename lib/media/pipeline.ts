@@ -11,8 +11,8 @@ type ProcessedImage = {
   variants: Record<ImageVariant, Buffer>
   width: number
   height: number
-  lqip: string
-  dominantColor: string
+  lqip: string | null
+  dominantColor: string | null
 }
 
 export async function processImage(input: Buffer): Promise<ProcessedImage> {
@@ -32,10 +32,13 @@ export async function processImage(input: Buffer): Promise<ProcessedImage> {
       .toBuffer()
   }
 
-  const tiny = await base.clone().resize(16, 16, { fit: 'inside' }).webp({ quality: 40 }).toBuffer()
-  const { dominant } = await base.clone().resize(64, 64, { fit: 'inside' }).stats()
-  const hex = (n: number) => n.toString(16).padStart(2, '0')
+  // Transparent images (cut-out products, logos) sit on the container's background: a placeholder color or
+  // blur would show through the transparent areas (and their dominant color is the black of empty pixels).
+  const { dominant, isOpaque } = await base.clone().resize(64, 64, { fit: 'inside' }).stats()
+  if (!isOpaque) return { variants, width, height, lqip: null, dominantColor: null }
 
+  const tiny = await base.clone().resize(16, 16, { fit: 'inside' }).webp({ quality: 40 }).toBuffer()
+  const hex = (n: number) => n.toString(16).padStart(2, '0')
   return {
     variants,
     width,
