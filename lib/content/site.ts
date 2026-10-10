@@ -158,7 +158,7 @@ export async function officesFor(current: CountryCode, locale: AppLocale): Promi
   }))
 }
 
-/** Group copy, map, brands, team and featured projects for the About page. */
+/** Group copy, map, brands, team and featured projects for the IHO Group page. */
 export async function getGroupVM(country: CountryCode, locale: AppLocale, paths: SitePaths) {
   const [settings, members, countries, brands, projects] = await Promise.all([
     getCountrySettings(country),

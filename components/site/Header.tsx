@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { useTranslations } from 'next-intl'
-import { ButtonArrow } from '@/components/ui/Arrow'
 import type { NavLink } from '@/lib/types/site'
 
 const noopSubscribe = () => () => {}
@@ -10,13 +9,15 @@ type Props = {
   logoHref: string
   links: NavLink[]
   cta: NavLink
+  /** Secondary button next to the CTA, to the group's online store. */
+  shop?: NavLink
   /** Fraction of the viewport height after which the header turns solid. */
   threshold?: number
   /** Extra controls (country / language switchers). */
   tools?: React.ReactNode
 }
 
-export function Header({ logoHref, links, cta, threshold = 0.75, tools }: Props) {
+export function Header({ logoHref, links, cta, shop, threshold = 0.75, tools }: Props) {
   const t = useTranslations('common')
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -31,7 +32,8 @@ export function Header({ logoHref, links, cta, threshold = 0.75, tools }: Props)
     return () => window.removeEventListener('scroll', onScroll)
   }, [threshold])
 
-  const navColor = menuOpen || scrolled ? '#2c2920' : '#ffffff'
+  const solid = menuOpen || scrolled
+  const navColor = solid ? '#2c2920' : '#ffffff'
   const close = () => setMenuOpen(false)
 
   return (
@@ -45,9 +47,13 @@ export function Header({ logoHref, links, cta, threshold = 0.75, tools }: Props)
           {links.map(l => (
             <a key={l.href} href={l.href} className="iho-nav-link" aria-current={isActive(l) ? 'page' : undefined} onClick={close}>{l.label}</a>
           ))}
-          <a href={cta.href} className="iho-btn" onClick={close} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
+          {shop && (
+            <a href={shop.href} className="iho-btn" onClick={close} style={{ display: 'inline-flex', alignItems: 'center', background: solid ? '#17150f' : '#ffffff', color: solid ? '#ffffff' : '#17150f', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none', transition: 'background 0.4s ease, color 0.4s ease' }}>
+              {shop.label}
+            </a>
+          )}
+          <a href={cta.href} className={shop ? 'iho-btn iho-btn-pair' : 'iho-btn'} onClick={close} style={{ display: 'inline-flex', alignItems: 'center', background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
             {cta.label}
-            <ButtonArrow w={15} h={13} />
           </a>
           {tools && <div className="iho-header-tools" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>{tools}</div>}
         </nav>

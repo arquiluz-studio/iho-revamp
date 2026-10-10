@@ -11,7 +11,7 @@ export function sitePaths(locale: AppLocale) {
     event: (slug: string) => getPathname({ href: { pathname: '/events/[slug]', params: { slug } }, locale }),
     projects: getPathname({ href: '/projects', locale }),
     project: (slug: string) => getPathname({ href: { pathname: '/projects/[slug]', params: { slug } }, locale }),
-    about: getPathname({ href: '/about', locale }),
+    group: getPathname({ href: '/group', locale }),
     solutions: getPathname({ href: '/solutions', locale }),
     spaces: getPathname({ href: '/spaces', locale }),
     brands: getPathname({ href: '/brands', locale }),

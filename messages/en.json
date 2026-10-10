@@ -16,7 +16,6 @@
     "sending": "Sending…"
   },
   "nav": {
-    "about": "About",
     "events": "What's next",
     "products": "Products",
     "group": "IHO Group",
@@ -25,6 +24,7 @@
     "solutions": "Solutions",
     "spaces": "Spaces",
     "contact": "Contact",
+    "shop": "Shop",
     "gallery": "Gallery",
     "requestPass": "Request a pass"
   },
@@ -156,7 +156,7 @@
   },
   "pages": {
     "events": { "label": "— EVENTS", "title": "Events and\nlaunches.", "upcoming": "Upcoming", "past": "Past", "empty": "No events right now." },
-    "about": { "label": "— ABOUT" },
+    "group": { "label": "— IHO GROUP" },
     "projects": { "label": "— PROJECTS", "title": "IHO\nprojects.", "empty": "No published projects yet.", "noMatch": "No projects match these filters.", "count": "{count} projects", "filters": "Filters", "clear": "Clear", "filterCountry": "Country", "filterSpace": "Space", "filterSolution": "Solution", "client": "Client", "year": "Year", "city": "City", "sector": "Space", "brandsUsed": "Brands", "gallery": "Gallery", "download": "Download high resolution", "solutions": "Solutions", "related": "— MORE PROJECTS" },
     "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand", "origin": "Origin" },
     "solutions": { "label": "— SOLUTIONS", "empty": "No solutions published yet.", "brands": "Brands in this solution", "projects": "Projects" },

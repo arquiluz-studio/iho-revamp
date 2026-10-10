@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
       { source: '/en/areas', destination: '/en/solutions', permanent: true },
       { source: '/en/areas/:slug', destination: '/en/solutions/:slug', permanent: true },
       { source: '/verticales', destination: '/espacios', permanent: true },
+      { source: '/nosotros', destination: '/grupo-iho', permanent: true },
+      { source: '/en/about', destination: '/en/iho-group', permanent: true },
       { source: '/en/verticals', destination: '/en/spaces', permanent: true },
       { source: '/admin/global/business-lines/:path*', destination: '/admin/global/solutions/:path*', permanent: true },
       { source: '/admin/global/sectors/:path*', destination: '/admin/global/spaces/:path*', permanent: true },

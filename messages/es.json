@@ -16,7 +16,6 @@
     "sending": "Enviando…"
   },
   "nav": {
-    "about": "Nosotros",
     "events": "Lo que viene",
     "products": "Productos",
     "group": "Grupo IHO",
@@ -25,6 +24,7 @@
     "solutions": "Soluciones",
     "spaces": "Espacios",
     "contact": "Contactar",
+    "shop": "Comprar",
     "gallery": "Galería",
     "requestPass": "Solicitar cortesía"
   },
@@ -156,7 +156,7 @@
   },
   "pages": {
     "events": { "label": "— EVENTOS", "title": "Eventos y\nlanzamientos.", "upcoming": "Próximos", "past": "Realizados", "empty": "No hay eventos por ahora." },
-    "about": { "label": "— NOSOTROS" },
+    "group": { "label": "— GRUPO IHO" },
     "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "noMatch": "Ningún proyecto coincide con estos filtros.", "count": "{count} proyectos", "filters": "Filtros", "clear": "Limpiar", "filterCountry": "País", "filterSpace": "Espacio", "filterSolution": "Solución", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Espacio", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "solutions": "Soluciones", "related": "— MÁS PROYECTOS" },
     "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
     "solutions": { "label": "— SOLUCIONES", "empty": "Aún no hay soluciones publicadas.", "brands": "Marcas de la solución", "projects": "Proyectos" },

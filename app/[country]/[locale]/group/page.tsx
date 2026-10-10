@@ -15,14 +15,14 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const tg = await getTranslations({ locale, namespace: 'home.group' })
-  return { title: `${tg('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/about', country, locale }) }
+  return { title: `${tg('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/group', country, locale }) }
 }
 
-export default async function AboutPage({ params }: { params: Promise<SiteParams> }) {
+export default async function GroupPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
   const [tp, tg, group, chrome] = await Promise.all([
-    getTranslations({ locale, namespace: 'pages.about' }),
+    getTranslations({ locale, namespace: 'pages.group' }),
     getTranslations({ locale, namespace: 'home.group' }),
     getGroupVM(country, locale, paths),
     innerChrome(country, locale, paths),
