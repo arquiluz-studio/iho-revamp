@@ -1,6 +1,7 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { emptyValues, type ResourceConfig, type ResourceKey } from '@/lib/admin/resources'
+import { emptyValues, singletonId, type ResourceConfig, type ResourceKey } from '@/lib/admin/resources'
 import { listRecords, loadMedia, loadOptions, loadRecord, mediaIdsOf } from '@/lib/admin/data'
 import { toFormValues } from '@/lib/admin/form-schema'
 import { ADMIN_MEDIA_SELECT, toAdminMedia } from '@/lib/admin/media'
@@ -11,9 +12,10 @@ import { AgendaEditor } from './AgendaEditor'
 import { PriceListExtras, ProductExtras, WarehouseExtras } from './catalog/CatalogExtras'
 import { formatDateTime } from '@/lib/admin/format'
 import { DataTable } from './DataTable'
+import { EventsCalendar, type CalendarParams } from './EventsCalendar'
 import { GalleryEditor, type GalleryItem } from './GalleryEditor'
 import { ResourceForm } from './ResourceForm'
-import { ButtonLink, Notice, PageHeader } from './ui'
+import { ButtonLink, Notice, PageHeader, cn } from './ui'
 
 type AnyRow = Record<string, unknown>
 
@@ -31,13 +33,41 @@ function access(session: AdminSession, config: ResourceConfig) {
   return { countryCode: null, canRead: canWrite, canWrite, timezone: 'America/Mexico_City' }
 }
 
-export async function ResourceListPage({ resource, config, basePath }: { resource: ResourceKey; config: ResourceConfig; basePath: string }) {
+function ViewToggle({ basePath, view }: { basePath: string; view: 'list' | 'calendar' }) {
+  return (
+    <div className="flex overflow-hidden rounded-md border border-zinc-300 text-sm">
+      {(['list', 'calendar'] as const).map(v => (
+        <Link
+          key={v}
+          href={v === 'list' ? basePath : `${basePath}?view=calendar`}
+          className={cn('px-3 py-1.5', view === v ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-700 hover:bg-zinc-50')}
+        >
+          {v === 'list' ? 'Lista' : 'Calendario'}
+        </Link>
+      ))}
+    </div>
+  )
+}
+
+export async function ResourceListPage({
+  resource,
+  config,
+  basePath,
+  searchParams = {},
+}: {
+  resource: ResourceKey
+  config: ResourceConfig
+  basePath: string
+  searchParams?: { view?: string } & CalendarParams
+}) {
   const session = await requireAdminSession()
   const { countryCode, canRead, canWrite, timezone } = access(session, config)
   if (!canRead) notFound()
-  if (config.singleton) return <ResourceEditPage resource={resource} config={config} id={countryCode} basePath={basePath} />
+  if (config.singleton) return <ResourceEditPage resource={resource} config={config} id={singletonId(config, countryCode)} basePath={basePath} />
 
-  const rows = await listRecords(config, countryCode)
+  const hasCalendar = resource === 'events' && session.activeCountry
+  const view = hasCalendar && searchParams.view === 'calendar' ? 'calendar' : 'list'
+  const rows = view === 'list' ? await listRecords(config, countryCode) : []
   const scopeLabel = config.scope === 'country' ? session.activeCountry?.name_es : 'Global'
   return (
     <>
@@ -46,16 +76,16 @@ export async function ResourceListPage({ resource, config, basePath }: { resourc
         description={config.description ?? scopeLabel}
         actions={
           <>
-            {resource === 'events' && (
-              <ButtonLink href="/admin/calendar" variant="outline">
-                Ver calendario
-              </ButtonLink>
-            )}
+            {hasCalendar && <ViewToggle basePath={basePath} view={view} />}
             {canWrite && <ButtonLink href={`${basePath}/new`}>Nuevo {config.singular}</ButtonLink>}
           </>
         }
       />
-      <DataTable columns={config.columns} rows={rows} rowKey={config.pk} hrefBase={basePath} timeZone={timezone} />
+      {view === 'calendar' && session.activeCountry ? (
+        <EventsCalendar country={session.activeCountry} params={searchParams} basePath={basePath} />
+      ) : (
+        <DataTable columns={config.columns} rows={rows} rowKey={config.pk} hrefBase={basePath} timeZone={timezone} />
+      )}
     </>
   )
 }
@@ -68,6 +98,7 @@ function publicHref(config: ResourceConfig, row: AnyRow | null) {
     case '/events/[slug]':
     case '/projects/[slug]':
     case '/brands/[slug]':
+    case '/designers/[slug]':
     case '/products/[slug]':
       return slug ? { pathname: config.publicPath, params: { slug } } : null
     case '/solutions/[businessLine]':
@@ -130,7 +161,9 @@ export async function ResourceEditPage({
 
   const title = id
     ? config.singleton
-      ? `${config.title} · ${session.activeCountry?.name_es ?? ''}`
+      ? config.scope === 'global'
+        ? config.title
+        : `${config.title} · ${session.activeCountry?.name_es ?? ''}`
       : String(row?.title_es ?? row?.name ?? row?.name_es ?? row?.full_name ?? row?.city ?? row?.platform ?? config.singular)
     : `Nuevo ${config.singular}`
 
@@ -147,10 +180,12 @@ export async function ResourceEditPage({
           )
         }
       />
-      {config.singleton && !row && <Notice tone="amber">Este país aún no tiene configuración; al guardar se crea.</Notice>}
+      {config.singleton && !row && (
+        <Notice tone="amber">{config.scope === 'global' ? 'Aún no hay configuración' : 'Este país aún no tiene configuración'}; al guardar se crea.</Notice>
+      )}
       <ResourceForm
         resource={resource}
-        id={config.singleton ? countryCode : id}
+        id={config.singleton ? singletonId(config, countryCode) : id}
         countryCode={countryCode}
         initialValues={initialValues}
         options={options}

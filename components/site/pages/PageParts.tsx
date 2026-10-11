@@ -1,7 +1,7 @@
 import { MediaImage } from '@/components/ui/MediaImage'
 import { RichText, SectionLabel } from '@/components/ui/Section'
 import { ACUMIN, MONO, SANS } from '@/components/ui/tokens'
-import type { BrandVM, ImageVM, NavLink, ProjectCardVM } from '@/lib/types/site'
+import type { BrandVM, DesignerCardVM, EventVM, ImageVM, NavLink, ProjectCardVM } from '@/lib/types/site'
 import type { SiteChrome } from '../HomeView'
 
 export function PageShell({ chrome, children }: { chrome: SiteChrome; children: React.ReactNode }) {
@@ -95,6 +95,48 @@ export function ProjectCards({ projects, twoColumns }: { projects: ProjectCardVM
               )}
             </div>
           </div>
+        </a>
+      ))}
+    </div>
+  )
+}
+
+export function EventRow({ event }: { event: EventVM }) {
+  return (
+    <a href={event.href} className="iho-event-row">
+      <div style={{ fontFamily: ACUMIN, fontWeight: 800, lineHeight: 0.9, color: event.isPast ? '#8a8478' : '#17150f' }}>
+        <div style={{ fontSize: 56 }}>{event.day}</div>
+        <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '1.5px', fontWeight: 400, marginTop: 6 }}>{event.month}</div>
+      </div>
+      <div>
+        <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '1.3px', color: '#ef483d', marginBottom: 8 }}>{event.typeLabel}</div>
+        <h3 style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 32, lineHeight: 1, textTransform: 'uppercase', margin: '0 0 8px', color: '#17150f', transition: 'color 0.3s' }}>{event.title}</h3>
+        <div style={{ fontFamily: SANS, fontSize: 14, color: '#7a756a' }}>{event.meta}</div>
+      </div>
+      <div style={{ height: 130, borderRadius: 4, overflow: 'hidden' }}>
+        <MediaImage image={event.image} sizes="220px" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: event.isPast ? 'grayscale(0.4)' : undefined }} />
+      </div>
+    </a>
+  )
+}
+
+export function DesignerCards({ designers }: { designers: DesignerCardVM[] }) {
+  return (
+    <div className="iho-product-grid">
+      {designers.map(d => (
+        <a key={d.key} href={d.href} className="iho-prod-card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+          <div style={{ width: '100%', aspectRatio: '3/4', background: '#f1ece3', borderRadius: 4, overflow: 'hidden' }}>
+            <MediaImage
+              image={d.image}
+              sizes="(max-width: 599px) 50vw, (max-width: 899px) 33vw, 300px"
+              className="iho-prod-img"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          </div>
+          <div style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 22, lineHeight: 1, textTransform: 'uppercase', color: '#17150f', marginTop: 16 }}>
+            {d.name}
+          </div>
+          {d.meta && <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '1.2px', color: '#8a8478', marginTop: 8 }}>{d.meta}</div>}
         </a>
       ))}
     </div>

@@ -35,6 +35,12 @@ export function getCountrySettings(code: string) {
   )
 }
 
+export function getSiteSettings() {
+  return cachedQuery(['site-settings'], [cacheTags.site], async ({ db }) =>
+    maybe(await db.from('site_settings').select('stats').eq('id', 'global').maybeSingle(), 'site_settings'),
+  )
+}
+
 export function getOffices() {
   return cachedQuery(['offices'], COUNTRY_CODES.map(c => cacheTags.country(c, 'offices')), async ({ db }) =>
     must(await db.from('offices').select('id, country_code, city, address, maps_url, phone, email, is_main, sort').order('sort'), 'offices'),

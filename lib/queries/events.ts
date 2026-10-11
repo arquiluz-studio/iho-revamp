@@ -4,7 +4,7 @@ import { cacheTags } from '@/lib/cache-tags'
 import { pickBySlug, SLUG_PATTERN } from '@/lib/i18n-fields'
 import { cachedQuery, media, must, visibleStatuses } from './core'
 
-const EVENT_LIST_SELECT = `id, slug, slug_en, type, title_es, title_en, summary_es, summary_en, starts_at, ends_at, timezone, city, venue_name, is_online, status, cover:${media('events_cover_media_id_fkey')}` as const
+const EVENT_LIST_SELECT = `id, slug, slug_en, type, title_es, title_en, summary_es, summary_en, starts_at, ends_at, timezone, city, venue_name, is_online, status, cover:${media('events_cover_media_id_fkey')}, designers:event_designers(designer_id)` as const
 
 /** Every visible event of the country, oldest first (the home timeline shows past and upcoming events). */
 export function getEvents(country: string) {
@@ -27,7 +27,7 @@ export async function getUpcomingEvents(country: string, now: Date = new Date())
 }
 
 function eventsBySlug(country: string, slug: string) {
-  return cachedQuery(['events-by-slug', country, slug], [cacheTags.country(country, 'events')], async ({ db, draft }) => {
+  return cachedQuery(['events-by-slug', country, slug], [cacheTags.country(country, 'events'), cacheTags.designers], async ({ db, draft }) => {
     const rows = must(
       await db
         .from('events')
@@ -36,6 +36,8 @@ function eventsBySlug(country: string, slug: string) {
           agenda:event_agenda_items(sort, time_label, text_es, text_en),
           gallery:event_media(sort, media:${media('event_media_media_id_fkey')}),
           brands:event_brands(brand:brands(id, slug, name, logo_is_thin, is_active, logo:${media('brands_logo_media_id_fkey')})),
+          designers:event_designers(designer:designers(id, slug, name, is_active, nationality_es, nationality_en, birth_year, death_year,
+            portrait:${media('designers_portrait_media_id_fkey')})),
           products:event_products(sort, product_id)` as const,
         )
         .eq('country_code', country)
@@ -50,6 +52,9 @@ function eventsBySlug(country: string, slug: string) {
       agenda: [...event.agenda].sort(bySort),
       gallery: [...event.gallery].sort(bySort),
       products: [...event.products].sort(bySort),
+      designers: event.designers
+        .flatMap(d => (d.designer?.is_active ? [d.designer] : []))
+        .sort((a, b) => a.name.localeCompare(b.name)),
     }))
   })
 }

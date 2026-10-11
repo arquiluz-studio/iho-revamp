@@ -152,6 +152,7 @@
       }
     },
     "brands": { "label": "— MARCAS PARTICIPANTES" },
+    "designers": { "label": "— DISEÑADORES" },
     "products": { "label": "— CATÁLOGO DEL EVENTO", "title": "Productos en\nexhibición.", "count": "{count} PIEZAS", "quote": "Cotizar" },
     "gallery": { "label": "— GALERÍA", "title": "Ediciones\nanteriores.", "pastTitle": "Así se\nvivió.", "item": "Galería {n}" },
     "cta": { "title": "¿Te interesa alguna pieza\npara tu proyecto?", "button": "Hablar con un especialista" }
@@ -161,6 +162,7 @@
     "group": { "label": "— GRUPO IHO" },
     "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "noMatch": "Ningún proyecto coincide con estos filtros.", "count": "{count} proyectos", "filters": "Filtros", "clear": "Limpiar", "filterCountry": "País", "filterSpace": "Espacio", "filterSolution": "Solución", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Espacio", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "solutions": "Soluciones", "related": "— MÁS PROYECTOS" },
     "brands": { "label": "— MARCAS", "title": "Nuestras\nmarcas.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
+    "designers": { "label": "— DISEÑADORES", "single": "— DISEÑADOR", "title": "Diseñadores.", "intro": "Los creadores detrás de las piezas que llevamos a cada proyecto.", "empty": "Aún no hay diseñadores publicados.", "nationality": "Nacionalidad", "years": "Años", "born": "n. {year}", "website": "Sitio web", "brands": "Marcas", "products": "Piezas de {name}", "events": "Eventos", "all": "Todos los diseñadores" },
     "solutions": { "label": "— SOLUCIONES", "empty": "Aún no hay soluciones publicadas.", "brands": "Marcas de la solución", "projects": "Proyectos" },
     "spaces": { "label": "— ESPACIOS", "title": "Espacios\nIHO.", "empty": "Aún no hay espacios publicados.", "projects": "Proyectos" },
     "products": { "label": "— PRODUCTOS", "title": "Catálogo.", "empty": "No hay productos disponibles en este país.", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud.", "price": "Precio", "availability": "Disponibilidad", "sale": "Oferta", "from": "Desde {price}", "quote": "Cotizar",

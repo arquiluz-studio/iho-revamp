@@ -3,7 +3,7 @@ import type { SiteChrome } from '../HomeView'
 import { EventHero } from './EventHero'
 import { EventAbout, EventFacts } from './EventInfo'
 import { EventRegistration, type RegistrationResult } from './EventRegistration'
-import { EventBrands, EventCta, EventGallery, EventProducts } from './EventShowcase'
+import { EventBrands, EventCta, EventDesigners, EventGallery, EventProducts } from './EventShowcase'
 
 type Props = {
   event: EventDetailVM
@@ -26,6 +26,7 @@ export function EventView({ event, chrome, contactHref, privacyHref, register }:
         <EventRegistration eventId={event.id} closed={event.registration.closed} privacyHref={privacyHref} action={register} />
       )}
       <EventBrands brands={event.brands} />
+      <EventDesigners designers={event.designers} />
       <EventProducts products={event.products} />
       <EventGallery images={event.gallery} past={event.isPast} />
       <EventCta href={contactHref} />

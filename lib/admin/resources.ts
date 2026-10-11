@@ -9,7 +9,7 @@ import type { CountryRole } from './roles'
 export type TableName = keyof Database['public']['Tables']
 export type MediaKind = Database['public']['Enums']['media_kind']
 export type Option = { value: string; label: string }
-export type ReferenceSource = 'brands' | 'business_lines' | 'sectors' | 'products'
+export type ReferenceSource = 'brands' | 'designers' | 'business_lines' | 'sectors' | 'products'
 export type Bridge = { table: TableName; selfKey: string; otherKey: string }
 
 type FieldBase = { name: string; label: string; required?: boolean; help?: string; wide?: boolean }
@@ -44,13 +44,13 @@ export type ResourceConfig = {
   columns: Column[]
   order: { column: string; ascending: boolean }[]
   section?: CountrySection
-  globalTag?: 'countries' | 'taxonomies' | 'brands' | 'products'
-  /** One row per country keyed by country_code (home settings). */
+  globalTag?: 'countries' | 'taxonomies' | 'brands' | 'designers' | 'products' | 'site'
+  /** A single row: one per country keyed by country_code (country scope), or `SITE_SETTINGS_ID` (global scope). */
   singleton?: boolean
   /** The primary key is typed by the user on creation (countries.code). */
   pkInput?: boolean
   /** Localized public route used by "Ver en el sitio" / preview. */
-  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/products/[slug]' | '/solutions/[businessLine]' | '/spaces/[sector]' | '/'
+  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/designers/[slug]' | '/products/[slug]' | '/solutions/[businessLine]' | '/spaces/[sector]' | '/'
   /** Datetime fields are entered in this row field's timezone (falls back to the country timezone). */
   timezoneField?: string
 }
@@ -150,6 +150,15 @@ const events: ResourceConfig = {
       type: 'multi',
       source: 'brands',
       through: { table: 'event_brands', selfKey: 'event_id', otherKey: 'brand_id' },
+      wide: true,
+    },
+    {
+      name: 'designers',
+      label: 'Diseñadores',
+      help: 'Sus productos se suman a los productos en exhibición, y el evento aparece en la página del diseñador.',
+      type: 'multi',
+      source: 'designers',
+      through: { table: 'event_designers', selfKey: 'event_id', otherKey: 'designer_id' },
       wide: true,
     },
     {
@@ -313,7 +322,7 @@ const home: ResourceConfig = {
   singleton: true,
   title: 'Home del país',
   singular: 'home',
-  description: 'Hero, estadísticas, imagen de contacto y SEO del sitio del país.',
+  description: 'Hero, imagen de contacto y SEO del sitio del país.',
   writeRole: 'admin',
   section: 'settings',
   publicPath: '/',
@@ -332,10 +341,28 @@ const home: ResourceConfig = {
     { name: 'hero_video_media_id', label: 'Hero · video (MP4)', type: 'media', kind: 'hero', video: true },
     { name: 'hero_image_media_id', label: 'Hero · imagen (poster / fallback)', type: 'media', kind: 'hero' },
     { name: 'contact_image_media_id', label: 'Imagen de la sección de contacto', type: 'media', kind: 'generic' },
-    { name: 'stats', label: 'Estadísticas', type: 'stats', wide: true },
     { name: 'seo_title', label: 'SEO · título', type: 'text', i18n: true, max: 120 },
     { name: 'seo_description', label: 'SEO · descripción', type: 'textarea', i18n: true, max: 300, rows: 3 },
   ],
+  columns: [],
+  order: [],
+}
+
+/** Primary key of the single `site_settings` row. */
+export const SITE_SETTINGS_ID = 'global'
+
+const stats: ResourceConfig = {
+  key: 'stats',
+  table: 'site_settings',
+  scope: 'global',
+  pk: 'id',
+  singleton: true,
+  title: 'Estadísticas',
+  singular: 'estadísticas',
+  description: 'Contadores de la sección Grupo IHO. Son los mismos en el sitio de todos los países.',
+  globalWrite: 'super',
+  globalTag: 'site',
+  fields: [{ name: 'stats', label: 'Estadísticas', type: 'stats', wide: true }],
   columns: [],
   order: [],
 }
@@ -410,6 +437,38 @@ const brands: ResourceConfig = {
   order: [{ column: 'name', ascending: true }],
 }
 
+const designers: ResourceConfig = {
+  key: 'designers',
+  table: 'designers',
+  scope: 'global',
+  pk: 'id',
+  title: 'Diseñadores',
+  singular: 'diseñador',
+  description: 'Página de homenaje del diseñador. Sus productos se ligan desde la ficha de cada producto.',
+  globalWrite: 'catalog',
+  globalTag: 'designers',
+  publicPath: '/designers/[slug]',
+  fields: [
+    { name: 'name', label: 'Nombre', type: 'text', required: true, max: 160, help: 'Ej. Achille Castiglioni, Patricia Urquiola o un estudio.' },
+    { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true },
+    { name: 'portrait_media_id', label: 'Retrato', type: 'media', kind: 'designer_photo' },
+    { name: 'cover_media_id', label: 'Imagen de portada (homenaje)', type: 'media', kind: 'hero' },
+    { name: 'nationality', label: 'Nacionalidad', type: 'text', i18n: true, max: 80 },
+    { name: 'birth_year', label: 'Año de nacimiento', type: 'number', min: 1700, max: 2100 },
+    { name: 'death_year', label: 'Año de fallecimiento', type: 'number', min: 1700, max: 2100 },
+    { name: 'website_url', label: 'Sitio web', type: 'url' },
+    { name: 'is_active', label: 'Publicado', type: 'boolean' },
+    { name: 'bio', label: 'Biografía', type: 'textarea', i18n: true, max: 8000, rows: 8, help: 'Una línea en blanco separa párrafos.' },
+  ],
+  columns: [
+    { key: 'name', label: 'Nombre' },
+    { key: 'slug', label: 'Slug' },
+    { key: 'nationality_es', label: 'Nacionalidad' },
+    { key: 'is_active', label: 'Publicado', format: 'boolean' },
+  ],
+  order: [{ column: 'name', ascending: true }],
+}
+
 const taxonomyFields = (coverLabel: string): Field[] => [
   { name: 'name', label: 'Nombre', type: 'text', i18n: true, required: true, max: 120 },
   { name: 'slug', label: 'Slug en español (URL)', type: 'slug', required: true },
@@ -475,7 +534,13 @@ const products: ResourceConfig = {
     { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
     { name: 'brand_id', label: 'Marca', type: 'reference', source: 'brands', required: true },
     { name: 'business_line_id', label: 'Solución', type: 'reference', source: 'business_lines' },
-    { name: 'designer', label: 'Diseñador', type: 'text', max: 160 },
+    {
+      name: 'designers',
+      label: 'Diseñadores',
+      type: 'multi',
+      source: 'designers',
+      through: { table: 'product_designers', selfKey: 'product_id', otherKey: 'designer_id' },
+    },
     { name: 'erp_ref', label: 'Referencia ERP', type: 'text', max: 120 },
     { name: 'description', label: 'Descripción', type: 'textarea', i18n: true, max: 8000, rows: 6 },
     { name: 'specs', label: 'Especificaciones', type: 'specs', wide: true },
@@ -490,7 +555,6 @@ const products: ResourceConfig = {
   columns: [
     { key: 'name_es', label: 'Nombre' },
     { key: 'slug', label: 'Slug' },
-    { key: 'designer', label: 'Diseñador' },
     STATUS_COLUMN,
   ],
   order: [{ column: 'name_es', ascending: true }],
@@ -562,7 +626,9 @@ export const RESOURCES = {
   'price-lists': priceLists,
   warehouses,
   countries,
+  stats,
   brands,
+  designers,
   products,
   solutions,
   spaces,
@@ -570,7 +636,12 @@ export const RESOURCES = {
 export type ResourceKey = keyof typeof RESOURCES
 
 export const COUNTRY_RESOURCES: ResourceKey[] = ['events', 'projects', 'socials', 'offices', 'team', 'price-lists', 'warehouses']
-export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'brands', 'products', 'solutions', 'spaces']
+export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'stats', 'brands', 'designers', 'products', 'solutions', 'spaces']
+
+/** Row key of a singleton resource. */
+export function singletonId(config: ResourceConfig, countryCode: string | null): string | null {
+  return config.scope === 'global' ? SITE_SETTINGS_ID : countryCode
+}
 
 export function getResource(key: string): ResourceConfig | null {
   return key in RESOURCES ? RESOURCES[key as ResourceKey] : null

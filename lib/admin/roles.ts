@@ -12,5 +12,7 @@ export const GLOBAL_ROLE_LABELS: Record<GlobalRole, string> = {
 }
 
 export const ADMIN_COUNTRY_COOKIE = 'iho_admin_country'
+/** Cookie value that selects the global (catalog) workspace instead of a country. */
+export const ADMIN_GLOBAL_SCOPE = 'global'
 
 export const atLeast = (role: CountryRole | undefined, min: CountryRole) => Boolean(role && ROLE_RANK[role] >= ROLE_RANK[min])

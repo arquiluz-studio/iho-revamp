@@ -45,6 +45,7 @@ export async function loadRecord(
 
 const SOURCES: Record<ReferenceSource, { table: string; label: string; order: string }> = {
   brands: { table: 'brands', label: 'name', order: 'name' },
+  designers: { table: 'designers', label: 'name', order: 'name' },
   business_lines: { table: 'business_lines', label: 'name_es', order: 'sort' },
   sectors: { table: 'sectors', label: 'name_es', order: 'sort' },
   products: { table: 'products', label: 'name_es', order: 'name_es' },

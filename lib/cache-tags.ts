@@ -8,8 +8,11 @@ export const cacheTags = {
   countries: 'countries',
   taxonomies: 'taxonomies',
   brands: 'brands',
+  designers: 'designers',
   /** Global product data (names, specs, variants, media) shared by every country's catalog. */
   products: 'products',
+  /** Site-wide settings shared by every country (stats). */
+  site: 'site',
   country: (code: string, section: CountrySection) => `country:${code}:${section}`,
   event: (id: string) => `event:${id}`,
   project: (id: string) => `project:${id}`,

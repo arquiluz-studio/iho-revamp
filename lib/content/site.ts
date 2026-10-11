@@ -7,11 +7,12 @@ import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { toImageVM, videoUrl, type ImageVariant, type MediaRef } from '@/lib/media'
 import { getCountryBrands, type CountryBrandRow } from '@/lib/queries/brands'
 import { formatPrice, getCatalog, type CatalogRow } from '@/lib/queries/catalog'
+import type { DesignerRow } from '@/lib/queries/designers'
 import { getEventBySlug, getEvents, type EventDetailRow, type EventListRow } from '@/lib/queries/events'
 import { getProjects, type ProjectListRow } from '@/lib/queries/projects'
-import { getBusinessLines, getCountries, getCountrySettings, getOffices, getSectors, getTeam } from '@/lib/queries/site'
+import { getBusinessLines, getCountries, getCountrySettings, getOffices, getSectors, getSiteSettings, getTeam } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
-import type { SolutionCardVM, BrandVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
+import type { SolutionCardVM, BrandVM, DesignerCardVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
 import { cityChip, cityDisplay } from './cities'
 import { legacyMedia } from './legacy-media'
 import type { SitePaths } from './paths'
@@ -46,7 +47,7 @@ function eventCity(e: Pick<EventListRow, 'city' | 'is_online'>, countryName: str
   return cityChip(city) === city ? `${city}, ${country}` : city
 }
 
-function toEventVM(e: EventListRow, locale: AppLocale, countryName: string, labels: EventLabels, paths: SitePaths): EventVM {
+function toEventVM(e: Omit<EventListRow, 'designers'>, locale: AppLocale, countryName: string, labels: EventLabels, paths: SitePaths): EventVM {
   const title = t(e, 'title', locale)
   const city = eventCity(e, countryName, labels)
   return {
@@ -74,6 +75,19 @@ export function toBrandVM(b: Pick<CountryBrandRow, 'slug' | 'name' | 'logo_is_th
     // Logos are cutouts. A sampled background (often near-white) would show through the transparent pixels.
     logo: { ...logo, color: null, placeholder: null },
   }
+}
+
+/** "1918 – 2002", or "n. 1971" via `born` while the designer is alive. */
+export function designerYears(d: Pick<DesignerRow, 'birth_year' | 'death_year'>, born: (year: number) => string): string | null {
+  if (d.birth_year && d.death_year) return `${d.birth_year} – ${d.death_year}`
+  return d.birth_year ? born(d.birth_year) : null
+}
+
+type DesignerCardRow = Pick<DesignerRow, 'id' | 'slug' | 'name' | 'nationality_es' | 'nationality_en' | 'birth_year' | 'death_year' | 'portrait'>
+
+export function toDesignerCardVM(d: DesignerCardRow, locale: AppLocale, paths: SitePaths, born: (year: number) => string): DesignerCardVM {
+  const meta = [t(d, 'nationality', locale), designerYears(d, born)].filter(Boolean).join(' · ')
+  return { key: d.id, name: d.name, href: paths.designer(d.slug), image: imageOf(d.portrait, locale, d.name, null, 'md'), meta: meta || undefined }
 }
 
 export function toProjectCardVM(p: ProjectListRow, locale: AppLocale, paths: SitePaths, largest: ImageVariant = 'md'): ProjectCardVM {
@@ -161,7 +175,7 @@ export async function officesFor(current: CountryCode, locale: AppLocale): Promi
 /** Group copy, map, brands, team and featured projects for the IHO Group page. */
 export async function getGroupVM(country: CountryCode, locale: AppLocale, paths: SitePaths) {
   const [settings, members, countries, brands, projects] = await Promise.all([
-    getCountrySettings(country),
+    getSiteSettings(),
     getTeam(country),
     mapCountries(country, locale),
     getCountryBrands(country),
@@ -230,9 +244,19 @@ export async function getEventsVM(country: CountryCode, locale: AppLocale, paths
   return events.map(e => toEventVM(e, locale, countryName, labels, paths))
 }
 
+/** Events of the country that feature the designer, oldest first. */
+export async function getDesignerEventsVM(country: CountryCode, locale: AppLocale, paths: SitePaths, designerId: string): Promise<EventVM[]> {
+  const [labels, events, countryRow] = await Promise.all([eventLabels(locale), getEvents(country), getCountries().then(r => r.find(c => c.code === country))])
+  const countryName = countryRow ? t(countryRow, 'name', locale) : country.toUpperCase()
+  return events.filter(e => e.designers.some(d => d.designer_id === designerId)).map(e => toEventVM(e, locale, countryName, labels, paths))
+}
+
 const EVENT_PRODUCT_LIMIT = 8
 
-/** Curated `event_products` first, then products of the linked brands; only those visible in the country. */
+/**
+ * Curated `event_products` first, then products of the linked designers, then of the linked brands; only those
+ * visible in the country.
+ */
 function eventProducts(event: EventDetailRow, catalog: CatalogRow[]): CatalogRow[] {
   const byId = new Map(catalog.map(p => [p.id, p]))
   const picked = new Map<string, CatalogRow>()
@@ -240,10 +264,14 @@ function eventProducts(event: EventDetailRow, catalog: CatalogRow[]): CatalogRow
     const p = byId.get(product_id)
     if (p) picked.set(p.id, p)
   }
+  const designerIds = new Set(event.designers.map(d => d.id))
   const brandIds = new Set(event.brands.flatMap(b => (b.brand ? [b.brand.id] : [])))
-  for (const p of catalog) {
-    if (picked.size >= EVENT_PRODUCT_LIMIT) break
-    if (p.brand && brandIds.has(p.brand.id)) picked.set(p.id, p)
+  const fillers = [(p: CatalogRow) => p.designers.some(d => designerIds.has(d.id)), (p: CatalogRow) => Boolean(p.brand && brandIds.has(p.brand.id))]
+  for (const matches of fillers) {
+    for (const p of catalog) {
+      if (picked.size >= EVENT_PRODUCT_LIMIT) break
+      if (matches(p)) picked.set(p.id, p)
+    }
   }
   return [...picked.values()].slice(0, EVENT_PRODUCT_LIMIT)
 }
@@ -279,11 +307,12 @@ function eventJsonLd(event: EventDetailRow, vm: { title: string; description: st
 }
 
 export async function getEventDetailVM(country: CountryCode, locale: AppLocale, slug: string, paths: SitePaths): Promise<EventDetailVM | null> {
-  const [labels, event, countryRow, catalog] = await Promise.all([
+  const [labels, event, countryRow, catalog, td] = await Promise.all([
     eventLabels(locale),
     getEventBySlug(country, slug, locale),
     getCountries().then(r => r.find(c => c.code === country)),
     getCatalog(country),
+    getTranslations({ locale, namespace: 'pages.designers' }),
   ])
   if (!event) return null
   const countryName = countryRow ? t(countryRow, 'name', locale) : country.toUpperCase()
@@ -313,6 +342,7 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
     agenda: event.agenda.map((a, i) => ({ num: a.time_label || String(i + 1).padStart(2, '0'), text: t(a, 'text', locale) })),
     gallery,
     brands: event.brands.flatMap(b => (b.brand && b.brand.is_active ? [toBrandVM(b.brand, locale, paths)] : [])),
+    designers: event.designers.map(d => toDesignerCardVM(d, locale, paths, year => td('born', { year }))),
     products: eventProducts(event, catalog).map(p => toProductCardVM(p, locale, country, paths)),
     registration: { enabled, closed },
     icsHref: `/api/events/${event.id}/ics?lang=${locale}`,

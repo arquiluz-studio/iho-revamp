@@ -8,12 +8,19 @@ import { cachedQuery, maybe, media, must, visibleStatuses, type Db } from './cor
 /** Prices depend on sale windows (`starts_at`/`ends_at`), so catalog reads expire hourly on top of tag purges. */
 const CATALOG_REVALIDATE_SECONDS = 60 * 60
 
-const catalogTags = (country: string) => [cacheTags.country(country, 'catalog'), cacheTags.products, cacheTags.brands, cacheTags.taxonomies]
+const catalogTags = (country: string) => [
+  cacheTags.country(country, 'catalog'),
+  cacheTags.products,
+  cacheTags.brands,
+  cacheTags.designers,
+  cacheTags.taxonomies,
+]
 
 const CATALOG_SELECT = `is_purchasable, is_featured, lead_time_days, sort,
-  product:products!inner(id, slug, slug_en, name_es, name_en, designer, status,
+  product:products!inner(id, slug, slug_en, name_es, name_en, status,
     cover:${media('products_cover_media_id_fkey')},
     brand:brands(id, slug, name, is_active),
+    designers:product_designers(designer:designers(id, slug, name, is_active)),
     business_line:business_lines(id, slug, slug_en, name_es, name_en),
     sectors:product_sectors(sector:sectors(id, slug, slug_en, name_es, name_en)))` as const
 
@@ -86,6 +93,9 @@ export function getCatalog(country: string) {
           ...product,
           ...availability,
           sectors: product.sectors.flatMap(s => (s.sector ? [s.sector] : [])),
+          designers: product.designers
+            .flatMap(d => (d.designer?.is_active ? [d.designer] : []))
+            .sort((a, b) => a.name.localeCompare(b.name)),
           ...summarize(prices.get(product.id)),
         }))
     },

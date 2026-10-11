@@ -22,7 +22,8 @@ export default async function DashboardPage() {
         <PageHeader title={`Hola, ${session.profile.full_name || session.email}`} />
         {session.canManageCatalog ? (
           <Notice>
-            Tienes acceso al catálogo global. Usa el menú <strong>Global</strong> para editar marcas, soluciones y espacios.
+            Estás en la vista <strong>Global</strong>. Usa el menú lateral para editar marcas, productos, soluciones y espacios.
+            {session.countries.length > 0 && ' Para editar el contenido de un país, selecciónalo en el selector del menú lateral.'}
           </Notice>
         ) : (
           <Notice tone="amber">Aún no tienes países asignados. Pide a un administrador que te dé acceso.</Notice>
@@ -71,7 +72,7 @@ export default async function DashboardPage() {
           <CardHeader
             title="Próximos eventos"
             actions={
-              <Link className="text-xs text-zinc-500 hover:text-zinc-900" href="/admin/calendar">
+              <Link className="text-xs text-zinc-500 hover:text-zinc-900" href="/admin/events?view=calendar">
                 Calendario →
               </Link>
             }

@@ -16,6 +16,8 @@ export function sitePaths(locale: AppLocale) {
     spaces: getPathname({ href: '/spaces', locale }),
     brands: getPathname({ href: '/brands', locale }),
     brand: (slug: string) => getPathname({ href: { pathname: '/brands/[slug]', params: { slug } }, locale }),
+    designers: getPathname({ href: '/designers', locale }),
+    designer: (slug: string) => getPathname({ href: { pathname: '/designers/[slug]', params: { slug } }, locale }),
     solution: (slug: string) => getPathname({ href: { pathname: '/solutions/[businessLine]', params: { businessLine: slug } }, locale }),
     space: (slug: string) => getPathname({ href: { pathname: '/spaces/[sector]', params: { sector: slug } }, locale }),
     products: getPathname({ href: '/products', locale }),

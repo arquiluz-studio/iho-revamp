@@ -4,7 +4,7 @@ import { signOut } from '@/app/admin/actions/session'
 import { CountrySelector } from '@/components/admin/CountrySelector'
 import { AdminNav, type NavSection } from '@/components/admin/AdminNav'
 import { Button } from '@/components/admin/ui'
-import { ROLE_LABELS, GLOBAL_ROLE_LABELS, atLeast } from '@/lib/admin/roles'
+import { ROLE_LABELS, GLOBAL_ROLE_LABELS, ADMIN_GLOBAL_SCOPE, atLeast } from '@/lib/admin/roles'
 import { requireAdminSession } from '@/lib/admin/session'
 
 export default async function PanelLayout({ children }: { children: ReactNode }) {
@@ -19,20 +19,12 @@ export default async function PanelLayout({ children }: { children: ReactNode })
       {
         title: `Contenido · ${session.activeCountry.name_es}`,
         items: [
+          ...(atLeast(role, 'admin') ? [{ href: '/admin/home', label: 'Home del país' }] : []),
           { href: '/admin/events', label: 'Eventos' },
-          { href: '/admin/calendar', label: 'Calendario' },
           { href: '/admin/projects', label: 'Proyectos' },
           { href: '/admin/country-brands', label: 'Marcas del país' },
           { href: '/admin/catalog', label: 'Catálogo del país' },
           { href: '/admin/media', label: 'Biblioteca de media' },
-          { href: '/admin/team', label: 'Equipo' },
-          { href: '/admin/socials', label: 'Redes sociales' },
-          ...(atLeast(role, 'admin')
-            ? [
-                { href: '/admin/offices', label: 'Oficinas' },
-                { href: '/admin/home', label: 'Home del país' },
-              ]
-            : []),
         ],
       },
       ...(atLeast(role, 'admin')
@@ -51,19 +43,30 @@ export default async function PanelLayout({ children }: { children: ReactNode })
         items: [{ href: '/admin/leads', label: 'Leads' }],
       },
     )
-    if (atLeast(role, 'admin')) sections.push({ title: 'Equipo IHO', items: [{ href: '/admin/users', label: 'Usuarios' }] })
-  }
-  if (session.canManageCatalog) {
+    if (atLeast(role, 'admin') && !session.isSuperAdmin) sections.push({ title: 'Equipo IHO', items: [{ href: '/admin/users', label: 'Usuarios' }] })
     sections.push({
-      title: 'Global',
+      title: 'Ajustes',
+      items: [
+        ...(atLeast(role, 'admin') ? [{ href: '/admin/offices', label: 'Oficinas' }] : []),
+        { href: '/admin/socials', label: 'Redes sociales' },
+        { href: '/admin/team', label: 'Equipo' },
+      ],
+    })
+  }
+  if (session.isGlobalScope) {
+    sections.push({
+      title: 'Ajustes Globales',
       items: [
         { href: '/admin/global/brands', label: 'Marcas' },
+        { href: '/admin/global/designers', label: 'Diseñadores' },
         { href: '/admin/global/products', label: 'Productos' },
         { href: '/admin/global/solutions', label: 'Soluciones' },
         { href: '/admin/global/spaces', label: 'Espacios' },
         ...(session.isSuperAdmin
           ? [
               { href: '/admin/global/countries', label: 'Países' },
+              { href: '/admin/global/stats', label: 'Estadísticas' },
+              { href: '/admin/users', label: 'Usuarios' },
               { href: '/admin/global/audit', label: 'Auditoría' },
             ]
           : []),
@@ -86,11 +89,12 @@ export default async function PanelLayout({ children }: { children: ReactNode })
             <span className="text-2xl font-bold leading-none tracking-wide text-zinc-900">CMS</span>
           </Link>
         </div>
-        {session.countries.length > 0 && (
+        {(session.countries.length > 0 || session.canManageCatalog) && (
           <div className="border-b border-zinc-100 px-4 py-3">
             <CountrySelector
-              countries={session.countries.map(c => ({ code: c.code, name: c.name_es, role: ROLE_LABELS[c.role] }))}
-              active={session.activeCountry?.code ?? ''}
+              countries={session.countries.map(c => ({ code: c.code, name: c.name_es }))}
+              active={session.isGlobalScope ? ADMIN_GLOBAL_SCOPE : (session.activeCountry?.code ?? '')}
+              showGlobal={session.canManageCatalog}
             />
           </div>
         )}

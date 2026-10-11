@@ -39,6 +39,7 @@ export type EventDetailVM = EventVM & {
   agenda: { num: string; text: string }[]
   gallery: ImageVM[]
   brands: BrandVM[]
+  designers: DesignerCardVM[]
   products: ProductCardVM[]
   registration: {
     enabled: boolean
@@ -92,6 +93,15 @@ export type ProjectCardVM = {
   image: ImageVM
   href?: string
   /** Country and space, shown on the projects index. */
+  meta?: string
+}
+
+export type DesignerCardVM = {
+  key: string
+  name: string
+  href: string
+  image: ImageVM
+  /** Nationality and years. */
   meta?: string
 }
 

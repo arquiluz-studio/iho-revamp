@@ -152,6 +152,7 @@
       }
     },
     "brands": { "label": "— PARTICIPATING BRANDS" },
+    "designers": { "label": "— DESIGNERS" },
     "products": { "label": "— EVENT CATALOG", "title": "Products on\ndisplay.", "count": "{count} PIECES", "quote": "Request a quote" },
     "gallery": { "label": "— GALLERY", "title": "Previous\neditions.", "pastTitle": "How it\nwent.", "item": "Gallery {n}" },
     "cta": { "title": "Interested in a piece\nfor your project?", "button": "Talk to a specialist" }
@@ -161,6 +162,7 @@
     "group": { "label": "— IHO GROUP" },
     "projects": { "label": "— PROJECTS", "title": "IHO\nprojects.", "empty": "No published projects yet.", "noMatch": "No projects match these filters.", "count": "{count} projects", "filters": "Filters", "clear": "Clear", "filterCountry": "Country", "filterSpace": "Space", "filterSolution": "Solution", "client": "Client", "year": "Year", "city": "City", "sector": "Space", "brandsUsed": "Brands", "gallery": "Gallery", "download": "Download high resolution", "solutions": "Solutions", "related": "— MORE PROJECTS" },
     "brands": { "label": "— BRANDS", "title": "Our\nbrands.", "website": "Website", "exclusive": "Exclusive distribution", "products": "Products", "projects": "Projects with this brand", "origin": "Origin" },
+    "designers": { "label": "— DESIGNERS", "single": "— DESIGNER", "title": "Designers.", "intro": "The creators behind the pieces we bring to every project.", "empty": "No designers published yet.", "nationality": "Nationality", "years": "Years", "born": "b. {year}", "website": "Website", "brands": "Brands", "products": "Pieces by {name}", "events": "Events", "all": "All designers" },
     "solutions": { "label": "— SOLUTIONS", "empty": "No solutions published yet.", "brands": "Brands in this solution", "projects": "Projects" },
     "spaces": { "label": "— SPACES", "title": "IHO\nspaces.", "empty": "No spaces published yet.", "projects": "Projects" },
     "products": { "label": "— PRODUCTS", "title": "Catalog.", "empty": "No products available in this country.", "all": "All", "brand": "Brand", "designer": "Designer", "specs": "Specifications", "variants": "Variants", "leadTime": "Ships in {days} days", "onRequest": "Made to order", "inStock": "In stock", "inquiry": "Request a quote", "inquirySent": "We received your request.", "price": "Price", "availability": "Availability", "sale": "Sale", "from": "From {price}", "quote": "Request a quote",

@@ -3,7 +3,7 @@ import { Arrow } from '@/components/ui/Arrow'
 import { MediaImage } from '@/components/ui/MediaImage'
 import { RichText } from '@/components/ui/Section'
 import { ACUMIN } from '@/components/ui/tokens'
-import type { BrandVM, ImageVM, ProductCardVM } from '@/lib/types/site'
+import type { BrandVM, DesignerCardVM, ImageVM, ProductCardVM } from '@/lib/types/site'
 import { ProductCard } from '../ProductCard'
 
 const MONO = '"Space Mono", monospace'
@@ -21,6 +21,29 @@ export function EventBrands({ brands }: { brands: BrandVM[] }) {
           {brands.map(b => (
             <a key={b.slug} href={b.href} aria-label={b.name} style={{ width: 200, height: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: b.thin ? 8 : 22, borderRight: '1px solid rgba(20,18,12,0.12)', borderBottom: '1px solid rgba(20,18,12,0.12)' }}>
               <MediaImage image={b.logo} alt={b.name} style={{ maxWidth: '100%', maxHeight: b.thin ? 94 : 54, objectFit: 'contain', width: 'auto', height: 'auto' }} />
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function EventDesigners({ designers }: { designers: DesignerCardVM[] }) {
+  const t = useTranslations('event.designers')
+  if (designers.length === 0) return null
+  return (
+    <section style={{ background: '#ffffff', padding: '64px 40px 0' }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+        <div style={labelStyle}>{t('label')}</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
+          {designers.map(d => (
+            <a key={d.key} href={d.href} className="iho-prod-card" style={{ width: 200, display: 'block', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ aspectRatio: '3/4', background: '#f1ece3', borderRadius: 4, overflow: 'hidden' }}>
+                <MediaImage image={d.image} sizes="200px" className="iho-prod-img" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+              <div style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 20, lineHeight: 1, textTransform: 'uppercase', color: '#17150f', marginTop: 14 }}>{d.name}</div>
+              {d.meta && <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '1.2px', color: '#8a8478', marginTop: 6 }}>{d.meta}</div>}
             </a>
           ))}
         </div>

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { ACCEPTED_MIME_TYPES, originalLocation } from '@/lib/media'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-const MEDIA_KINDS = ['project_photo', 'product_photo', 'event_photo', 'brand_logo', 'team_photo', 'hero', 'generic'] as const
+const MEDIA_KINDS = ['project_photo', 'product_photo', 'event_photo', 'brand_logo', 'team_photo', 'designer_photo', 'hero', 'generic'] as const
 
 const bodySchema = z.object({
   countryCode: z.string().regex(/^[a-z]{2}$/).nullable(),

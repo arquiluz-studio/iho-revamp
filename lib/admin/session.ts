@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { cache } from 'react'
 import type { Database } from '@/lib/supabase/database.types'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { ADMIN_COUNTRY_COOKIE, ROLE_RANK, type CountryRole } from './roles'
+import { ADMIN_COUNTRY_COOKIE, ADMIN_GLOBAL_SCOPE, ROLE_RANK, type CountryRole } from './roles'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 type CountryRow = Pick<Database['public']['Tables']['countries']['Row'], 'code' | 'name_es' | 'timezone' | 'currency' | 'domain'>
@@ -19,6 +19,8 @@ export type AdminSession = {
   /** Countries the user can work on, with their effective role (super admins are admin everywhere). */
   countries: (CountryRow & { role: CountryRole })[]
   activeCountry: (CountryRow & { role: CountryRole }) | null
+  /** The global workspace is selected; `activeCountry` is null while it is. */
+  isGlobalScope: boolean
 }
 
 /** Resolves the signed-in staff member once per request. Returns null when there is no valid staff session. */
@@ -41,8 +43,10 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
     .map(c => ({ ...c, role: (isSuperAdmin ? 'admin' : roleByCountry.get(c.code)) as CountryRole | undefined }))
     .filter((c): c is CountryRow & { role: CountryRole } => Boolean(c.role))
 
+  const canManageCatalog = isSuperAdmin || isCatalogAdmin
   const preferred = (await cookies()).get(ADMIN_COUNTRY_COOKIE)?.value
-  const activeCountry = allowed.find(c => c.code === preferred) ?? allowed[0] ?? null
+  const isGlobalScope = canManageCatalog && (preferred === ADMIN_GLOBAL_SCOPE || allowed.length === 0)
+  const activeCountry = isGlobalScope ? null : (allowed.find(c => c.code === preferred) ?? allowed[0] ?? null)
 
   return {
     userId: auth.user.id,
@@ -50,9 +54,10 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
     profile,
     isSuperAdmin,
     isCatalogAdmin,
-    canManageCatalog: isSuperAdmin || isCatalogAdmin,
+    canManageCatalog,
     countries: allowed,
     activeCountry,
+    isGlobalScope,
   }
 })
 

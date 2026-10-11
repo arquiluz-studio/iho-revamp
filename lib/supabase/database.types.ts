@@ -432,7 +432,6 @@ export type Database = {
           seo_description_es: string | null
           seo_title_en: string | null
           seo_title_es: string | null
-          stats: Json
           updated_at: string
         }
         Insert: {
@@ -451,7 +450,6 @@ export type Database = {
           seo_description_es?: string | null
           seo_title_en?: string | null
           seo_title_es?: string | null
-          stats?: Json
           updated_at?: string
         }
         Update: {
@@ -470,7 +468,6 @@ export type Database = {
           seo_description_es?: string | null
           seo_title_en?: string | null
           seo_title_es?: string | null
-          stats?: Json
           updated_at?: string
         }
         Relationships: [
@@ -498,6 +495,75 @@ export type Database = {
           {
             foreignKeyName: "country_settings_hero_video_media_id_fkey"
             columns: ["hero_video_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      designers: {
+        Row: {
+          bio_en: string | null
+          bio_es: string | null
+          birth_year: number | null
+          cover_media_id: string | null
+          created_at: string
+          death_year: number | null
+          id: string
+          is_active: boolean
+          name: string
+          nationality_en: string | null
+          nationality_es: string | null
+          portrait_media_id: string | null
+          slug: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          bio_en?: string | null
+          bio_es?: string | null
+          birth_year?: number | null
+          cover_media_id?: string | null
+          created_at?: string
+          death_year?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          nationality_en?: string | null
+          nationality_es?: string | null
+          portrait_media_id?: string | null
+          slug: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          bio_en?: string | null
+          bio_es?: string | null
+          birth_year?: number | null
+          cover_media_id?: string | null
+          created_at?: string
+          death_year?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          nationality_en?: string | null
+          nationality_es?: string | null
+          portrait_media_id?: string | null
+          slug?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "designers_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "designers_portrait_media_id_fkey"
+            columns: ["portrait_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
             referencedColumns: ["id"]
@@ -568,6 +634,36 @@ export type Database = {
           },
           {
             foreignKeyName: "event_brands_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_designers: {
+        Row: {
+          designer_id: string
+          event_id: string
+        }
+        Insert: {
+          designer_id: string
+          event_id: string
+        }
+        Update: {
+          designer_id?: string
+          event_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_designers_designer_id_fkey"
+            columns: ["designer_id"]
+            isOneToOne: false
+            referencedRelation: "designers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_designers_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
@@ -1094,6 +1190,43 @@ export type Database = {
           },
         ]
       }
+      product_designers: {
+        Row: {
+          designer_id: string
+          product_id: string
+        }
+        Insert: {
+          designer_id: string
+          product_id: string
+        }
+        Update: {
+          designer_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_designers_designer_id_fkey"
+            columns: ["designer_id"]
+            isOneToOne: false
+            referencedRelation: "designers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_designers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_designers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "v_country_catalog"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       product_media: {
         Row: {
           media_id: string
@@ -1242,7 +1375,6 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_es: string | null
-          designer: string | null
           erp_ref: string | null
           id: string
           name_en: string | null
@@ -1260,7 +1392,6 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_es?: string | null
-          designer?: string | null
           erp_ref?: string | null
           id?: string
           name_en?: string | null
@@ -1278,7 +1409,6 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_es?: string | null
-          designer?: string | null
           erp_ref?: string | null
           id?: string
           name_en?: string | null
@@ -1586,6 +1716,27 @@ export type Database = {
           },
         ]
       }
+      site_settings: {
+        Row: {
+          created_at: string
+          id: string
+          stats: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          stats?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          stats?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       social_accounts: {
         Row: {
           country_code: string
@@ -1776,7 +1927,6 @@ export type Database = {
           country_code: string | null
           cover_media_id: string | null
           currency: string | null
-          designer: string | null
           is_featured: boolean | null
           is_purchasable: boolean | null
           is_visible: boolean | null
@@ -1882,6 +2032,7 @@ export type Database = {
         | "team_photo"
         | "hero"
         | "generic"
+        | "designer_photo"
       media_processing_status: "pending" | "ready" | "failed"
       price_list_kind: "base" | "sale"
       registration_status:
@@ -2048,6 +2199,7 @@ export const Constants = {
         "team_photo",
         "hero",
         "generic",
+        "designer_photo",
       ],
       media_processing_status: ["pending", "ready", "failed"],
       price_list_kind: ["base", "sale"],

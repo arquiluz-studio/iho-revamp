@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { untypedFrom } from '@/lib/admin/data'
 import { buildSchema, toRow } from '@/lib/admin/form-schema'
-import { getResource, type ResourceConfig } from '@/lib/admin/resources'
+import { getResource, singletonId, type ResourceConfig } from '@/lib/admin/resources'
 import { revalidateResource } from '@/lib/admin/revalidate'
 import { getAdminSession, hasRole, type AdminSession } from '@/lib/admin/session'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -44,13 +44,16 @@ export async function saveResource(
   let savedId: string
 
   if (config.singleton) {
-    const { data, error } = await table.update(row as never).eq('country_code', countryCode!).select('country_code')
+    const key = singletonId(config, countryCode)
+    if (!key) return FORBIDDEN
+    row[config.pk] = key
+    const { data, error } = await table.update(row as never).eq(config.pk, key).select(config.pk)
     if (error) return dbError(error)
     if (!data?.length) {
       const inserted = await untypedFrom(supabase, config.table).insert(row as never)
       if (inserted.error) return dbError(inserted.error)
     }
-    savedId = countryCode!
+    savedId = key
   } else if (id) {
     delete row[config.pk]
     let query = table.update(row as never).eq(config.pk, id)

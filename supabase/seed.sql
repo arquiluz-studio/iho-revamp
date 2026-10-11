@@ -10,7 +10,7 @@ insert into public.countries (code, name_es, name_en, domain, is_hq, currency, t
 on conflict (code) do nothing;
 
 insert into public.country_settings (
-  country_code, hero_eyebrow_es, hero_eyebrow_en, hero_title_es, hero_title_en, stats,
+  country_code, hero_eyebrow_es, hero_eyebrow_en, hero_title_es, hero_title_en,
   seo_title_es, seo_title_en, seo_description_es, seo_description_en
 )
 select
@@ -19,18 +19,23 @@ select
   'EST. 1992 · LATIN AMERICA',
   E'TODO EL PROYECTO,\n*UN SOLO* PROVEEDOR.',
   E'THE WHOLE PROJECT,\n*ONE SINGLE* SUPPLIER.',
-  jsonb_build_array(
-    jsonb_build_object('value', 35, 'prefix', '+', 'suffix', '', 'label_es', E'Años de\nexperiencia', 'label_en', E'Years of\nexperience'),
-    jsonb_build_object('value', 17, 'prefix', '', 'suffix', 'M', 'label_es', E'm²\ninstalados', 'label_en', E'm²\ninstalled'),
-    jsonb_build_object('value', 5, 'prefix', '', 'suffix', '', 'label_es', E'Áreas de\nnegocio', 'label_en', E'Business\nareas'),
-    jsonb_build_object('value', 4, 'prefix', '', 'suffix', '', 'label_es', E'Países en\nLATAM', 'label_en', E'Countries in\nLATAM')
-  ),
   'Grupo IHO ' || c.name_es || ' — Todo el proyecto, un solo proveedor',
   'IHO Group ' || c.name_en || ' — The whole project, one single supplier',
   'Grupo empresarial latinoamericano de interiorismo corporativo, industrial, comercial y residencial. Soluciones arquitectónicas y de iluminación en LATAM.',
   'Latin American business group for corporate, industrial, commercial and residential interiors. Architectural and lighting solutions across LATAM.'
 from public.countries c
 on conflict (country_code) do nothing;
+
+insert into public.site_settings (id, stats) values (
+  'global',
+  jsonb_build_array(
+    jsonb_build_object('value', 35, 'prefix', '+', 'suffix', '', 'label_es', E'Años de\nexperiencia', 'label_en', E'Years of\nexperience'),
+    jsonb_build_object('value', 17, 'prefix', '', 'suffix', 'M', 'label_es', E'm²\ninstalados', 'label_en', E'm²\ninstalled'),
+    jsonb_build_object('value', 5, 'prefix', '', 'suffix', '', 'label_es', 'Soluciones', 'label_en', 'Solutions'),
+    jsonb_build_object('value', 4, 'prefix', '', 'suffix', '', 'label_es', E'Países en\nLATAM', 'label_en', E'Countries in\nLATAM')
+  )
+)
+on conflict (id) do nothing;
 
 -- Taxonomies ------------------------------------------------------------------
 insert into public.business_lines (slug, name_es, name_en, description_es, description_en, sort) values
@@ -216,8 +221,8 @@ join public.brands b on b.slug = v.brand_slug
 on conflict do nothing;
 
 -- Catalog samples (the placeholder products of the original home) ---------------
-insert into public.products (slug, brand_id, business_line_id, name_es, name_en, designer, description_es, description_en, specs, status)
-select v.slug, b.id, bl.id, v.name, coalesce(v.name_en_override, v.name), v.designer, v.desc_es, v.desc_en, v.specs::jsonb, 'published'
+insert into public.products (slug, brand_id, business_line_id, name_es, name_en, description_es, description_en, specs, status)
+select v.slug, b.id, bl.id, v.name, coalesce(v.name_en_override, v.name), v.desc_es, v.desc_en, v.specs::jsonb, 'published'
 from (values
   ('smart-conference', 'allsteel', 'furniture', 'Smart Conference', null, null, 'Mesa de juntas modular con electrificación integrada.', 'Modular conference table with built-in power.', '[{"label_es":"Dimensiones","label_en":"Dimensions","value":"360 × 120 × 74 cm"}]'),
   ('float-gather', 'the-senator-group', 'furniture', 'Float Gather', null, null, 'Sistema de mesas colaborativas para espacios abiertos.', 'Collaborative table system for open spaces.', '[]'),
@@ -239,6 +244,23 @@ from (values
 join public.brands b on b.slug = v.brand_slug
 join public.business_lines bl on bl.slug = v.line_slug
 on conflict (slug) do nothing;
+
+insert into public.designers (slug, name) values
+  ('lievore-altherr', 'Lievore Altherr'),
+  ('axel-meise', 'Axel Meise'),
+  ('charles-ray-eames', 'Charles & Ray Eames')
+on conflict (slug) do nothing;
+
+insert into public.product_designers (product_id, designer_id)
+select p.id, d.id
+from (values
+  ('silla-path-alta', 'lievore-altherr'),
+  ('occhio-sento', 'axel-meise'),
+  ('vitra-eames-chair', 'charles-ray-eames')
+) as v (product_slug, designer_slug)
+join public.products p on p.slug = v.product_slug
+join public.designers d on d.slug = v.designer_slug
+on conflict do nothing;
 
 -- Every product is visible in every country; the home shows them as featured in Mexico.
 insert into public.country_products (country_code, product_id, is_visible, is_featured, is_purchasable, lead_time_days, sort)

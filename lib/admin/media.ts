@@ -71,6 +71,7 @@ export const MEDIA_KIND_LABELS: Record<MediaRow['kind'], string> = {
   event_photo: 'Foto de evento',
   brand_logo: 'Logo de marca',
   team_photo: 'Foto de equipo',
+  designer_photo: 'Foto de diseñador',
   hero: 'Hero',
   generic: 'General',
 }

@@ -14,7 +14,7 @@ const globalRole = z.enum(Constants.public.Enums.global_role)
 const inviteSchema = z.object({
   email: z.email('Email inválido').max(200),
   fullName: z.string().trim().max(160),
-  countryCode: z.string().regex(/^[a-z]{2}$/),
+  countryCode: z.string().regex(/^[a-z]{2}$/).nullable(),
   role: countryRole.nullable(),
   globalRole: globalRole.nullable(),
 })
@@ -30,9 +30,10 @@ export async function inviteUser(input: z.input<typeof inviteSchema>): Promise<A
   const parsed = inviteSchema.safeParse({ ...input, email: input.email.trim().toLowerCase() })
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Datos inválidos.' }
   const { email, fullName, countryCode, role, globalRole: global } = parsed.data
-  if (!hasRole(session, countryCode, 'admin')) return FORBIDDEN
   if (global && !session.isSuperAdmin) return FORBIDDEN
   if (!role && !global) return { ok: false, error: 'Elige un rol.' }
+  if (role && !countryCode) return { ok: false, error: 'Elige un país.' }
+  if (countryCode ? !hasRole(session, countryCode, 'admin') : !session.isSuperAdmin) return FORBIDDEN
   if (!hasServiceRole()) return { ok: false, error: 'Falta SUPABASE_SERVICE_ROLE_KEY en el servidor para enviar invitaciones.' }
 
   const admin = createSupabaseAdminClient()
@@ -52,7 +53,7 @@ export async function inviteUser(input: z.input<typeof inviteSchema>): Promise<A
   }
 
   const supabase = await createSupabaseServerClient()
-  if (role) {
+  if (role && countryCode) {
     const { error } = await supabase
       .from('user_country_roles')
       .upsert({ user_id: userId, country_code: countryCode, role }, { onConflict: 'user_id,country_code' })

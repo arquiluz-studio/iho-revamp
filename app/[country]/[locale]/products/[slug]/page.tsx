@@ -138,7 +138,19 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                     </a>
                   ),
                 },
-                { label: tp('designer'), value: product.designer },
+                {
+                  label: tp('designer'),
+                  value:
+                    product.designers.length > 0 &&
+                    product.designers.map((d, i) => (
+                      <span key={d.id}>
+                        {i > 0 && ', '}
+                        <a href={paths.designer(d.slug)} style={{ color: '#ef483d', textDecoration: 'none' }}>
+                          {d.name}
+                        </a>
+                      </span>
+                    )),
+                },
                 { label: tp('availability'), value: availability },
                 ...product.specs.map(s => ({ label: t(s, 'label', locale), value: s.value })),
               ]}

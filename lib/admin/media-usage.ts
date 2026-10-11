@@ -29,6 +29,13 @@ export const MEDIA_REFERENCES: Reference[] = [
     where: 'Logo de marca',
     describe: r => ({ label: String(r.name), href: `/admin/global/brands/${r.id}`, tags: [cacheTags.brands, cacheTags.brand(String(r.id))] }),
   },
+  ...(['portrait_media_id', 'cover_media_id'] as const).map(column => ({
+    table: 'designers',
+    column,
+    select: 'id, name',
+    where: column === 'portrait_media_id' ? 'Retrato de diseñador' : 'Portada de diseñador',
+    describe: (r: AnyRow) => ({ label: String(r.name), href: `/admin/global/designers/${r.id}`, tags: [cacheTags.designers] }),
+  })),
   {
     table: 'products',
     column: 'cover_media_id',
