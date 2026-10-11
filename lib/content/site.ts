@@ -23,9 +23,14 @@ const PLACEHOLDER_SRC = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="ht
 
 /** Media asset when present, else the pre-import file in public/, else a neutral placeholder. */
 export function imageOf(media: MediaRef | null | undefined, locale: AppLocale, alt: string, fallback?: string | null, largest: ImageVariant = 'lg'): ImageVM {
+  return imageOrNull(media, locale, alt, fallback, largest) ?? { src: PLACEHOLDER_SRC, alt, color: PLACEHOLDER_COLOR }
+}
+
+/** No media and no fallback means the slot stays empty, instead of a placeholder. */
+export function imageOrNull(media: MediaRef | null | undefined, locale: AppLocale, alt: string, fallback?: string | null, largest: ImageVariant = 'md'): ImageVM | null {
   if (media) return toImageVM(media, locale, largest, alt)
   if (fallback) return { src: fallback, alt }
-  return { src: PLACEHOLDER_SRC, alt, color: PLACEHOLDER_COLOR }
+  return null
 }
 
 async function eventLabels(locale: AppLocale) {
@@ -195,7 +200,7 @@ export async function getGroupVM(country: CountryCode, locale: AppLocale, paths:
 }
 
 export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: SitePaths): Promise<HomeVM> {
-  const [tr, labels, homeSource, events, sectors, businessLines, brands, projects, offices, countryRow, products] = await Promise.all([
+  const [tr, labels, home, events, sectors, businessLines, brands, projects, offices, countryRow, products] = await Promise.all([
     getTranslations({ locale }),
     eventLabels(locale),
     resolveHomeRecord(country),
@@ -210,11 +215,13 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
   ])
   const countryName = countryRow ? t(countryRow, 'name', locale) : country.toUpperCase()
 
+  const homeSource = home
+
   return {
     hero: {
-      eyebrow: t(homeSource, 'hero_eyebrow', locale) || tr('hero.eyebrow'),
-      title: t(homeSource, 'hero_title', locale) || tr('hero.title'),
-      videoSrc: videoUrl(homeSource?.hero_video) ?? legacyMedia.heroVideo(),
+      eyebrow: t(homeSource, 'hero_eyebrow', locale),
+      title: t(homeSource, 'hero_title', locale),
+      videoSrc: videoUrl(homeSource?.hero_video),
       poster: homeSource?.hero_image ? toImageVM(homeSource.hero_image, locale, 'lg').src : null,
     },
     sectors: sectors.map(s => t(s, 'name', locale).toUpperCase()),
@@ -232,7 +239,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
     brands: brands.map(b => toBrandVM(b, locale, paths)),
     projects: projects.map(p => toProjectCardVM(p, locale, paths)),
     offices,
-    contactImage: imageOf(homeSource?.contact_image, locale, tr('contact.imageAlt'), legacyMedia.contactImage(), 'md'),
+    contactImage: imageOrNull(homeSource?.contact_image, locale, tr('contact.imageAlt'), null, 'md'),
   }
 }
 

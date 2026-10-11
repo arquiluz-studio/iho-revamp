@@ -14,7 +14,14 @@ export function Hero({ eyebrow, title, videoSrc, poster, ctaHref }: {
   const t = useTranslations('hero')
   return (
     <section style={{ position: 'relative', height: '100vh', minHeight: 640, width: '100%', overflow: 'hidden', background: '#0e0e0e' }}>
-      {videoSrc && <HeroVideo src={videoSrc} poster={poster ?? undefined} />}
+      {videoSrc ? (
+        <HeroVideo src={videoSrc} poster={poster ?? undefined} />
+      ) : (
+        poster && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={poster} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        )
+      )}
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(8,8,8,0.8) 0%, rgba(8,8,8,0.5) 42%, rgba(8,8,8,0.08) 74%, rgba(8,8,8,0) 100%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(8,8,8,0.6) 0%, rgba(8,8,8,0) 26%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>

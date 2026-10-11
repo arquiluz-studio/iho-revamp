@@ -4,7 +4,7 @@ import { SolutionsGrid } from '@/components/site/SolutionsGrid'
 import { EmptyNote, HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { legacyMedia } from '@/lib/content/legacy-media'
-import { resolvePageHero } from '@/lib/content/page-hero'
+import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { imageOf } from '@/lib/content/site'
 import { localSlug, t } from '@/lib/i18n-fields'
@@ -14,20 +14,15 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
-  const [tp, th] = await Promise.all([
-    getTranslations({ locale, namespace: 'pages.solutions' }),
-    getTranslations({ locale, namespace: 'home.solutions' }),
-  ])
-  const hero = await resolvePageHero(country, 'solutions', locale, { label: tp('label'), title: th('title') })
-  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/solutions', country, locale }) }
+  const hero = await resolvePageHero(country, 'solutions', locale)
+  return { title: heroDocumentTitle(hero.title), alternates: buildAlternates({ href: '/solutions', country, locale }) }
 }
 
 export default async function SolutionsPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
-  const [tp, th, lines, chrome] = await Promise.all([
+  const [tp, lines, chrome] = await Promise.all([
     getTranslations({ locale, namespace: 'pages.solutions' }),
-    getTranslations({ locale, namespace: 'home.solutions' }),
     getBusinessLines(),
     innerChrome(country, locale, paths),
   ])
@@ -38,7 +33,7 @@ export default async function SolutionsPage({ params }: { params: Promise<SitePa
     image: imageOf(line.cover, locale, t(line, 'name', locale), legacyMedia.businessLineCover(line.slug), 'md'),
     href: paths.solution(localSlug(line, locale)),
   }))
-  const hero = await resolvePageHero(country, 'solutions', locale, { label: tp('label'), title: th('title') })
+  const hero = await resolvePageHero(country, 'solutions', locale)
   return (
     <PageShell chrome={chrome}>
       <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>

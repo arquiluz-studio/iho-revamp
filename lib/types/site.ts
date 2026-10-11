@@ -119,5 +119,5 @@ export type HomeVM = {
   brands: BrandVM[]
   projects: ProjectCardVM[]
   offices: OfficeVM[]
-  contactImage: ImageVM
+  contactImage: ImageVM | null
 }

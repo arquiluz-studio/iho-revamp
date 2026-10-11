@@ -4,30 +4,24 @@ import { ContactSection } from '@/components/site/ContactSection'
 import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MONO, SANS } from '@/components/ui/tokens'
-import { legacyMedia } from '@/lib/content/legacy-media'
-import { resolveHomeRecord, resolvePageHero } from '@/lib/content/page-hero'
+import { heroDocumentTitle, resolveHomeRecord, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
-import { imageOf, officesFor } from '@/lib/content/site'
+import { imageOrNull, officesFor } from '@/lib/content/site'
 import { getCountry } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
-  const [tc, tp] = await Promise.all([
-    getTranslations({ locale, namespace: 'contact' }),
-    getTranslations({ locale, namespace: 'pages.contact' }),
-  ])
-  const hero = await resolvePageHero(country, 'contact', locale, { label: tp('label'), title: tc('title') })
-  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/contact', country, locale }) }
+  const hero = await resolvePageHero(country, 'contact', locale)
+  return { title: heroDocumentTitle(hero.title), alternates: buildAlternates({ href: '/contact', country, locale }) }
 }
 
 export default async function ContactPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
-  const [tc, tp, home, offices, countryRow, chrome] = await Promise.all([
+  const [tc, home, offices, countryRow, chrome] = await Promise.all([
     getTranslations({ locale, namespace: 'contact' }),
-    getTranslations({ locale, namespace: 'pages.contact' }),
     resolveHomeRecord(country),
     officesFor(country, locale),
     getCountry(country),
@@ -39,7 +33,7 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
     countryRow?.email && { label: tc('email'), href: `mailto:${countryRow.email}`, value: countryRow.email },
   ].filter(Boolean) as { label: string; href: string; value: string }[]
 
-  const hero = await resolvePageHero(country, 'contact', locale, { label: tp('label'), title: tc('title') })
+  const hero = await resolvePageHero(country, 'contact', locale)
   return (
     <PageShell chrome={chrome}>
       <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
@@ -58,7 +52,7 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
       <ContactSection
         countryCode={country}
         offices={offices}
-        image={imageOf(home?.contact_image, locale, tc('imageAlt'), legacyMedia.contactImage(), 'md')}
+        image={imageOrNull(home?.contact_image, locale, tc('imageAlt'), null, 'md')}
       />
     </PageShell>
   )

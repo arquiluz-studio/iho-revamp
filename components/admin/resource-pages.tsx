@@ -193,8 +193,8 @@ export async function ResourceEditPage({
       {config.upsert && !row && (
         <Notice tone="amber">
           {config.scope === 'global'
-            ? 'Aún no hay contenido global. Un campo vacío conserva el texto fijo del sitio.'
-            : 'Esta página aún usa el texto fijo. Al guardar se crea el hero de este país.'}
+            ? 'Aún no hay contenido global. Un campo vacío no se publica.'
+            : 'Aún no hay hero de este país. Lo que dejes vacío no aparece en el sitio.'}
         </Notice>
       )}
       <ResourceForm

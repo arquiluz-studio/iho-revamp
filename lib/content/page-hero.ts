@@ -6,13 +6,6 @@ import { getCountryPage, getCountrySettings, getPageChoice, getSitePage } from '
 import type { ImageVM } from '@/lib/types/site'
 import type { ContentPageKey, CountryPageKey } from './static-pages'
 
-export type PageHeroFallback = {
-  label: string
-  title: string
-  intro?: string
-  extra?: string
-}
-
 export type ResolvedPageHero = {
   label: string
   title: string
@@ -33,22 +26,30 @@ export async function resolveHomeRecord(country: CountryCode) {
   return getCountrySettings(country)
 }
 
-/** Saved hero for a static page. Empty fields fall back to the built-in copy, not the other source. */
+/**
+ * Hero of a static page from the source this country chose.
+ * Empty fields stay empty. Listing pages may still pass an image of their first item.
+ */
 export async function resolvePageHero(
   country: CountryCode,
   page: CountryPageKey,
   locale: AppLocale,
-  fallback: PageHeroFallback,
   fallbackImage?: ImageVM | null,
 ): Promise<ResolvedPageHero> {
   const row = (await usesGlobalPage(country, page)) ? await getSitePage(page) : await getCountryPage(country, page)
-  const intro = t(row, 'hero_intro', locale) || fallback.intro || ''
-  const extra = t(row, 'hero_extra', locale) || fallback.extra || ''
+  const intro = t(row, 'hero_intro', locale)
+  const extra = t(row, 'hero_extra', locale)
   return {
-    label: t(row, 'hero_eyebrow', locale) || fallback.label,
-    title: t(row, 'hero_title', locale) || fallback.title,
+    label: t(row, 'hero_eyebrow', locale),
+    title: t(row, 'hero_title', locale),
     intro: intro || undefined,
     extra: extra || undefined,
     image: row?.hero_image ? toImageVM(row.hero_image, locale, 'lg') : (fallbackImage ?? null),
   }
+}
+
+/** Browser title for a CMS hero. No title means the layout default. */
+export function heroDocumentTitle(title: string) {
+  const flat = title.replace(/\n/g, ' ').trim()
+  return flat ? `${flat} — IHO` : undefined
 }

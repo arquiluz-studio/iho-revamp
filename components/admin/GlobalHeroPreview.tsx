@@ -36,7 +36,7 @@ export async function GlobalHeroPreview({ pageKey }: { pageKey: ContentPageKey }
     <>
       <PageHeader title={page?.label ?? 'Página'} description="Contenido global en solo lectura. Se edita en Contenido - Global." />
       {!data || (filled.length === 0 && images.length === 0) ? (
-        <Notice>El contenido global está vacío, así que el sitio usa el texto fijo.</Notice>
+        <Notice>El contenido global de esta página está vacío.</Notice>
       ) : (
         <Card className="space-y-5 p-5">
           {filled.map(([label, es, en]) => (

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { DesignerCards, EmptyNote, HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
-import { resolvePageHero } from '@/lib/content/page-hero'
+import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { toDesignerCardVM } from '@/lib/content/site'
 import { getDesigners } from '@/lib/queries/designers'
@@ -11,9 +11,8 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
-  const tp = await getTranslations({ locale, namespace: 'pages.designers' })
-  const hero = await resolvePageHero(country, 'designers', locale, { label: tp('label'), title: tp('title'), intro: tp('intro') })
-  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/designers', country, locale }) }
+  const hero = await resolvePageHero(country, 'designers', locale)
+  return { title: heroDocumentTitle(hero.title), alternates: buildAlternates({ href: '/designers', country, locale }) }
 }
 
 export default async function DesignersPage({ params }: { params: Promise<SiteParams> }) {
@@ -25,7 +24,7 @@ export default async function DesignersPage({ params }: { params: Promise<SitePa
     innerChrome(country, locale, paths),
   ])
   const born = (year: number) => tp('born', { year })
-  const hero = await resolvePageHero(country, 'designers', locale, { label: tp('label'), title: tp('title'), intro: tp('intro') })
+  const hero = await resolvePageHero(country, 'designers', locale)
   return (
     <PageShell chrome={chrome}>
       <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>

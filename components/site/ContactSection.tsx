@@ -5,11 +5,11 @@ import { ACUMIN } from '@/components/ui/tokens'
 import type { ImageVM, OfficeVM } from '@/lib/types/site'
 import { ContactForm } from './ContactForm'
 
-export function ContactSection({ offices, image, countryCode }: { offices: OfficeVM[]; image: ImageVM; countryCode: string }) {
+export function ContactSection({ offices, image, countryCode }: { offices: OfficeVM[]; image: ImageVM | null; countryCode: string }) {
   const t = useTranslations('contact')
   return (
     <section id="contacto" style={{ background: '#f1ece3' }}>
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '84px 40px', display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: 56, alignItems: 'stretch' }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '84px 40px', display: 'grid', gridTemplateColumns: image ? '1.05fr 0.95fr' : '1fr', gap: 56, alignItems: 'stretch' }}>
         <div>
           <SectionLabel>{t('label')}</SectionLabel>
           <h2 style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 48, lineHeight: 0.98, letterSpacing: '-0.5px', textTransform: 'uppercase', margin: '0 0 34px', color: '#000' }}>{t('title')}</h2>
@@ -23,9 +23,11 @@ export function ContactSection({ offices, image, countryCode }: { offices: Offic
             ))}
           </div>
         </div>
-        <div style={{ position: 'relative', borderRadius: 6, overflow: 'hidden' }}>
-          <MediaImage image={image} alt={t('imageAlt')} sizes="(max-width: 1024px) 100vw, 560px" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        </div>
+        {image && (
+          <div style={{ position: 'relative', borderRadius: 6, overflow: 'hidden' }}>
+            <MediaImage image={image} alt={t('imageAlt')} sizes="(max-width: 1024px) 100vw, 560px" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </div>
+        )}
       </div>
     </section>
   )
