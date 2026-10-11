@@ -54,13 +54,11 @@ export async function siteChrome({ country, locale, paths, threshold, contactHre
     {
       href: paths.solutions,
       label: tn('solutions'),
-      allLabel: tn('allSolutions'),
       items: lines.map(line => ({ href: paths.solution(localSlug(line, locale)), label: t(line, 'name', locale) })),
     },
     {
       href: paths.spaces,
       label: tn('spaces'),
-      allLabel: tn('allSpaces'),
       items: sectors.map(sector => ({ href: paths.space(localSlug(sector, locale)), label: t(sector, 'name', locale) })),
     },
     { href: paths.projects, label: tn('projects') },

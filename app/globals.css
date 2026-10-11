@@ -787,11 +787,12 @@
           display: block;
           width: 22px;
           height: 2px;
-          background: #17150f;
+          background: currentColor;
           border-radius: 2px;
           transition:
             transform 0.3s ease,
-            opacity 0.3s ease;
+            opacity 0.3s ease,
+            background-color 0.3s ease;
         }
         #iho-menu-btn.is-open span:nth-child(1) {
           transform: translateY(7px) rotate(45deg);
@@ -816,23 +817,35 @@
             padding: 16px 28px !important;
           }
           /* Header collapses into the hamburger menu */
+          /* Full-screen panel that slides down from the top, under the logo and the menu button */
           header nav {
-            display: none !important;
-            position: absolute !important;
-            top: 100% !important;
-            left: 0 !important;
-            right: 0 !important;
+            position: fixed !important;
+            inset: 0 !important;
+            height: 100dvh !important;
+            overflow-y: auto !important;
+            overscroll-behavior: contain;
             background: #faf7f1 !important;
             flex-direction: column !important;
             align-items: flex-start !important;
-            padding: 16px 28px 24px !important;
+            padding: 96px 28px 40px !important;
             gap: 0 !important;
-            border-bottom: 1px solid rgba(20, 18, 12, 0.08) !important;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
-            z-index: 59 !important;
+            font-size: 20px !important;
+            z-index: 1 !important;
+            transform: translateY(-100%);
+            visibility: hidden;
+            transition:
+              transform 0.6s ease,
+              visibility 0s linear 0.6s;
           }
           header nav.iho-nav-open {
-            display: flex !important;
+            transform: none;
+            visibility: visible;
+            transition: transform 0.6s ease;
+          }
+          header > div > a,
+          #iho-menu-btn {
+            position: relative;
+            z-index: 2;
           }
           header nav a {
             padding: 12px 4px !important;
@@ -841,6 +854,15 @@
           }
           header nav a:last-child {
             border-bottom: none !important;
+          }
+          header nav a.iho-btn {
+            justify-content: center;
+            margin-top: 28px;
+            padding: 14px 20px !important;
+            border-bottom: none !important;
+          }
+          header nav .iho-header-tools {
+            margin-top: 24px;
           }
           #iho-menu-btn {
             display: flex !important;
@@ -914,6 +936,9 @@
         /* ===== ≤768px ===== */
         @media (max-width: 768px) {
           /* Header */
+          header nav {
+            padding: 88px 20px 40px !important;
+          }
           header > div {
             padding: 14px 20px !important;
           }
