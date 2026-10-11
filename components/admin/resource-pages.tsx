@@ -9,7 +9,7 @@ import { previewUrl, publicUrl } from '@/lib/admin/public-url'
 import { hasRole, requireAdminSession, type AdminSession } from '@/lib/admin/session'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { AgendaEditor } from './AgendaEditor'
-import { PriceListExtras, ProductExtras, WarehouseExtras } from './catalog/CatalogExtras'
+import { ProductExtras } from './catalog/CatalogExtras'
 import { formatDateTime } from '@/lib/admin/format'
 import { DataTable } from './DataTable'
 import { EventsCalendar, type CalendarParams } from './EventsCalendar'
@@ -129,7 +129,7 @@ export async function ResourceEditPage({
   if (id && !record && !config.singleton) notFound()
   const row = record?.row ?? null
   const initialValues = row ? toFormValues(config, row, record!.bridges, timezone) : emptyValues(config)
-  const [options, media] = await Promise.all([loadOptions(config), loadMedia(mediaIdsOf(config, row))])
+  const [options, media] = await Promise.all([loadOptions(config, countryCode), loadMedia(mediaIdsOf(config, row))])
 
   const siteCountry = countryCode ?? session.activeCountry?.code ?? 'mx'
   const href = publicHref(config, row)
@@ -200,11 +200,9 @@ export async function ResourceEditPage({
           <ContentExtras owner={resource === 'events' ? 'event' : 'project'} id={id} countryCode={countryCode} coverId={(row?.cover_media_id as string) ?? null} canEdit={canWrite} />
         </div>
       )}
-      {id && (resource === 'products' || resource === 'price-lists' || resource === 'warehouses') && (
+      {id && resource === 'products' && countryCode && (
         <div className="mt-6 space-y-6 lg:max-w-[calc(100%-304px)]">
-          {resource === 'products' && <ProductExtras productId={id} coverId={(row?.cover_media_id as string) ?? null} canEdit={canWrite} />}
-          {resource === 'price-lists' && <PriceListExtras priceListId={id} currency={String(row?.currency ?? '')} canEdit={canWrite} />}
-          {resource === 'warehouses' && <WarehouseExtras warehouseId={id} canEdit={canWrite} />}
+          <ProductExtras productId={id} countryCode={countryCode} coverId={(row?.cover_media_id as string) ?? null} canEdit={canWrite} />
         </div>
       )}
     </>

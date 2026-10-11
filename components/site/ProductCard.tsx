@@ -35,7 +35,6 @@ export function ProductCard({ product, showCategory = false, ariaHidden }: Props
       {(product.price || product.inquiry) && (
         <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 12, letterSpacing: '0.5px', color: '#17150f', marginTop: 6, display: 'flex', gap: 10, alignItems: 'baseline' }}>
           {product.price && <span>{product.price}</span>}
-          {product.compareAt && <span style={{ color: '#8a8478', textDecoration: 'line-through' }}>{product.compareAt}</span>}
           {!product.price && product.inquiry && <span style={{ color: '#ef483d', textTransform: 'uppercase' }}>{t('quote')} →</span>}
         </div>
       )}

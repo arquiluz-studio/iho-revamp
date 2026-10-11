@@ -43,15 +43,16 @@ export async function loadRecord(
   return { row: row as AnyRow, bridges }
 }
 
-const SOURCES: Record<ReferenceSource, { table: string; label: string; order: string }> = {
+const SOURCES: Record<ReferenceSource, { table: string; label: string; order: string; country?: boolean }> = {
   brands: { table: 'brands', label: 'name', order: 'name' },
   designers: { table: 'designers', label: 'name', order: 'name' },
   business_lines: { table: 'business_lines', label: 'name_es', order: 'sort' },
   sectors: { table: 'sectors', label: 'name_es', order: 'sort' },
-  products: { table: 'products', label: 'name_es', order: 'name_es' },
+  products: { table: 'products', label: 'name_es', order: 'name_es', country: true },
+  catalog_brands: { table: 'catalog_brands', label: 'name', order: 'name', country: true },
 }
 
-export async function loadOptions(config: ResourceConfig): Promise<Record<string, Option[]>> {
+export async function loadOptions(config: ResourceConfig, countryCode: string | null): Promise<Record<string, Option[]>> {
   const supabase = await createSupabaseServerClient()
   const options: Record<string, Option[]> = {}
   const sources = new Set(
@@ -59,8 +60,14 @@ export async function loadOptions(config: ResourceConfig): Promise<Record<string
   )
   await Promise.all(
     [...sources].map(async ([name, source]) => {
-      const { table, label, order } = SOURCES[source]
-      const { data } = await untypedFrom(supabase, table).select(`id, ${label}`).order(order)
+      const { table, label, order, country } = SOURCES[source]
+      if (country && !countryCode) {
+        options[name] = []
+        return
+      }
+      let query = untypedFrom(supabase, table).select(`id, ${label}`).order(order)
+      if (country && countryCode) query = query.eq('country_code', countryCode)
+      const { data } = await query
       options[name] = ((data ?? []) as unknown as AnyRow[]).map(r => ({ value: String(r.id), label: String(r[label]) }))
     }),
   )

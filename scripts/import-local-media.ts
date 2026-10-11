@@ -92,7 +92,7 @@ async function check<T extends { error: unknown }>(promise: PromiseLike<T>): Pro
 async function main() {
   manifest = existsSync(MANIFEST) ? JSON.parse(await readFile(MANIFEST, 'utf8')) : {}
 
-  // --- Products (global) — imported first so event galleries reuse the same assets. ---
+  // --- Products (one row per country) — imported first so event galleries reuse the same assets. ---
   console.log('Products')
   for (const n of [1, 2, 3, 4]) {
     await importFile(`images/productos/producto-${n}.webp`, { kind: 'product_photo', country: null, alt: `Producto ${n}` })

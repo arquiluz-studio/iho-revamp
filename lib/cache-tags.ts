@@ -9,7 +9,7 @@ export const cacheTags = {
   taxonomies: 'taxonomies',
   brands: 'brands',
   designers: 'designers',
-  /** Global product data (names, specs, variants, media) shared by every country's catalog. */
+  /** Legacy tag kept so a product save still drops catalog entries cached before products were per country. */
   products: 'products',
   /** Site-wide settings shared by every country (stats). */
   site: 'site',

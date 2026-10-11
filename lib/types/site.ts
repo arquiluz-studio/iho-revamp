@@ -56,7 +56,6 @@ export type ProductCardVM = {
   category?: string
   href: string
   price?: string
-  compareAt?: string
   inquiry?: boolean
 }
 

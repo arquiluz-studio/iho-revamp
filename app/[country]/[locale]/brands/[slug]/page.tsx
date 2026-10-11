@@ -2,12 +2,14 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { Chips, Facts, PageHero, PageShell, ProjectCards, Prose, SectionHeading } from '@/components/site/pages/PageParts'
+import { ProductCard } from '@/components/site/ProductCard'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MediaImage } from '@/components/ui/MediaImage'
 import { sitePaths } from '@/lib/content/paths'
-import { toBrandVM, toProjectCardVM } from '@/lib/content/site'
+import { toBrandVM, toProductCardVM, toProjectCardVM } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getCountryBrand, getCountryBrands } from '@/lib/queries/brands'
+import { getCatalog } from '@/lib/queries/catalog'
 import { getProjects } from '@/lib/queries/projects'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
@@ -44,12 +46,14 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
   const paths = sitePaths(locale)
-  const [brand, tp, chrome] = await Promise.all([
+  const [brand, catalog, tp, chrome] = await Promise.all([
     getCountryBrand(country, slug),
+    getCatalog(country),
     getTranslations({ locale, namespace: 'pages.brands' }),
     innerChrome(country, locale, paths),
   ])
   if (!brand) notFound()
+  const products = catalog.filter(p => p.brand?.id === brand.id)
   const projects = await getProjects(country, { brandId: brand.id })
   const vm = toBrandVM(brand, locale)
   const lines = brand.business_lines.flatMap(b => (b.business_line ? [b.business_line] : []))
@@ -80,6 +84,16 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
           />
         </div>
       </section>
+      {products.length > 0 && (
+        <section className="iho-page-section" style={{ paddingTop: 0 }}>
+          <SectionHeading label={`— ${tp('products').toUpperCase()}`} />
+          <div className="iho-product-grid">
+            {products.map(p => (
+              <ProductCard key={p.id} product={toProductCardVM(p, locale, country, paths)} showCategory />
+            ))}
+          </div>
+        </section>
+      )}
       {projects.length > 0 && (
         <section className="iho-page-section" style={{ paddingTop: 0 }}>
           <SectionHeading label={`— ${tp('projects').toUpperCase()}`} />

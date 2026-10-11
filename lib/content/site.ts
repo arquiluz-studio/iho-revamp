@@ -102,12 +102,9 @@ export function toProjectCardVM(p: ProjectListRow, locale: AppLocale, paths: Sit
 }
 
 /** Price label of a catalog row, or null when the product is quote-only in the country. */
-export function priceLabels(offer: { amount: number | null; compareAt: number | null; currency: string | null } | null, locale: AppLocale, country: string) {
+export function priceLabels(offer: { amount: number | null; currency: string | null } | null, locale: AppLocale, country: string) {
   if (!offer || offer.amount == null || !offer.currency) return null
-  return {
-    price: formatPrice(offer.amount, offer.currency, locale, country),
-    compareAt: offer.compareAt != null && offer.compareAt > offer.amount ? formatPrice(offer.compareAt, offer.currency, locale, country) : undefined,
-  }
+  return { price: formatPrice(offer.amount, offer.currency, locale, country) }
 }
 
 export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: string, paths: SitePaths): ProductCardVM {
@@ -121,7 +118,6 @@ export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: strin
     href: labels ? paths.product(localSlug(p, locale)) : `${paths.product(localSlug(p, locale))}#cotizar`,
     image: imageOf(p.cover, locale, name, legacyMedia.productCover(p.slug), 'md'),
     price: labels?.price,
-    compareAt: labels?.compareAt,
     inquiry: !labels,
   }
 }

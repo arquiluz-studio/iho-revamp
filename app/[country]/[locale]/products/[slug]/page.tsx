@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const product = await getProductBySlug(country, slug, locale)
   if (!product) return {}
   return {
-    title: `${t(product, 'name', locale)}${product.brand ? ` · ${product.brand.name}` : ''} — IHO`,
+    title: `${t(product, 'name', locale)} · ${product.brand?.name ?? product.catalogBrandName} — IHO`,
     description: t(product, 'description', locale).slice(0, 160) || undefined,
     alternates: buildAlternates({ href: l => ({ pathname: '/products/[slug]', params: { slug: localSlug(product, l) } }), country, locale, availableIn: [country] }),
   }
@@ -51,17 +51,13 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   ])
 
   const name = t(product, 'name', locale)
+  const brandName = product.brand?.name ?? product.catalogBrandName
   const cover = imageOf(product.cover, locale, name, legacyMedia.productCover(product.slug), 'lg')
   const gallery = product.gallery.flatMap(g => (g.media && g.media.id !== product.cover?.id ? [imageOf(g.media, locale, name, null, 'md')] : []))
   const labels = product.is_purchasable ? priceLabels(product.price, locale, country) : null
-  const availability =
-    product.stock != null && product.stock > 0
-      ? tp('inStock')
-      : product.lead_time_days
-        ? tp('leadTime', { days: product.lead_time_days })
-        : tp('onRequest')
+  const availability = product.lead_time_days ? tp('leadTime', { days: product.lead_time_days }) : tp('onRequest')
   const variants = product.variants.length > 1 ? product.variants : []
-  const related = catalog.filter(p => p.id !== product.id && p.brand?.id === product.brand?.id).slice(0, 4)
+  const related = catalog.filter(p => p.id !== product.id && p.catalogBrandId === product.catalogBrandId).slice(0, 4)
   const chips = [
     ...(product.business_line ? [{ href: paths.solution(localSlug(product.business_line, locale)), label: t(product.business_line, 'name', locale) }] : []),
     ...product.sectors.map(s => ({ href: paths.space(localSlug(s, locale)), label: t(s, 'name', locale) })),
@@ -69,7 +65,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={product.brand ? `— ${product.brand.name.toUpperCase()}` : tp('label')} title={name}>
+      <PageHero label={`— ${brandName.toUpperCase()}`} title={name}>
         {chips.length > 0 && (
           <div style={{ marginTop: 28 }} className="iho-chips-dark">
             <Chips links={chips} />
@@ -107,24 +103,6 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                 <span style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 36, color: '#17150f' }}>
                   {product.multiplePrices ? tp('from', { price: labels.price }) : labels.price}
                 </span>
-                {labels.compareAt && (
-                  <span style={{ fontFamily: MONO, fontSize: 14, color: '#8a8478', textDecoration: 'line-through' }}>{labels.compareAt}</span>
-                )}
-                {product.price?.priceKind === 'sale' && (
-                  <span
-                    style={{
-                      fontFamily: MONO,
-                      fontSize: 11,
-                      letterSpacing: '1.2px',
-                      color: '#fff',
-                      background: '#ef483d',
-                      padding: '4px 10px',
-                      borderRadius: 20,
-                    }}
-                  >
-                    {tp('sale').toUpperCase()}
-                  </span>
-                )}
               </div>
             )}
             <Prose paragraphs={paragraphs(t(product, 'description', locale))} />
@@ -132,10 +110,12 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               items={[
                 {
                   label: tp('brand'),
-                  value: product.brand && (
+                  value: product.brand ? (
                     <a href={paths.brand(product.brand.slug)} style={{ color: '#ef483d', textDecoration: 'none' }}>
                       {product.brand.name}
                     </a>
+                  ) : (
+                    brandName
                   ),
                 },
                 {
@@ -194,7 +174,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                 countryCode={country}
                 inquiry={{
                   productId: product.id,
-                  message: tp('inquiryMessage', { product: product.brand ? `${name} (${product.brand.name})` : name }),
+                  message: tp('inquiryMessage', { product: `${name} (${brandName})` }),
                   submitLabel: tp('inquiry'),
                   successText: tp('inquirySent'),
                 }}
@@ -205,7 +185,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       </section>
       {related.length > 0 && (
         <section className="iho-page-section" style={{ paddingTop: 0 }}>
-          <SectionHeading label={`— ${product.brand?.name.toUpperCase() ?? tp('all').toUpperCase()}`} />
+          <SectionHeading label={`— ${brandName.toUpperCase()}`} />
           <div className="iho-product-grid">
             {related.map(p => (
               <ProductCard key={p.id} product={toProductCardVM(p, locale, country, paths)} showCategory />

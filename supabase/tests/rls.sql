@@ -237,29 +237,39 @@ begin
 end $$;
 reset role;
 
--- catalog: prices per country, availability, variants ---------------------------
-insert into public.products (id, slug, brand_id, name_es, status) values
-  ('30000000-0000-4000-8000-000000000001', 'test-product', '20000000-0000-4000-8000-000000000001', 'Producto', 'published');
-insert into public.country_products (country_code, product_id, is_visible, is_purchasable) values
-  ('mx', '30000000-0000-4000-8000-000000000001', true, false),
-  ('pa', '30000000-0000-4000-8000-000000000001', true, true);
-insert into public.price_lists (id, country_code, currency, name, kind) values
-  ('40000000-0000-4000-8000-000000000001', 'mx', 'MXN', 'Test base MX', 'base'),
-  ('40000000-0000-4000-8000-000000000002', 'pa', 'USD', 'Test base PA', 'base');
-insert into public.price_list_items (price_list_id, variant_id, amount)
-select l.id, v.id, case when l.country_code = 'mx' then 1000 else 50 end
-from public.price_lists l
-cross join public.product_variants v
-where l.name like 'Test base %' and v.product_id = '30000000-0000-4000-8000-000000000001';
+-- catalog: one product per country, cost hidden, sale price public only when purchasable --
+insert into public.catalog_brands (id, country_code, name, brand_id) values
+  ('21000000-0000-4000-8000-000000000001', 'mx', 'Test Brand', '20000000-0000-4000-8000-000000000001'),
+  ('21000000-0000-4000-8000-000000000002', 'pa', 'Test Brand', '20000000-0000-4000-8000-000000000001');
+insert into public.products (id, country_code, catalog_brand_id, slug, name_es, status, is_visible, is_purchasable) values
+  ('30000000-0000-4000-8000-000000000001', 'mx', '21000000-0000-4000-8000-000000000001', 'test-product', 'Producto', 'published', true, false),
+  ('30000000-0000-4000-8000-000000000002', 'pa', '21000000-0000-4000-8000-000000000002', 'test-product', 'Producto', 'published', true, true),
+  ('30000000-0000-4000-8000-000000000003', 'mx', '21000000-0000-4000-8000-000000000001', 'test-hidden', 'Oculto', 'published', false, false);
+update public.variant_prices vp
+set price = case when p.country_code = 'mx' then 1000 else 50 end,
+    cost = 10,
+    currency = case when p.country_code = 'mx' then 'MXN' else 'USD' end
+from public.product_variants v
+join public.products p on p.id = v.product_id
+where vp.variant_id = v.id and p.slug = 'test-product';
 
 do $$
 begin
   if (select count(*) from public.product_variants where product_id = '30000000-0000-4000-8000-000000000001') <> 1 then
     raise exception 'catalog: a new product should get a default variant';
   end if;
+  if (select count(*) from public.variant_prices vp join public.product_variants v on v.id = vp.variant_id where v.product_id = '30000000-0000-4000-8000-000000000001') <> 1 then
+    raise exception 'catalog: a new variant should get a price row';
+  end if;
   begin
     delete from public.product_variants where product_id = '30000000-0000-4000-8000-000000000001';
     raise exception 'catalog: deleting the last variant must be rejected';
+  exception when check_violation then null;
+  end;
+  begin
+    insert into public.event_products (event_id, product_id)
+    values ('10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000002');
+    raise exception 'catalog: an event cannot feature another country''s product';
   exception when check_violation then null;
   end;
 end $$;
@@ -268,13 +278,15 @@ set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 do $$
 begin
-  if exists (select 1 from public.price_lists) then raise exception 'anon: must not read price lists'; end if;
-  if exists (select 1 from public.price_list_items) then raise exception 'anon: must not read prices'; end if;
-  if (select amount from public.v_country_catalog where slug = 'test-product' and country_code = 'pa') <> 50 then
+  if exists (select 1 from public.variant_prices) then raise exception 'anon: must not read cost or price rows'; end if;
+  if (select amount from public.v_country_catalog where slug = 'test-product' and country_code = 'pa') is distinct from 50 then
     raise exception 'anon: should see the price of a purchasable product';
   end if;
   if (select amount from public.v_country_catalog where slug = 'test-product' and country_code = 'mx') is not null then
     raise exception 'anon: must not see the price of a quote-only product';
+  end if;
+  if exists (select 1 from public.products where country_code = 'mx' and is_visible = false) then
+    raise exception 'anon: must not read hidden products';
   end if;
 end $$;
 reset role;
@@ -284,18 +296,19 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000
 do $$
 declare n int;
 begin
-  if exists (select 1 from public.price_lists where country_code = 'mx') then raise exception 'pa_editor: must not read mx prices'; end if;
-  update public.country_products set is_visible = false where country_code = 'mx';
+  if exists (
+    select 1 from public.variant_prices vp
+    join public.product_variants v on v.id = vp.variant_id
+    join public.products p on p.id = v.product_id
+    where p.country_code = 'mx'
+  ) then raise exception 'pa_editor: must not read mx prices'; end if;
+  update public.products set is_visible = false where country_code = 'mx';
   get diagnostics n = row_count;
-  if n <> 0 then raise exception 'pa_editor: must not change mx availability'; end if;
+  if n <> 0 then raise exception 'pa_editor: must not change mx products'; end if;
   begin
-    insert into public.price_lists (country_code, currency, name) values ('pa', 'USD', 'Nope');
-    raise exception 'pa_editor: price lists require country admin';
-  exception when insufficient_privilege then null;
-  end;
-  begin
-    insert into public.products (slug, brand_id, name_es) values ('test-nope', '20000000-0000-4000-8000-000000000001', 'x');
-    raise exception 'pa_editor: products are global catalog';
+    insert into public.products (country_code, catalog_brand_id, slug, name_es)
+    values ('pa', '21000000-0000-4000-8000-000000000002', 'test-nope', 'x');
+    raise exception 'pa_editor: products require country admin';
   exception when insufficient_privilege then null;
   end;
 end $$;
@@ -306,18 +319,30 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000
 do $$
 declare n int;
 begin
-  insert into public.price_lists (country_code, currency, name, kind) values ('mx', 'MXN', 'Test sale MX', 'sale');
-  update public.country_products set is_purchasable = true where country_code = 'mx' and product_id = '30000000-0000-4000-8000-000000000001';
+  update public.products set is_purchasable = true where country_code = 'mx' and id = '30000000-0000-4000-8000-000000000001';
   get diagnostics n = row_count;
-  if n <> 1 then raise exception 'mx_admin: should change mx availability'; end if;
+  if n <> 1 then raise exception 'mx_admin: should change mx products'; end if;
+  update public.variant_prices vp
+  set price = 900
+  from public.product_variants v
+  where v.id = vp.variant_id and v.product_id = '30000000-0000-4000-8000-000000000001';
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'mx_admin: should change mx prices'; end if;
   begin
-    insert into public.price_lists (country_code, currency, name) values ('pa', 'USD', 'Nope');
-    raise exception 'mx_admin: must not create pa price lists';
+    insert into public.products (country_code, catalog_brand_id, slug, name_es)
+    values ('pa', '21000000-0000-4000-8000-000000000002', 'test-nope-pa', 'x');
+    raise exception 'mx_admin: must not create pa products';
   exception when insufficient_privilege then null;
   end;
-  if not exists (select 1 from public.audit_log where table_name = 'price_list_items' and country_code = 'mx') then
+  if not exists (select 1 from public.audit_log where table_name = 'variant_prices' and country_code = 'mx') then
     raise exception 'mx_admin: price changes should appear in the mx audit log';
   end if;
+  if exists (
+    select 1 from public.variant_prices vp
+    join public.product_variants v on v.id = vp.variant_id
+    join public.products p on p.id = v.product_id
+    where p.country_code = 'pa'
+  ) then raise exception 'mx_admin: must not read pa prices'; end if;
 end $$;
 reset role;
 
@@ -325,12 +350,13 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 do $$
 begin
-  insert into public.products (slug, brand_id, name_es) values ('test-catalog-product', '20000000-0000-4000-8000-000000000001', 'Nuevo');
   begin
-    insert into public.price_lists (country_code, currency, name) values ('mx', 'MXN', 'Nope');
-    raise exception 'catalog_admin: prices belong to country admins';
+    insert into public.products (country_code, catalog_brand_id, slug, name_es)
+    values ('mx', '21000000-0000-4000-8000-000000000001', 'test-catalog-product', 'Nuevo');
+    raise exception 'catalog_admin: products belong to country admins';
   exception when insufficient_privilege then null;
   end;
+  if exists (select 1 from public.variant_prices) then raise exception 'catalog_admin: must not read costs or prices'; end if;
 end $$;
 reset role;
 

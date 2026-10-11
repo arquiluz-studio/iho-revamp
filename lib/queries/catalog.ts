@@ -5,39 +5,31 @@ import { pickBySlug } from '@/lib/i18n-fields'
 import { MEDIA_SELECT } from '@/lib/media'
 import { cachedQuery, maybe, media, must, visibleStatuses, type Db } from './core'
 
-/** Prices depend on sale windows (`starts_at`/`ends_at`), so catalog reads expire hourly on top of tag purges. */
-const CATALOG_REVALIDATE_SECONDS = 60 * 60
-
 const catalogTags = (country: string) => [
   cacheTags.country(country, 'catalog'),
-  cacheTags.products,
   cacheTags.brands,
   cacheTags.designers,
   cacheTags.taxonomies,
 ]
 
-const CATALOG_SELECT = `is_purchasable, is_featured, lead_time_days, sort,
-  product:products!inner(id, slug, slug_en, name_es, name_en, status,
-    cover:${media('products_cover_media_id_fkey')},
-    brand:brands(id, slug, name, is_active),
-    designers:product_designers(designer:designers(id, slug, name, is_active)),
-    business_line:business_lines(id, slug, slug_en, name_es, name_en),
-    sectors:product_sectors(sector:sectors(id, slug, slug_en, name_es, name_en)))` as const
+const CATALOG_SELECT = `id, slug, slug_en, name_es, name_en, status, is_purchasable, is_featured, lead_time_days, sort,
+  cover:${media('products_cover_media_id_fkey')},
+  catalog_brand:catalog_brands!inner(id, name, brand:brands(id, slug, name, is_active)),
+  designers:product_designers(designer:designers(id, slug, name, is_active)),
+  business_line:business_lines(id, slug, slug_en, name_es, name_en),
+  sectors:product_sectors(sector:sectors(id, slug, slug_en, name_es, name_en))` as const
 
 export type VariantOffer = {
   variantId: string
   amount: number | null
-  compareAt: number | null
   currency: string | null
-  priceKind: 'base' | 'sale' | null
-  stock: number | null
 }
 
-/** Effective price and stock per variant (from `v_country_catalog`, which hides prices of quote-only products). */
+/** Sale price per variant. Quote-only products come back without an amount. Cost is never selected. */
 async function offers(db: Db, country: string, productIds?: string[]): Promise<Map<string, VariantOffer[]>> {
   let query = db
     .from('v_country_catalog')
-    .select('product_id, variant_id, variant_sort, amount, compare_at_amount, currency, price_kind, available_stock')
+    .select('product_id, variant_id, variant_sort, amount, currency')
     .eq('country_code', country)
     .order('variant_sort')
   if (productIds) query = query.in('product_id', productIds)
@@ -49,58 +41,50 @@ async function offers(db: Db, country: string, productIds?: string[]): Promise<M
     list.push({
       variantId: r.variant_id,
       amount: r.amount,
-      compareAt: r.compare_at_amount,
       currency: r.currency,
-      priceKind: r.price_kind,
-      stock: r.available_stock,
     })
     byProduct.set(r.product_id, list)
   }
   return byProduct
 }
 
-/** Lowest current price across variants ("from" price) and total stock, if tracked. */
+/** Lowest current price across variants ("from" price). */
 function summarize(list: VariantOffer[] = []) {
   const priced = list.filter(o => o.amount != null).sort((a, b) => a.amount! - b.amount!)
-  const tracked = list.filter(o => o.stock != null)
   return {
     price: priced[0] ?? null,
     multiplePrices: new Set(priced.map(o => o.amount)).size > 1,
-    stock: tracked.length ? tracked.reduce((sum, o) => sum + o.stock!, 0) : null,
   }
 }
 
-/** Products available in the country (visible in `country_products`), with their current price summary. */
+/** Products visible in the country, with their current sale price. */
 export function getCatalog(country: string) {
-  return cachedQuery(
-    ['catalog', country],
-    catalogTags(country),
-    async ({ db, draft }) => {
-      const [rows, prices] = await Promise.all([
-        db
-          .from('country_products')
-          .select(CATALOG_SELECT)
-          .eq('country_code', country)
-          .eq('is_visible', true)
-          .in('product.status', visibleStatuses(draft))
-          .order('sort')
-          .then(r => must(r, 'country_products')),
-        offers(db, country),
-      ])
-      return rows
-        .filter(r => r.product.brand?.is_active !== false)
-        .map(({ product, ...availability }) => ({
-          ...product,
-          ...availability,
-          sectors: product.sectors.flatMap(s => (s.sector ? [s.sector] : [])),
-          designers: product.designers
-            .flatMap(d => (d.designer?.is_active ? [d.designer] : []))
-            .sort((a, b) => a.name.localeCompare(b.name)),
-          ...summarize(prices.get(product.id)),
-        }))
-    },
-    CATALOG_REVALIDATE_SECONDS,
-  )
+  return cachedQuery(['catalog', country], catalogTags(country), async ({ db, draft }) => {
+    const [rows, prices] = await Promise.all([
+      db
+        .from('products')
+        .select(CATALOG_SELECT)
+        .eq('country_code', country)
+        .eq('is_visible', true)
+        .in('status', visibleStatuses(draft))
+        .order('sort')
+        .then(r => must(r, 'products')),
+      offers(db, country),
+    ])
+    return rows
+      .filter(r => r.catalog_brand.brand?.is_active !== false)
+      .map(({ catalog_brand, ...product }) => ({
+        ...product,
+        brand: catalog_brand.brand,
+        catalogBrandId: catalog_brand.id,
+        catalogBrandName: catalog_brand.name,
+        sectors: product.sectors.flatMap(s => (s.sector ? [s.sector] : [])),
+        designers: product.designers
+          .flatMap(d => (d.designer?.is_active ? [d.designer] : []))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+        ...summarize(prices.get(product.id)),
+      }))
+  })
 }
 
 export type CatalogRow = Awaited<ReturnType<typeof getCatalog>>[number]
@@ -139,7 +123,6 @@ export async function getProductBySlug(country: string, slug: string, locale: Ap
           .map(v => ({ ...v, offer: variantOffers.find(o => o.variantId === v.id) ?? null })),
       }
     },
-    CATALOG_REVALIDATE_SECONDS,
   )
   return detail ? { ...listed, ...detail } : null
 }

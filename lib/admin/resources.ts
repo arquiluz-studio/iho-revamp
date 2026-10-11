@@ -9,7 +9,7 @@ import type { CountryRole } from './roles'
 export type TableName = keyof Database['public']['Tables']
 export type MediaKind = Database['public']['Enums']['media_kind']
 export type Option = { value: string; label: string }
-export type ReferenceSource = 'brands' | 'designers' | 'business_lines' | 'sectors' | 'products'
+export type ReferenceSource = 'brands' | 'designers' | 'business_lines' | 'sectors' | 'products' | 'catalog_brands'
 export type Bridge = { table: TableName; selfKey: string; otherKey: string }
 
 type FieldBase = { name: string; label: string; required?: boolean; help?: string; wide?: boolean }
@@ -516,25 +516,51 @@ const spaces: ResourceConfig = {
   order: [{ column: 'sort', ascending: true }],
 }
 
-export const PRICE_KIND_OPTIONS = enumOptions(Constants.public.Enums.price_list_kind, { base: 'Base', sale: 'Promoción' })
+const catalogBrands: ResourceConfig = {
+  key: 'catalog-brands',
+  table: 'catalog_brands',
+  scope: 'country',
+  pk: 'id',
+  title: 'Marcas comerciales',
+  singular: 'marca comercial',
+  description: 'Marcas que este país vende. Enlaza una marca global solo si también se anuncia en el sitio.',
+  writeRole: 'admin',
+  section: 'catalog',
+  fields: [
+    { name: 'name', label: 'Nombre', type: 'text', required: true, max: 160 },
+    {
+      name: 'brand_id',
+      label: 'Marca del sitio',
+      type: 'reference',
+      source: 'brands',
+      help: 'Opcional. Si se elige, los productos heredan el logo y la página de esa marca.',
+    },
+    { name: 'erp_ref', label: 'Referencia ERP', type: 'text', max: 120 },
+  ],
+  columns: [
+    { key: 'name', label: 'Nombre' },
+    { key: 'erp_ref', label: 'ERP' },
+  ],
+  order: [{ column: 'name', ascending: true }],
+}
 
 const products: ResourceConfig = {
   key: 'products',
   table: 'products',
-  scope: 'global',
+  scope: 'country',
   pk: 'id',
-  title: 'Productos (catálogo global)',
+  title: 'Catálogo',
   singular: 'producto',
-  description: 'Ficha global del producto. Visibilidad, precios e inventario se definen en cada país.',
-  globalWrite: 'catalog',
-  globalTag: 'products',
+  description: 'Ficha comercial de este país. El costo y el precio de venta se capturan en cada variante. Las existencias viven en el ERP.',
+  writeRole: 'admin',
+  section: 'catalog',
   publicPath: '/products/[slug]',
   fields: [
     { name: 'name', label: 'Nombre', type: 'text', i18n: true, required: true, max: 200 },
     { name: 'slug', label: 'Slug en español (URL)', type: 'slug', required: true },
     { name: 'slug_en', label: 'Slug en inglés (URL)', type: 'slug', help: 'Opcional. Si queda vacío, la versión en inglés usa el slug en español.' },
     { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
-    { name: 'brand_id', label: 'Marca', type: 'reference', source: 'brands', required: true },
+    { name: 'catalog_brand_id', label: 'Marca comercial', type: 'reference', source: 'catalog_brands', required: true },
     { name: 'business_line_id', label: 'Solución', type: 'reference', source: 'business_lines' },
     {
       name: 'designers',
@@ -543,7 +569,12 @@ const products: ResourceConfig = {
       source: 'designers',
       through: { table: 'product_designers', selfKey: 'product_id', otherKey: 'designer_id' },
     },
-    { name: 'erp_ref', label: 'Referencia ERP', type: 'text', max: 120 },
+    { name: 'is_visible', label: 'Visible en el sitio', type: 'boolean' },
+    { name: 'is_purchasable', label: 'Mostrar precio', type: 'boolean', help: 'Sin esto, el sitio ofrece cotizar. El precio igual se guarda en la variante.' },
+    { name: 'is_featured', label: 'Destacado en el home', type: 'boolean' },
+    { name: 'lead_time_days', label: 'Días de entrega', type: 'number', min: 0, max: 3650, help: 'Se muestra cuando no hay una fecha del ERP.' },
+    SORT_FIELD,
+    { name: 'erp_ref', label: 'Referencia ERP (familia)', type: 'text', max: 120 },
     { name: 'description', label: 'Descripción', type: 'textarea', i18n: true, max: 8000, rows: 6 },
     { name: 'specs', label: 'Especificaciones', type: 'specs', wide: true },
     {
@@ -557,65 +588,11 @@ const products: ResourceConfig = {
   columns: [
     { key: 'name_es', label: 'Nombre' },
     { key: 'slug', label: 'Slug' },
+    { key: 'is_visible', label: 'Visible', format: 'boolean' },
+    { key: 'is_purchasable', label: 'Con precio', format: 'boolean' },
     STATUS_COLUMN,
   ],
   order: [{ column: 'name_es', ascending: true }],
-}
-
-const priceLists: ResourceConfig = {
-  key: 'price-lists',
-  table: 'price_lists',
-  scope: 'country',
-  pk: 'id',
-  title: 'Listas de precios',
-  singular: 'lista de precios',
-  description: 'Rige el precio vigente de mayor prioridad; una promoción activa reemplaza al precio base y lo muestra tachado.',
-  writeRole: 'admin',
-  section: 'catalog',
-  fields: [
-    { name: 'name', label: 'Nombre', type: 'text', required: true, max: 160 },
-    { name: 'kind', label: 'Tipo', type: 'select', options: PRICE_KIND_OPTIONS, required: true },
-    { name: 'currency', label: 'Moneda (ISO 4217)', type: 'text', required: true, max: 3, help: 'Ej. MXN, USD.' },
-    { name: 'priority', label: 'Prioridad', type: 'number', min: 0, max: 1000, help: 'Mayor número gana si dos listas del mismo tipo coinciden.' },
-    { name: 'starts_at', label: 'Vigente desde', type: 'datetime' },
-    { name: 'ends_at', label: 'Vigente hasta', type: 'datetime' },
-    { name: 'is_active', label: 'Activa', type: 'boolean' },
-  ],
-  columns: [
-    { key: 'name', label: 'Nombre' },
-    { key: 'kind', label: 'Tipo', format: 'enum', options: PRICE_KIND_OPTIONS },
-    { key: 'currency', label: 'Moneda' },
-    { key: 'starts_at', label: 'Desde', format: 'datetime' },
-    { key: 'ends_at', label: 'Hasta', format: 'datetime' },
-    { key: 'is_active', label: 'Activa', format: 'boolean' },
-  ],
-  order: [
-    { column: 'kind', ascending: true },
-    { column: 'priority', ascending: false },
-  ],
-}
-
-const warehouses: ResourceConfig = {
-  key: 'warehouses',
-  table: 'warehouses',
-  scope: 'country',
-  pk: 'id',
-  title: 'Almacenes e inventario',
-  singular: 'almacén',
-  description: 'El inventario disponible (existencia − apartado) de todos los almacenes activos se suma por variante.',
-  writeRole: 'admin',
-  section: 'catalog',
-  fields: [
-    { name: 'name', label: 'Nombre', type: 'text', required: true, max: 160 },
-    { name: 'erp_ref', label: 'Referencia ERP', type: 'text', max: 120 },
-    { name: 'is_active', label: 'Activo', type: 'boolean' },
-  ],
-  columns: [
-    { key: 'name', label: 'Nombre' },
-    { key: 'erp_ref', label: 'ERP' },
-    { key: 'is_active', label: 'Activo', format: 'boolean' },
-  ],
-  order: [{ column: 'name', ascending: true }],
 }
 
 export const RESOURCES = {
@@ -625,20 +602,19 @@ export const RESOURCES = {
   offices,
   team,
   home,
-  'price-lists': priceLists,
-  warehouses,
+  'catalog-brands': catalogBrands,
+  products,
   countries,
   stats,
   brands,
   designers,
-  products,
   solutions,
   spaces,
 }
 export type ResourceKey = keyof typeof RESOURCES
 
-export const COUNTRY_RESOURCES: ResourceKey[] = ['events', 'projects', 'socials', 'offices', 'team', 'price-lists', 'warehouses']
-export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'stats', 'brands', 'designers', 'products', 'solutions', 'spaces']
+export const COUNTRY_RESOURCES: ResourceKey[] = ['events', 'projects', 'socials', 'offices', 'team', 'catalog-brands', 'products']
+export const GLOBAL_RESOURCES: ResourceKey[] = ['countries', 'stats', 'brands', 'designers', 'solutions', 'spaces']
 
 /** Row key of a singleton resource. */
 export function singletonId(config: ResourceConfig, countryCode: string | null): string | null {
@@ -660,7 +636,7 @@ export function fieldColumns(field: Field): string[] {
 export function emptyValues(config: ResourceConfig): Record<string, unknown> {
   const values: Record<string, unknown> = {}
   for (const field of config.fields) {
-    if (field.type === 'boolean') values[field.name] = ['is_active', 'is_published', 'registration_enabled'].includes(field.name)
+    if (field.type === 'boolean') values[field.name] = ['is_active', 'is_published', 'registration_enabled', 'is_visible'].includes(field.name)
     else if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs') values[field.name] = []
     else if (field.type === 'select') values[field.name] = field.required ? field.options[0]?.value ?? '' : ''
     else for (const column of fieldColumns(field)) values[column] = ''

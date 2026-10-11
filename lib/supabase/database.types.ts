@@ -188,6 +188,51 @@ export type Database = {
           },
         ]
       }
+      catalog_brands: {
+        Row: {
+          brand_id: string | null
+          country_code: string
+          created_at: string
+          erp_ref: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          brand_id?: string | null
+          country_code: string
+          created_at?: string
+          erp_ref?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string | null
+          country_code?: string
+          created_at?: string
+          erp_ref?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_brands_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalog_brands_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       contact_leads: {
         Row: {
           business_line_id: string | null
@@ -360,58 +405,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "countries"
             referencedColumns: ["code"]
-          },
-        ]
-      }
-      country_products: {
-        Row: {
-          country_code: string
-          is_featured: boolean
-          is_purchasable: boolean
-          is_visible: boolean
-          lead_time_days: number | null
-          product_id: string
-          sort: number
-        }
-        Insert: {
-          country_code: string
-          is_featured?: boolean
-          is_purchasable?: boolean
-          is_visible?: boolean
-          lead_time_days?: number | null
-          product_id: string
-          sort?: number
-        }
-        Update: {
-          country_code?: string
-          is_featured?: boolean
-          is_purchasable?: boolean
-          is_visible?: boolean
-          lead_time_days?: number | null
-          product_id?: string
-          sort?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "country_products_country_code_fkey"
-            columns: ["country_code"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "country_products_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "country_products_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "v_country_catalog"
-            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -911,58 +904,6 @@ export type Database = {
           },
         ]
       }
-      inventory_levels: {
-        Row: {
-          on_hand: number
-          reserved: number
-          source: string
-          synced_at: string | null
-          updated_at: string
-          variant_id: string
-          warehouse_id: string
-        }
-        Insert: {
-          on_hand?: number
-          reserved?: number
-          source?: string
-          synced_at?: string | null
-          updated_at?: string
-          variant_id: string
-          warehouse_id: string
-        }
-        Update: {
-          on_hand?: number
-          reserved?: number
-          source?: string
-          synced_at?: string | null
-          updated_at?: string
-          variant_id?: string
-          warehouse_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "inventory_levels_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "product_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "inventory_levels_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "v_country_catalog"
-            referencedColumns: ["variant_id"]
-          },
-          {
-            foreignKeyName: "inventory_levels_warehouse_id_fkey"
-            columns: ["warehouse_id"]
-            isOneToOne: false
-            referencedRelation: "warehouses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       media_assets: {
         Row: {
           alt_en: string | null
@@ -1090,99 +1031,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "offices_country_code_fkey"
-            columns: ["country_code"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      price_list_items: {
-        Row: {
-          amount: number
-          compare_at_amount: number | null
-          price_list_id: string
-          variant_id: string
-        }
-        Insert: {
-          amount: number
-          compare_at_amount?: number | null
-          price_list_id: string
-          variant_id: string
-        }
-        Update: {
-          amount?: number
-          compare_at_amount?: number | null
-          price_list_id?: string
-          variant_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "price_list_items_price_list_id_fkey"
-            columns: ["price_list_id"]
-            isOneToOne: false
-            referencedRelation: "price_lists"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "price_list_items_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "product_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "price_list_items_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "v_country_catalog"
-            referencedColumns: ["variant_id"]
-          },
-        ]
-      }
-      price_lists: {
-        Row: {
-          country_code: string
-          created_at: string
-          currency: string
-          ends_at: string | null
-          id: string
-          is_active: boolean
-          kind: Database["public"]["Enums"]["price_list_kind"]
-          name: string
-          priority: number
-          starts_at: string | null
-          updated_at: string
-        }
-        Insert: {
-          country_code: string
-          created_at?: string
-          currency: string
-          ends_at?: string | null
-          id?: string
-          is_active?: boolean
-          kind?: Database["public"]["Enums"]["price_list_kind"]
-          name: string
-          priority?: number
-          starts_at?: string | null
-          updated_at?: string
-        }
-        Update: {
-          country_code?: string
-          created_at?: string
-          currency?: string
-          ends_at?: string | null
-          id?: string
-          is_active?: boolean
-          kind?: Database["public"]["Enums"]["price_list_kind"]
-          name?: string
-          priority?: number
-          starts_at?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "price_lists_country_code_fkey"
             columns: ["country_code"]
             isOneToOne: false
             referencedRelation: "countries"
@@ -1369,70 +1217,95 @@ export type Database = {
       }
       products: {
         Row: {
-          brand_id: string
           business_line_id: string | null
+          catalog_brand_id: string
+          country_code: string
           cover_media_id: string | null
           created_at: string
           description_en: string | null
           description_es: string | null
           erp_ref: string | null
           id: string
+          is_featured: boolean
+          is_purchasable: boolean
+          is_visible: boolean
+          lead_time_days: number | null
           name_en: string | null
           name_es: string
           slug: string
           slug_en: string | null
+          sort: number
           specs: Json
           status: Database["public"]["Enums"]["content_status"]
           updated_at: string
         }
         Insert: {
-          brand_id: string
           business_line_id?: string | null
+          catalog_brand_id: string
+          country_code: string
           cover_media_id?: string | null
           created_at?: string
           description_en?: string | null
           description_es?: string | null
           erp_ref?: string | null
           id?: string
+          is_featured?: boolean
+          is_purchasable?: boolean
+          is_visible?: boolean
+          lead_time_days?: number | null
           name_en?: string | null
           name_es: string
           slug: string
           slug_en?: string | null
+          sort?: number
           specs?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
         }
         Update: {
-          brand_id?: string
           business_line_id?: string | null
+          catalog_brand_id?: string
+          country_code?: string
           cover_media_id?: string | null
           created_at?: string
           description_en?: string | null
           description_es?: string | null
           erp_ref?: string | null
           id?: string
+          is_featured?: boolean
+          is_purchasable?: boolean
+          is_visible?: boolean
+          lead_time_days?: number | null
           name_en?: string | null
           name_es?: string
           slug?: string
           slug_en?: string | null
+          sort?: number
           specs?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "products_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brands"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "products_business_line_id_fkey"
             columns: ["business_line_id"]
             isOneToOne: false
             referencedRelation: "business_lines"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_catalog_brand_id_fkey"
+            columns: ["catalog_brand_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
           },
           {
             foreignKeyName: "products_cover_media_id_fkey"
@@ -1877,41 +1750,42 @@ export type Database = {
           },
         ]
       }
-      warehouses: {
+      variant_prices: {
         Row: {
-          country_code: string
-          created_at: string
-          erp_ref: string | null
-          id: string
-          is_active: boolean
-          name: string
+          cost: number | null
+          currency: string
+          price: number | null
           updated_at: string
+          variant_id: string
         }
         Insert: {
-          country_code: string
-          created_at?: string
-          erp_ref?: string | null
-          id?: string
-          is_active?: boolean
-          name: string
+          cost?: number | null
+          currency: string
+          price?: number | null
           updated_at?: string
+          variant_id: string
         }
         Update: {
-          country_code?: string
-          created_at?: string
-          erp_ref?: string | null
-          id?: string
-          is_active?: boolean
-          name?: string
+          cost?: number | null
+          currency?: string
+          price?: number | null
           updated_at?: string
+          variant_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "warehouses_country_code_fkey"
-            columns: ["country_code"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["code"]
+            foreignKeyName: "variant_prices_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: true
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "variant_prices_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: true
+            referencedRelation: "v_country_catalog"
+            referencedColumns: ["variant_id"]
           },
         ]
       }
@@ -1920,10 +1794,10 @@ export type Database = {
       v_country_catalog: {
         Row: {
           amount: number | null
-          available_stock: number | null
           brand_id: string | null
           business_line_id: string | null
-          compare_at_amount: number | null
+          catalog_brand_id: string | null
+          catalog_brand_name: string | null
           country_code: string | null
           cover_media_id: string | null
           currency: string | null
@@ -1934,10 +1808,10 @@ export type Database = {
           name_en: string | null
           name_es: string | null
           options: Json | null
-          price_kind: Database["public"]["Enums"]["price_list_kind"] | null
           product_id: string | null
           sku: string | null
           slug: string | null
+          slug_en: string | null
           sort: number | null
           status: Database["public"]["Enums"]["content_status"] | null
           variant_id: string | null
@@ -1947,14 +1821,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "country_products_country_code_fkey"
-            columns: ["country_code"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "products_brand_id_fkey"
+            foreignKeyName: "catalog_brands_brand_id_fkey"
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
@@ -1968,6 +1835,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "products_catalog_brand_id_fkey"
+            columns: ["catalog_brand_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
             foreignKeyName: "products_cover_media_id_fkey"
             columns: ["cover_media_id"]
             isOneToOne: false
@@ -1978,18 +1859,11 @@ export type Database = {
       }
     }
     Functions: {
-      get_available_stock: {
-        Args: { p_country_code: string; p_variant_id: string }
-        Returns: number
-      }
-      get_effective_price: {
-        Args: { p_at?: string; p_country_code: string; p_variant_id: string }
+      get_public_price: {
+        Args: { p_variant_id: string }
         Returns: {
           amount: number
-          compare_at_amount: number
           currency: string
-          kind: Database["public"]["Enums"]["price_list_kind"]
-          price_list_id: string
         }[]
       }
       register_for_event: {
@@ -2034,7 +1908,6 @@ export type Database = {
         | "generic"
         | "designer_photo"
       media_processing_status: "pending" | "ready" | "failed"
-      price_list_kind: "base" | "sale"
       registration_status:
         | "pending"
         | "confirmed"
@@ -2202,7 +2075,6 @@ export const Constants = {
         "designer_photo",
       ],
       media_processing_status: ["pending", "ready", "failed"],
-      price_list_kind: ["base", "sale"],
       registration_status: [
         "pending",
         "confirmed",

@@ -10,7 +10,7 @@ type Row = VariantInput & { key: string }
 let counter = 0
 const newKey = () => `new-${++counter}`
 
-/** Variants (SKU, name, options) of a global product. Prices and stock per variant are set in each country. */
+/** Variants of a country product: SKU, cost, sale price and the ERP item code. Cost is not published. */
 export function VariantsEditor({ productId, initialVariants, canEdit }: { productId: string; initialVariants: VariantInput[]; canEdit: boolean }) {
   const router = useRouter()
   const [rows, setRows] = useState<Row[]>(() => initialVariants.map(v => ({ ...v, key: v.id ?? newKey() })))
@@ -48,13 +48,13 @@ export function VariantsEditor({ productId, initialVariants, canEdit }: { produc
     <Card>
       <CardHeader
         title="Variantes"
-        description="Cada variante tiene su SKU, precio e inventario por país. Opciones: una por línea, formato «clave: valor» (ej. acabado: negro)."
+        description="Cada variante tiene su SKU, costo, precio de venta y código de artículo en el ERP. El costo no se publica. Opciones: una por línea, formato «clave: valor»."
         actions={
           canEdit && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => update([...rows, { key: newKey(), sku: '', nameEs: '', nameEn: '', options: '', isActive: true }])}
+              onClick={() => update([...rows, { key: newKey(), sku: '', nameEs: '', nameEn: '', options: '', erpRef: '', cost: '', price: '', isActive: true }])}
             >
               Agregar variante
             </Button>
@@ -70,6 +70,9 @@ export function VariantsEditor({ productId, initialVariants, canEdit }: { produc
                 <th className="pb-2 pr-2 font-medium">Nombre ES</th>
                 <th className="pb-2 pr-2 font-medium">Name EN</th>
                 <th className="pb-2 pr-2 font-medium">Opciones</th>
+                <th className="pb-2 pr-2 font-medium">ERP</th>
+                <th className="pb-2 pr-2 font-medium">Costo</th>
+                <th className="pb-2 pr-2 font-medium">Precio</th>
                 <th className="pb-2 pr-2 font-medium">Activa</th>
                 <th />
               </tr>
@@ -99,6 +102,15 @@ export function VariantsEditor({ productId, initialVariants, canEdit }: { produc
                       disabled={!canEdit}
                       onChange={e => patch(row.key, { options: e.target.value })}
                     />
+                  </td>
+                  <td className="py-1 pr-2">
+                    <Input className="h-8 w-28 font-mono text-xs" value={row.erpRef} disabled={!canEdit} onChange={e => patch(row.key, { erpRef: e.target.value })} />
+                  </td>
+                  <td className="py-1 pr-2">
+                    <Input className="h-8 w-28 font-mono text-xs" inputMode="decimal" value={row.cost} disabled={!canEdit} onChange={e => patch(row.key, { cost: e.target.value })} />
+                  </td>
+                  <td className="py-1 pr-2">
+                    <Input className="h-8 w-28 font-mono text-xs" inputMode="decimal" value={row.price} disabled={!canEdit} onChange={e => patch(row.key, { price: e.target.value })} />
                   </td>
                   <td className="py-2 pr-2">
                     <Checkbox checked={row.isActive} disabled={!canEdit} onChange={e => patch(row.key, { isActive: e.target.checked })} />
