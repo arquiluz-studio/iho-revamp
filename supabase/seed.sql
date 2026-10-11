@@ -9,21 +9,9 @@ insert into public.countries (code, name_es, name_en, domain, is_hq, currency, t
   ('pa', 'Panamá', 'Panama', 'iho.com.pa', false, 'USD', 'America/Panama', 4)
 on conflict (code) do nothing;
 
-insert into public.country_settings (
-  country_code, hero_eyebrow_es, hero_eyebrow_en, hero_title_es, hero_title_en,
-  seo_title_es, seo_title_en, seo_description_es, seo_description_en
-)
-select
-  c.code,
-  'EST. 1992 · LATINOAMÉRICA',
-  'EST. 1992 · LATIN AMERICA',
-  E'TODO EL PROYECTO,\n*UN SOLO* PROVEEDOR.',
-  E'THE WHOLE PROJECT,\n*ONE SINGLE* SUPPLIER.',
-  'Grupo IHO ' || c.name_es || ' — Todo el proyecto, un solo proveedor',
-  'IHO Group ' || c.name_en || ' — The whole project, one single supplier',
-  'Grupo empresarial latinoamericano de interiorismo corporativo, industrial, comercial y residencial. Soluciones arquitectónicas y de iluminación en LATAM.',
-  'Latin American business group for corporate, industrial, commercial and residential interiors. Architectural and lighting solutions across LATAM.'
-from public.countries c
+-- Home and page heroes live in site_pages (filled by migration). A country row stays empty until that country uploads its own.
+insert into public.country_settings (country_code)
+select c.code from public.countries c
 on conflict (country_code) do nothing;
 
 insert into public.site_settings (id, stats) values (

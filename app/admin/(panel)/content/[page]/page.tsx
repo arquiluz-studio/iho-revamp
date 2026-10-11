@@ -8,15 +8,16 @@ import { hasRole, requireAdminSession } from '@/lib/admin/session'
 import { contentPage, isContentPageKey, isCountryPageKey } from '@/lib/content/static-pages'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-type Props = { params: Promise<{ page: string }> }
+type Props = { params: Promise<{ page: string }>; searchParams: Promise<{ fuente?: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const item = contentPage((await params).page)
   return { title: item ? `${item.label} · Contenido` : 'Contenido' }
 }
 
-export default async function ContentPageEditor({ params }: Props) {
+export default async function ContentPageEditor({ params, searchParams }: Props) {
   const { page } = await params
+  const { fuente } = await searchParams
   if (!isContentPageKey(page)) notFound()
   const session = await requireAdminSession()
   const country = session.activeCountry
@@ -30,11 +31,12 @@ export default async function ContentPageEditor({ params }: Props) {
     .eq('page_key', page)
     .maybeSingle()
   const usesGlobal = choice?.uses_global !== false
+  const viewingGlobal = fuente === 'pais' ? false : fuente === 'global' ? true : usesGlobal
 
   return (
     <>
-      <PageSourceSwitch countryCode={country.code} pageKey={page} usesGlobal={usesGlobal} />
-      {usesGlobal ? (
+      <PageSourceSwitch countryCode={country.code} pageKey={page} usesGlobal={usesGlobal} viewingGlobal={viewingGlobal} />
+      {viewingGlobal ? (
         <GlobalHeroPreview pageKey={page} />
       ) : page === 'home' ? (
         <ResourceEditPage resource="home" config={RESOURCES.home} id={country.code} basePath="/admin/content" />
