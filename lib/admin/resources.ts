@@ -20,7 +20,7 @@ export type Field =
   | (FieldBase & { type: 'select'; options: Option[] })
   | (FieldBase & { type: 'datetime' })
   | (FieldBase & { type: 'reference'; source: ReferenceSource })
-  | (FieldBase & { type: 'multi'; source: ReferenceSource; through: Bridge })
+  | (FieldBase & { type: 'multi'; source: ReferenceSource; through: Bridge; checklist?: boolean })
   | (FieldBase & { type: 'media'; kind: MediaKind; video?: boolean })
   | (FieldBase & { type: 'stats' })
   | (FieldBase & { type: 'specs' })
@@ -209,6 +209,7 @@ const projects: ResourceConfig = {
       label: 'Soluciones',
       type: 'multi',
       source: 'business_lines',
+      checklist: true,
       through: { table: 'project_business_lines', selfKey: 'project_id', otherKey: 'business_line_id' },
     },
     {
@@ -425,6 +426,7 @@ const brands: ResourceConfig = {
       label: 'Soluciones',
       type: 'multi',
       source: 'business_lines',
+      checklist: true,
       through: { table: 'brand_business_lines', selfKey: 'brand_id', otherKey: 'business_line_id' },
     },
   ],

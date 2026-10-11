@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { saveCountryBrands } from '@/app/admin/actions/country-brands'
-import { MediaThumb } from '@/components/admin/MediaPicker'
+import { MediaThumb } from '@/components/admin/MediaUpload'
 import { Badge, Button, Checkbox, Input, Notice, cn } from '@/components/admin/ui'
 import type { AdminMedia } from '@/lib/admin/media'
 

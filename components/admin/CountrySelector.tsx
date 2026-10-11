@@ -4,23 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { setActiveCountry } from '@/app/admin/actions/session'
 import { ADMIN_GLOBAL_SCOPE } from '@/lib/admin/roles'
+import { CheckIcon, ChevronIcon } from './Dropdown'
 import { cn } from './ui'
-
-function ChevronIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.75} className={className} aria-hidden>
-      <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={2} className={className} aria-hidden>
-      <path d="M5 10.5l3.5 3.5L15 7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
 
 function GlobeIcon({ className }: { className?: string }) {
   return (

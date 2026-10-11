@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { inviteUser, setCountryRole, setGlobalRole, setUserActive } from '@/app/admin/actions/users'
-import { Badge, Button, Card, CardHeader, Checkbox, FieldShell, Input, Notice, Select } from '@/components/admin/ui'
+import { Dropdown } from '@/components/admin/Dropdown'
+import { Badge, Button, Card, CardHeader, Checkbox, FieldShell, Input, Notice } from '@/components/admin/ui'
 import { GLOBAL_ROLE_LABELS, ROLE_LABELS, type CountryRole, type GlobalRole } from '@/lib/admin/roles'
 
 export type StaffUser = {
@@ -15,8 +16,8 @@ export type StaffUser = {
   roles: Record<string, CountryRole>
 }
 
-const COUNTRY_ROLES = Object.keys(ROLE_LABELS) as CountryRole[]
-const GLOBAL_ROLES = Object.keys(GLOBAL_ROLE_LABELS) as GlobalRole[]
+const ROLE_OPTIONS = (Object.keys(ROLE_LABELS) as CountryRole[]).map(r => ({ value: r, label: ROLE_LABELS[r] }))
+const GLOBAL_ROLE_OPTIONS = (Object.keys(GLOBAL_ROLE_LABELS) as GlobalRole[]).map(r => ({ value: r, label: GLOBAL_ROLE_LABELS[r] }))
 
 export function UsersManager({
   users,
@@ -89,40 +90,31 @@ export function UsersManager({
           </FieldShell>
           {!single && (
             <FieldShell label="País">
-              <Select value={invite.countryCode} onChange={e => setInvite({ ...invite, countryCode: e.target.value })}>
-                {isSuperAdmin && <option value="">Ninguno</option>}
-                {countries.map(c => (
-                  <option key={c.code} value={c.code}>
-                    {c.name}
-                  </option>
-                ))}
-              </Select>
+              <Dropdown
+                value={invite.countryCode}
+                emptyLabel={isSuperAdmin ? 'Ninguno' : undefined}
+                options={countries.map(c => ({ value: c.code, label: c.name }))}
+                onChange={countryCode => setInvite({ ...invite, countryCode })}
+              />
             </FieldShell>
           )}
           <FieldShell label={single ? `Rol en ${single.name}` : 'Rol en el país'}>
-            <Select
+            <Dropdown
               value={invite.role}
               disabled={!invite.countryCode}
-              onChange={e => setInvite({ ...invite, role: e.target.value as CountryRole | '' })}
-            >
-              {isSuperAdmin && <option value="">Sin rol de país</option>}
-              {COUNTRY_ROLES.map(r => (
-                <option key={r} value={r}>
-                  {ROLE_LABELS[r]}
-                </option>
-              ))}
-            </Select>
+              emptyLabel={isSuperAdmin ? 'Sin rol de país' : undefined}
+              options={ROLE_OPTIONS}
+              onChange={role => setInvite({ ...invite, role: role as CountryRole | '' })}
+            />
           </FieldShell>
           {isSuperAdmin ? (
             <FieldShell label="Rol global">
-              <Select value={invite.globalRole} onChange={e => setInvite({ ...invite, globalRole: e.target.value as GlobalRole | '' })}>
-                <option value="">Ninguno</option>
-                {GLOBAL_ROLES.map(r => (
-                  <option key={r} value={r}>
-                    {GLOBAL_ROLE_LABELS[r]}
-                  </option>
-                ))}
-              </Select>
+              <Dropdown
+                value={invite.globalRole}
+                emptyLabel="Ninguno"
+                options={GLOBAL_ROLE_OPTIONS}
+                onChange={globalRole => setInvite({ ...invite, globalRole: globalRole as GlobalRole | '' })}
+              />
             </FieldShell>
           ) : (
             <div />
@@ -165,23 +157,19 @@ export function UsersManager({
                   </td>
                   {countries.map(c => (
                     <td key={c.code} className="px-4 py-2.5">
-                      <Select
-                        className={`h-8 text-xs ${single ? 'w-40' : 'w-32'}`}
+                      <Dropdown
+                        size="sm"
+                        className={single ? 'w-40' : 'w-32'}
                         value={user.roles[c.code] ?? ''}
+                        emptyLabel="Sin acceso"
+                        options={ROLE_OPTIONS}
                         disabled={pending || (self && !isSuperAdmin)}
-                        onChange={e => {
-                          const role = e.target.value || null
+                        onChange={value => {
+                          const role = value || null
                           if (!role && !confirm(`¿Quitar el acceso de ${user.email} a ${c.name}?`)) return
                           run(() => setCountryRole(user.id, c.code, role), 'Rol actualizado.')
                         }}
-                      >
-                        <option value="">Sin acceso</option>
-                        {COUNTRY_ROLES.map(r => (
-                          <option key={r} value={r}>
-                            {ROLE_LABELS[r]}
-                          </option>
-                        ))}
-                      </Select>
+                      />
                     </td>
                   ))}
                   {showOtherCountries && (
@@ -198,19 +186,15 @@ export function UsersManager({
                   )}
                   {isSuperAdmin && (
                     <td className="px-4 py-2.5">
-                      <Select
-                        className="h-8 w-44 text-xs"
+                      <Dropdown
+                        size="sm"
+                        className="w-44"
                         value={user.globalRole ?? ''}
+                        emptyLabel="Ninguno"
+                        options={GLOBAL_ROLE_OPTIONS}
                         disabled={pending || self}
-                        onChange={e => run(() => setGlobalRole(user.id, e.target.value || null), 'Rol global actualizado.')}
-                      >
-                        <option value="">Ninguno</option>
-                        {GLOBAL_ROLES.map(r => (
-                          <option key={r} value={r}>
-                            {GLOBAL_ROLE_LABELS[r]}
-                          </option>
-                        ))}
-                      </Select>
+                        onChange={value => run(() => setGlobalRole(user.id, value || null), 'Rol global actualizado.')}
+                      />
                     </td>
                   )}
                   {isSuperAdmin && (

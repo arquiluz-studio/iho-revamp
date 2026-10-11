@@ -3,7 +3,8 @@
 import { useMemo, useState, useTransition } from 'react'
 import { deleteRegistration, updateRegistration } from '@/app/admin/actions/registrations'
 import { formatDateTime } from '@/lib/admin/format'
-import { Badge, Button, EmptyState, Input, Notice, STATUS_TONES, Select } from '@/components/admin/ui'
+import { Dropdown } from '@/components/admin/Dropdown'
+import { Badge, Button, EmptyState, Input, Notice, STATUS_TONES } from '@/components/admin/ui'
 import { Constants, type Database } from '@/lib/supabase/database.types'
 
 type Status = Database['public']['Enums']['registration_status']
@@ -28,6 +29,8 @@ export const REGISTRATION_STATUS_LABELS: Record<Status, string> = {
   cancelled: 'Cancelado',
   attended: 'Asistió',
 }
+
+const STATUS_OPTIONS = Constants.public.Enums.registration_status.map(s => ({ value: s, label: REGISTRATION_STATUS_LABELS[s] }))
 
 export function RegistrationsTable({ rows: initial, timeZone, canEdit, canDelete }: { rows: Row[]; timeZone: string; canEdit: boolean; canDelete: boolean }) {
   const [rows, setRows] = useState(initial)
@@ -62,14 +65,7 @@ export function RegistrationsTable({ rows: initial, timeZone, canEdit, canDelete
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <Input className="max-w-xs" placeholder="Buscar nombre, email, empresa…" value={query} onChange={e => setQuery(e.target.value)} />
-        <Select className="w-48" value={status} onChange={e => setStatus(e.target.value as Status | '')}>
-          <option value="">Todos los estados</option>
-          {Constants.public.Enums.registration_status.map(s => (
-            <option key={s} value={s}>
-              {REGISTRATION_STATUS_LABELS[s]}
-            </option>
-          ))}
-        </Select>
+        <Dropdown className="w-48" value={status} emptyLabel="Todos los estados" options={STATUS_OPTIONS} onChange={value => setStatus(value as Status | '')} />
         <span className="text-xs text-zinc-500">{visible.length} registros</span>
       </div>
       {error && <Notice tone="red">{error}</Notice>}
@@ -106,13 +102,14 @@ export function RegistrationsTable({ rows: initial, timeZone, canEdit, canDelete
                 <td className="px-4 py-2.5 text-xs text-zinc-500">{formatDateTime(r.created_at, timeZone)}</td>
                 <td className="px-4 py-2.5">
                   {canEdit ? (
-                    <Select className="h-8 w-40 text-xs" value={r.status} disabled={pending} onChange={e => run(r.id, { status: e.target.value as Status })}>
-                      {Constants.public.Enums.registration_status.map(s => (
-                        <option key={s} value={s}>
-                          {REGISTRATION_STATUS_LABELS[s]}
-                        </option>
-                      ))}
-                    </Select>
+                    <Dropdown
+                      size="sm"
+                      className="w-40"
+                      value={r.status}
+                      options={STATUS_OPTIONS}
+                      disabled={pending}
+                      onChange={value => run(r.id, { status: value as Status })}
+                    />
                   ) : (
                     <Badge tone={STATUS_TONES[r.status]}>{REGISTRATION_STATUS_LABELS[r.status]}</Badge>
                   )}

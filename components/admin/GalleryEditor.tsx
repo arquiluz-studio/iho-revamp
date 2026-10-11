@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
-import { listMedia } from '@/app/admin/actions/media'
+import { getMediaByIds } from '@/app/admin/actions/media'
 import { saveProductGallery } from '@/app/admin/actions/catalog'
 import { saveGallery } from '@/app/admin/actions/content'
 import type { AdminMedia } from '@/lib/admin/media'
-import { MediaPicker, MediaThumb, UploadButton } from './MediaPicker'
+import { MediaThumb, UploadButton } from './MediaUpload'
 import { Button, Card, CardHeader, Checkbox, Input, Notice, cn } from './ui'
 
 export type GalleryItem = { media: AdminMedia; captionEs: string; captionEn: string; isDownloadable: boolean }
@@ -31,7 +31,6 @@ export function GalleryEditor({
   const [items, setItems] = useState(initialItems)
   const [coverId, setCoverId] = useState(initialCoverId)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
-  const [picker, setPicker] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [message, setMessage] = useState<{ tone: 'green' | 'red'; text: string } | null>(null)
   const [pending, startTransition] = useTransition()
@@ -100,22 +99,16 @@ export function GalleryEditor({
         }
         actions={
           canEdit && (
-            <div className="flex items-start gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPicker(true)}>
-                Desde biblioteca
-              </Button>
-              <UploadButton
-                kind={kind}
-                countryCode={countryCode}
-                projectId={isProject ? ownerId : null}
-                multiple
-                label="Subir fotos"
-                onUploaded={async ids => {
-                  const media = await listMedia({ countryCode, limit: 100 })
-                  add(ids.map(id => media.find(m => m.id === id)).filter((m): m is AdminMedia => Boolean(m)))
-                }}
-              />
-            </div>
+            <UploadButton
+              kind={kind}
+              countryCode={countryCode}
+              projectId={isProject ? ownerId : null}
+              multiple
+              label="Subir fotos"
+              onUploaded={async ids => {
+                if (ids.length) add(await getMediaByIds(ids))
+              }}
+            />
           )
         }
       />
@@ -225,17 +218,6 @@ export function GalleryEditor({
           </div>
         )}
       </div>
-      <MediaPicker
-        open={picker}
-        onClose={() => setPicker(false)}
-        countryCode={countryCode}
-        kind={kind}
-        projectId={isProject ? ownerId : null}
-        onSelect={media => {
-          add([media])
-          setPicker(false)
-        }}
-      />
     </Card>
   )
 }

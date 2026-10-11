@@ -4,12 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState, useTransition, type ReactNode } from 'react'
 import { Controller, useFieldArray, useForm, type Control, type UseFormRegister } from 'react-hook-form'
+import { getMediaByIds } from '@/app/admin/actions/media'
 import { deleteResource, saveResource } from '@/app/admin/actions/resources'
 import { buildSchema, type FormValues } from '@/lib/admin/form-schema'
 import type { AdminMedia } from '@/lib/admin/media'
 import { RESOURCES, fieldColumns, type Field, type MediaKind, type Option, type ResourceKey } from '@/lib/admin/resources'
-import { MediaPicker, MediaThumb } from './MediaPicker'
-import { Button, Card, Checkbox, FieldShell, Input, Notice, Select, Textarea, cn } from './ui'
+import { Dropdown, MultiDropdown } from './Dropdown'
+import { MediaThumb, UploadButton } from './MediaUpload'
+import { Button, Card, Checkbox, FieldShell, Input, Notice, Textarea, cn } from './ui'
 
 type Props = {
   resource: ResourceKey
@@ -222,14 +224,20 @@ function FieldInput({
     case 'select':
     case 'reference':
       return shell(
-        <Select id={column} disabled={disabled} {...register(column)}>
-          {!field.required && <option value="">—</option>}
-          {options.map(o => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </Select>,
+        <Controller
+          control={control}
+          name={column}
+          render={({ field: f }) => (
+            <Dropdown
+              id={column}
+              value={(f.value as string) ?? ''}
+              options={options}
+              onChange={f.onChange}
+              emptyLabel={field.required ? undefined : 'Ninguno'}
+              disabled={disabled}
+            />
+          )}
+        />,
       )
     case 'number':
       return shell(<Input id={column} inputMode="numeric" disabled={disabled} {...register(column)} />)
@@ -240,9 +248,13 @@ function FieldInput({
         <Controller
           control={control}
           name={field.name}
-          render={({ field: f }) => (
-            <MultiSelect options={options} value={(f.value as string[]) ?? []} onChange={f.onChange} disabled={disabled} />
-          )}
+          render={({ field: f }) =>
+            field.checklist ? (
+              <Checklist options={options} value={(f.value as string[]) ?? []} onChange={f.onChange} disabled={disabled} />
+            ) : (
+              <MultiDropdown id={column} options={options} value={(f.value as string[]) ?? []} onChange={f.onChange} disabled={disabled} />
+            )
+          }
         />,
       )
     case 'media':
@@ -313,39 +325,37 @@ function MediaField({
   disabled: boolean
   projectId: string | null
 }) {
-  const [open, setOpen] = useState(false)
   const current = value ? media[value] : null
+  const noun = video ? 'video' : 'imagen'
   return (
     <div className="flex items-center gap-3">
       <MediaThumb media={current ?? (value ? undefined : null)} className="h-20 w-28 shrink-0" />
-      <div className="flex flex-col gap-1.5">
-        <Button variant="outline" size="sm" disabled={disabled} onClick={() => setOpen(true)}>
-          {value ? 'Cambiar' : 'Elegir'}
-        </Button>
+      <div className="flex flex-col items-start gap-1.5">
+        <UploadButton
+          kind={kind}
+          countryCode={countryCode}
+          projectId={projectId}
+          video={video}
+          disabled={disabled}
+          label={value ? `Reemplazar ${noun}` : `Subir ${noun}`}
+          onUploaded={async ids => {
+            const [uploaded] = await getMediaByIds(ids)
+            if (!uploaded) return
+            onMedia(uploaded)
+            onChange(uploaded.id)
+          }}
+        />
         {value && (
           <Button variant="ghost" size="sm" disabled={disabled} onClick={() => onChange('')}>
             Quitar
           </Button>
         )}
       </div>
-      <MediaPicker
-        open={open}
-        onClose={() => setOpen(false)}
-        countryCode={countryCode}
-        kind={kind}
-        video={video}
-        projectId={projectId}
-        onSelect={selected => {
-          onMedia(selected)
-          onChange(selected.id)
-          setOpen(false)
-        }}
-      />
     </div>
   )
 }
 
-export function MultiSelect({
+function Checklist({
   options,
   value,
   onChange,
@@ -356,49 +366,19 @@ export function MultiSelect({
   onChange: (value: string[]) => void
   disabled?: boolean
 }) {
-  const [query, setQuery] = useState('')
   const selected = new Set(value)
-  const labelOf = new Map(options.map(o => [o.value, o.label]))
-  const filtered = options.filter(o => !selected.has(o.value) && o.label.toLowerCase().includes(query.toLowerCase()))
   return (
-    <div className="rounded-md border border-zinc-300 bg-white p-2">
-      <div className="mb-2 flex flex-wrap gap-1.5">
-        {value.length === 0 && <span className="text-xs text-zinc-400">Ninguna seleccionada</span>}
-        {value.map(v => (
-          <span key={v} className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2.5 py-0.5 text-xs text-white">
-            {labelOf.get(v) ?? v}
-            {!disabled && (
-              <button type="button" aria-label="Quitar" onClick={() => onChange(value.filter(x => x !== v))}>
-                ×
-              </button>
-            )}
-          </span>
-        ))}
-      </div>
-      {!disabled && (
-        <>
-          <Input placeholder="Buscar para agregar…" value={query} onChange={e => setQuery(e.target.value)} className="h-8" />
-          {query && (
-            <ul className="mt-1 max-h-48 overflow-y-auto">
-              {filtered.slice(0, 30).map(o => (
-                <li key={o.value}>
-                  <button
-                    type="button"
-                    className="w-full rounded px-2 py-1 text-left text-sm hover:bg-zinc-100"
-                    onClick={() => {
-                      onChange([...value, o.value])
-                      setQuery('')
-                    }}
-                  >
-                    {o.label}
-                  </button>
-                </li>
-              ))}
-              {filtered.length === 0 && <li className="px-2 py-1 text-xs text-zinc-400">Sin resultados</li>}
-            </ul>
-          )}
-        </>
-      )}
+    <div className="flex flex-wrap gap-x-6 gap-y-2 rounded-md border border-zinc-300 bg-white px-3 py-2.5">
+      {options.map(o => (
+        <label key={o.value} className="flex items-center gap-2 text-sm text-zinc-800">
+          <Checkbox
+            checked={selected.has(o.value)}
+            disabled={disabled}
+            onChange={e => onChange(e.target.checked ? [...value, o.value] : value.filter(v => v !== o.value))}
+          />
+          {o.label}
+        </label>
+      ))}
     </div>
   )
 }

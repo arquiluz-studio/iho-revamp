@@ -14,8 +14,8 @@ export type UploadOptions = {
 
 /**
  * Admin upload: create the pending asset + signed URL, upload the original straight to Storage,
- * then ask the server to generate the public variants. Resolves with the media id (even if
- * processing failed, so the asset can be retried from the library).
+ * then ask the server to generate the public variants. Resolves with the media id only once the
+ * asset is usable.
  */
 export async function uploadMedia(
   file: File,
@@ -48,7 +48,7 @@ export async function uploadMedia(
     .uploadToSignedUrl(path, token, file, { contentType: file.type })
   if (uploadError) {
     onStage?.('failed')
-    return { mediaId, error: `Error al subir: ${uploadError.message}` }
+    return { mediaId: null, error: `Error al subir: ${uploadError.message}` }
   }
 
   onStage?.('processing')
@@ -59,7 +59,7 @@ export async function uploadMedia(
   })
   if (!processed.ok) {
     onStage?.('failed')
-    return { mediaId, error: 'El archivo se subió pero no se pudo procesar. Reintenta desde la biblioteca.' }
+    return { mediaId: null, error: 'No se pudo procesar el archivo. Intenta subirlo de nuevo.' }
   }
   onStage?.('done')
   return { mediaId }

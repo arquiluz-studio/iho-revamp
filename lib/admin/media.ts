@@ -1,6 +1,6 @@
 import { publicMediaUrl, publicPaths, type MediaRow } from '@/lib/media'
 
-/** Lightweight media shape used by the admin (pickers, galleries, library). */
+/** Lightweight media shape used by the admin (media fields and galleries). */
 export type AdminMedia = {
   id: string
   kind: MediaRow['kind']
@@ -63,15 +63,4 @@ export function toAdminMedia(row: AdminMediaRow): AdminMedia {
     isDownloadable: row.is_downloadable,
     createdAt: row.created_at,
   }
-}
-
-export const MEDIA_KIND_LABELS: Record<MediaRow['kind'], string> = {
-  project_photo: 'Foto de proyecto',
-  product_photo: 'Foto de producto',
-  event_photo: 'Foto de evento',
-  brand_logo: 'Logo de marca',
-  team_photo: 'Foto de equipo',
-  designer_photo: 'Foto de diseñador',
-  hero: 'Hero',
-  generic: 'General',
 }

@@ -17,39 +17,38 @@ export default async function PanelLayout({ children }: { children: ReactNode })
   if (session.activeCountry) {
     sections.push(
       {
+        title: 'Contactos',
+        items: [{ href: '/admin/leads', label: 'Leads' }],
+      },
+      {
         title: `Contenido · ${session.activeCountry.name_es}`,
         items: [
           ...(atLeast(role, 'admin') ? [{ href: '/admin/home', label: 'Home del país' }] : []),
           { href: '/admin/events', label: 'Eventos' },
           { href: '/admin/projects', label: 'Proyectos' },
-          { href: '/admin/country-brands', label: 'Marcas del país' },
-          { href: '/admin/catalog', label: 'Catálogo del país' },
-          { href: '/admin/media', label: 'Biblioteca de media' },
         ],
       },
-      ...(atLeast(role, 'admin')
-        ? [
-            {
-              title: 'Precios e inventario',
-              items: [
+      {
+        title: 'Catálogo',
+        items: [
+          { href: '/admin/country-brands', label: 'Marcas del país' },
+          { href: '/admin/catalog', label: 'Catálogo del país' },
+          ...(atLeast(role, 'admin')
+            ? [
                 { href: '/admin/price-lists', label: 'Listas de precios' },
                 { href: '/admin/warehouses', label: 'Almacenes e inventario' },
-              ],
-            },
-          ]
-        : []),
-      {
-        title: 'Contactos',
-        items: [{ href: '/admin/leads', label: 'Leads' }],
+              ]
+            : []),
+        ],
       },
     )
     if (atLeast(role, 'admin') && !session.isSuperAdmin) sections.push({ title: 'Equipo IHO', items: [{ href: '/admin/users', label: 'Usuarios' }] })
     sections.push({
       title: 'Ajustes',
       items: [
+        { href: '/admin/team', label: 'Equipo' },
         ...(atLeast(role, 'admin') ? [{ href: '/admin/offices', label: 'Oficinas' }] : []),
         { href: '/admin/socials', label: 'Redes sociales' },
-        { href: '/admin/team', label: 'Equipo' },
       ],
     })
   }

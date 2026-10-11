@@ -52,10 +52,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, ComponentProps<'textarea
   return <textarea ref={ref} className={cn(FIELD, 'py-2 leading-relaxed', className)} {...props} />
 })
 
-export const Select = forwardRef<HTMLSelectElement, ComponentProps<'select'>>(function Select({ className, ...props }, ref) {
-  return <select ref={ref} className={cn(FIELD, 'h-9 pr-8', className)} {...props} />
-})
-
 export const Checkbox = forwardRef<HTMLInputElement, Omit<ComponentProps<'input'>, 'type'>>(function Checkbox({ className, ...props }, ref) {
   return <input ref={ref} type="checkbox" className={cn('size-4 rounded border-zinc-300 accent-zinc-900', className)} {...props} />
 })

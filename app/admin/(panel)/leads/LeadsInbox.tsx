@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useState, useTransition } from 'react'
 import { deleteLead, updateLeadStatus } from '@/app/admin/actions/leads'
 import { formatDateTime } from '@/lib/admin/format'
-import { Badge, Button, EmptyState, Notice, STATUS_TONES, Select, cn } from '@/components/admin/ui'
+import { Dropdown } from '@/components/admin/Dropdown'
+import { Badge, Button, EmptyState, Notice, STATUS_TONES, cn } from '@/components/admin/ui'
 import { LEAD_SOURCE_LABELS, LEAD_STATUS_LABELS, type LeadStatus } from '@/lib/admin/leads'
 
 type Lead = {
@@ -25,6 +26,7 @@ type Lead = {
 }
 
 const STATUSES = Object.keys(LEAD_STATUS_LABELS) as LeadStatus[]
+const STATUS_OPTIONS = STATUSES.map(s => ({ value: s, label: LEAD_STATUS_LABELS[s] }))
 
 export function LeadsInbox({
   leads: initial,
@@ -79,25 +81,21 @@ export function LeadsInbox({
                   </p>
                 </button>
                 {canEdit ? (
-                  <Select
-                    className="h-8 w-36 text-xs"
+                  <Dropdown
+                    size="sm"
+                    className="w-36"
                     value={lead.status}
+                    options={STATUS_OPTIONS}
                     disabled={pending}
-                    onChange={e => {
-                      const next = e.target.value as LeadStatus
+                    onChange={value => {
+                      const next = value as LeadStatus
                       startTransition(async () => {
                         const result = await updateLeadStatus(lead.id, next)
                         if (result.ok) setLeads(prev => prev.map(l => (l.id === lead.id ? { ...l, status: next } : l)))
                         else setError(result.error)
                       })
                     }}
-                  >
-                    {STATUSES.map(s => (
-                      <option key={s} value={s}>
-                        {LEAD_STATUS_LABELS[s]}
-                      </option>
-                    ))}
-                  </Select>
+                  />
                 ) : (
                   <Badge tone={STATUS_TONES[lead.status]}>{LEAD_STATUS_LABELS[lead.status]}</Badge>
                 )}
