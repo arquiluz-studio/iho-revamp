@@ -408,6 +408,38 @@ export type Database = {
           },
         ]
       }
+      country_page_choices: {
+        Row: {
+          country_code: string
+          created_at: string
+          page_key: string
+          updated_at: string
+          uses_global: boolean
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          page_key: string
+          updated_at?: string
+          uses_global?: boolean
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          page_key?: string
+          updated_at?: string
+          uses_global?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_page_choices_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       country_pages: {
         Row: {
           country_code: string
@@ -1646,6 +1678,97 @@ export type Database = {
           {
             foreignKeyName: "sectors_cover_media_id_fkey"
             columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_pages: {
+        Row: {
+          contact_image_media_id: string | null
+          created_at: string
+          hero_extra_en: string | null
+          hero_extra_es: string | null
+          hero_eyebrow_en: string | null
+          hero_eyebrow_es: string | null
+          hero_image_media_id: string | null
+          hero_intro_en: string | null
+          hero_intro_es: string | null
+          hero_subtitle_en: string | null
+          hero_subtitle_es: string | null
+          hero_title_en: string | null
+          hero_title_es: string | null
+          hero_video_media_id: string | null
+          page_key: string
+          seo_description_en: string | null
+          seo_description_es: string | null
+          seo_title_en: string | null
+          seo_title_es: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_image_media_id?: string | null
+          created_at?: string
+          hero_extra_en?: string | null
+          hero_extra_es?: string | null
+          hero_eyebrow_en?: string | null
+          hero_eyebrow_es?: string | null
+          hero_image_media_id?: string | null
+          hero_intro_en?: string | null
+          hero_intro_es?: string | null
+          hero_subtitle_en?: string | null
+          hero_subtitle_es?: string | null
+          hero_title_en?: string | null
+          hero_title_es?: string | null
+          hero_video_media_id?: string | null
+          page_key: string
+          seo_description_en?: string | null
+          seo_description_es?: string | null
+          seo_title_en?: string | null
+          seo_title_es?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_image_media_id?: string | null
+          created_at?: string
+          hero_extra_en?: string | null
+          hero_extra_es?: string | null
+          hero_eyebrow_en?: string | null
+          hero_eyebrow_es?: string | null
+          hero_image_media_id?: string | null
+          hero_intro_en?: string | null
+          hero_intro_es?: string | null
+          hero_subtitle_en?: string | null
+          hero_subtitle_es?: string | null
+          hero_title_en?: string | null
+          hero_title_es?: string | null
+          hero_video_media_id?: string | null
+          page_key?: string
+          seo_description_en?: string | null
+          seo_description_es?: string | null
+          seo_title_en?: string | null
+          seo_title_es?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_pages_contact_image_media_id_fkey"
+            columns: ["contact_image_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_pages_hero_image_media_id_fkey"
+            columns: ["hero_image_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_pages_hero_video_media_id_fkey"
+            columns: ["hero_video_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
             referencedColumns: ["id"]

@@ -18,12 +18,18 @@ export const CONTENT_PAGES = [
 export type ContentPageKey = (typeof CONTENT_PAGES)[number]['key']
 export type CountryPageKey = Exclude<ContentPageKey, 'home'>
 
+export const CONTENT_PAGE_KEYS: readonly ContentPageKey[] = CONTENT_PAGES.map(page => page.key)
+
 export const COUNTRY_PAGE_KEYS: readonly CountryPageKey[] = CONTENT_PAGES.flatMap(page =>
   page.key === 'home' ? [] : [page.key],
 )
 
 export function contentPage(key: string) {
   return CONTENT_PAGES.find(page => page.key === key) ?? null
+}
+
+export function isContentPageKey(key: string): key is ContentPageKey {
+  return CONTENT_PAGE_KEYS.some(page => page === key)
 }
 
 export function isCountryPageKey(key: string): key is CountryPageKey {

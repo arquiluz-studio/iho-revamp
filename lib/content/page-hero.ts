@@ -2,9 +2,9 @@ import 'server-only'
 import type { AppLocale, CountryCode } from '@/config/countries'
 import { t } from '@/lib/i18n-fields'
 import { toImageVM } from '@/lib/media'
-import { getCountryPage } from '@/lib/queries/site'
+import { getCountryPage, getCountrySettings, getPageChoice, getSitePage } from '@/lib/queries/site'
 import type { ImageVM } from '@/lib/types/site'
-import type { CountryPageKey } from './static-pages'
+import type { ContentPageKey, CountryPageKey } from './static-pages'
 
 export type PageHeroFallback = {
   label: string
@@ -21,7 +21,19 @@ export type ResolvedPageHero = {
   image: ImageVM | null
 }
 
-/** Saved hero for a static page, with empty fields falling back to the built-in copy. */
+/** No choice row means the country publishes the global page. */
+export async function usesGlobalPage(country: CountryCode, page: ContentPageKey) {
+  const choice = await getPageChoice(country, page)
+  return choice?.uses_global !== false
+}
+
+/** Home hero, contact image and SEO from the source this country chose. */
+export async function resolveHomeRecord(country: CountryCode) {
+  if (await usesGlobalPage(country, 'home')) return getSitePage('home')
+  return getCountrySettings(country)
+}
+
+/** Saved hero for a static page. Empty fields fall back to the built-in copy, not the other source. */
 export async function resolvePageHero(
   country: CountryCode,
   page: CountryPageKey,
@@ -29,7 +41,7 @@ export async function resolvePageHero(
   fallback: PageHeroFallback,
   fallbackImage?: ImageVM | null,
 ): Promise<ResolvedPageHero> {
-  const row = await getCountryPage(country, page)
+  const row = (await usesGlobalPage(country, page)) ? await getSitePage(page) : await getCountryPage(country, page)
   const intro = t(row, 'hero_intro', locale) || fallback.intro || ''
   const extra = t(row, 'hero_extra', locale) || fallback.extra || ''
   return {

@@ -192,6 +192,16 @@ begin
     raise exception 'mx_editor: country pages require admin';
   exception when insufficient_privilege then null;
   end;
+  begin
+    insert into public.country_page_choices (country_code, page_key, uses_global) values ('mx', 'home', false);
+    raise exception 'mx_editor: page choices require admin';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into public.site_pages (page_key) values ('home');
+    raise exception 'mx_editor: site pages require super admin';
+  exception when insufficient_privilege then null;
+  end;
   delete from public.contact_leads where country_code = 'mx';
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'mx_editor: deleting leads requires admin'; end if;

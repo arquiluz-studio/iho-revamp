@@ -5,10 +5,10 @@ import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PagePart
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MONO, SANS } from '@/components/ui/tokens'
 import { legacyMedia } from '@/lib/content/legacy-media'
-import { resolvePageHero } from '@/lib/content/page-hero'
+import { resolveHomeRecord, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { imageOf, officesFor } from '@/lib/content/site'
-import { getCountry, getCountrySettings } from '@/lib/queries/site'
+import { getCountry } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
@@ -25,10 +25,10 @@ export async function generateMetadata({ params }: { params: Promise<SiteParams>
 export default async function ContactPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
-  const [tc, tp, settings, offices, countryRow, chrome] = await Promise.all([
+  const [tc, tp, home, offices, countryRow, chrome] = await Promise.all([
     getTranslations({ locale, namespace: 'contact' }),
     getTranslations({ locale, namespace: 'pages.contact' }),
-    getCountrySettings(country),
+    resolveHomeRecord(country),
     officesFor(country, locale),
     getCountry(country),
     innerChrome(country, locale, paths),
@@ -58,7 +58,7 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
       <ContactSection
         countryCode={country}
         offices={offices}
-        image={imageOf(settings?.contact_image, locale, tc('imageAlt'), legacyMedia.contactImage(), 'md')}
+        image={imageOf(home?.contact_image, locale, tc('imageAlt'), legacyMedia.contactImage(), 'md')}
       />
     </PageShell>
   )

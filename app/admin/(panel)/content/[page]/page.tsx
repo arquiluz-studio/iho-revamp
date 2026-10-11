@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { GlobalHeroPreview } from '@/components/admin/GlobalHeroPreview'
+import { PageSourceSwitch } from '@/components/admin/PageSourceSwitch'
 import { ResourceEditPage } from '@/components/admin/resource-pages'
 import { RESOURCES } from '@/lib/admin/resources'
-import { requireAdminSession } from '@/lib/admin/session'
-import { contentPage, isCountryPageKey } from '@/lib/content/static-pages'
+import { hasRole, requireAdminSession } from '@/lib/admin/session'
+import { contentPage, isContentPageKey, isCountryPageKey } from '@/lib/content/static-pages'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 type Props = { params: Promise<{ page: string }> }
 
@@ -14,16 +17,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ContentPageEditor({ params }: Props) {
   const { page } = await params
-  const item = contentPage(page)
-  if (!item) notFound()
+  if (!isContentPageKey(page)) notFound()
+  const session = await requireAdminSession()
+  const country = session.activeCountry
+  if (!country || !hasRole(session, country.code, 'admin')) notFound()
 
-  if (page === 'home') {
-    const session = await requireAdminSession()
-    const countryCode = session.activeCountry?.code
-    if (!countryCode) notFound()
-    return <ResourceEditPage resource="home" config={RESOURCES.home} id={countryCode} basePath="/admin/content" />
-  }
+  const supabase = await createSupabaseServerClient()
+  const { data: choice } = await supabase
+    .from('country_page_choices')
+    .select('uses_global')
+    .eq('country_code', country.code)
+    .eq('page_key', page)
+    .maybeSingle()
+  const usesGlobal = choice?.uses_global !== false
 
-  if (!isCountryPageKey(page)) notFound()
-  return <ResourceEditPage resource="pages" config={RESOURCES.pages} id={page} basePath="/admin/content" />
+  return (
+    <>
+      <PageSourceSwitch countryCode={country.code} pageKey={page} usesGlobal={usesGlobal} />
+      {usesGlobal ? (
+        <GlobalHeroPreview pageKey={page} />
+      ) : page === 'home' ? (
+        <ResourceEditPage resource="home" config={RESOURCES.home} id={country.code} basePath="/admin/content" />
+      ) : isCountryPageKey(page) ? (
+        <ResourceEditPage resource="pages" config={RESOURCES.pages} id={page} basePath="/admin/content" />
+      ) : null}
+    </>
+  )
 }

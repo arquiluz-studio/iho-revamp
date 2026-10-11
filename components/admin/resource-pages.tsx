@@ -92,7 +92,7 @@ export async function ResourceListPage({
 }
 
 function publicHref(config: ResourceConfig, row: AnyRow | null, id: string | null) {
-  if (config.key === 'pages') return contentPage(id ?? '')?.href ?? null
+  if (config.key === 'pages' || config.key === 'site-pages' || config.key === 'site-home') return contentPage(id ?? '')?.href ?? null
   const slug = row?.slug ? String(row.slug) : null
   switch (config.publicPath) {
     case '/':
@@ -161,9 +161,11 @@ export async function ResourceEditPage({
     </div>
   )
 
-  const pageLabel = config.key === 'pages' ? contentPage(id ?? '')?.label : null
+  const pageLabel = config.key === 'pages' || config.key === 'site-pages' || config.key === 'site-home' ? contentPage(id ?? '')?.label : null
   const title = pageLabel
-    ? `${pageLabel} · ${session.activeCountry?.name_es ?? ''}`
+    ? config.scope === 'global'
+      ? `${pageLabel} · Global`
+      : `${pageLabel} · ${session.activeCountry?.name_es ?? ''}`
     : id
       ? config.singleton
         ? config.scope === 'global'
@@ -189,7 +191,11 @@ export async function ResourceEditPage({
         <Notice tone="amber">{config.scope === 'global' ? 'Aún no hay configuración' : 'Este país aún no tiene configuración'}; al guardar se crea.</Notice>
       )}
       {config.upsert && !row && (
-        <Notice tone="amber">Esta página aún usa el texto del sitio. Al guardar se crea el hero de este país.</Notice>
+        <Notice tone="amber">
+          {config.scope === 'global'
+            ? 'Aún no hay contenido global. Un campo vacío conserva el texto fijo del sitio.'
+            : 'Esta página aún usa el texto fijo. Al guardar se crea el hero de este país.'}
+        </Notice>
       )}
       <ResourceForm
         resource={resource}

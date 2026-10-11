@@ -10,11 +10,12 @@ import { formatPrice, getCatalog, type CatalogRow } from '@/lib/queries/catalog'
 import type { DesignerRow } from '@/lib/queries/designers'
 import { getEventBySlug, getEvents, type EventDetailRow, type EventListRow } from '@/lib/queries/events'
 import { getProjects, type ProjectListRow } from '@/lib/queries/projects'
-import { getBusinessLines, getCountries, getCountrySettings, getOffices, getSectors, getSiteSettings, getTeam } from '@/lib/queries/site'
+import { getBusinessLines, getCountries, getOffices, getSectors, getSiteSettings, getTeam } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import type { SolutionCardVM, BrandVM, DesignerCardVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
 import { cityChip, cityDisplay } from './cities'
 import { legacyMedia } from './legacy-media'
+import { resolveHomeRecord } from './page-hero'
 import type { SitePaths } from './paths'
 
 const PLACEHOLDER_COLOR = '#d9d4ca'
@@ -194,10 +195,10 @@ export async function getGroupVM(country: CountryCode, locale: AppLocale, paths:
 }
 
 export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: SitePaths): Promise<HomeVM> {
-  const [tr, labels, settings, events, sectors, businessLines, brands, projects, offices, countryRow, products] = await Promise.all([
+  const [tr, labels, homeSource, events, sectors, businessLines, brands, projects, offices, countryRow, products] = await Promise.all([
     getTranslations({ locale }),
     eventLabels(locale),
-    getCountrySettings(country),
+    resolveHomeRecord(country),
     getEvents(country),
     getSectors(),
     getBusinessLines(),
@@ -211,10 +212,10 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
 
   return {
     hero: {
-      eyebrow: t(settings, 'hero_eyebrow', locale) || tr('hero.eyebrow'),
-      title: t(settings, 'hero_title', locale) || tr('hero.title'),
-      videoSrc: videoUrl(settings?.hero_video) ?? legacyMedia.heroVideo(),
-      poster: settings?.hero_image ? toImageVM(settings.hero_image, locale, 'lg').src : null,
+      eyebrow: t(homeSource, 'hero_eyebrow', locale) || tr('hero.eyebrow'),
+      title: t(homeSource, 'hero_title', locale) || tr('hero.title'),
+      videoSrc: videoUrl(homeSource?.hero_video) ?? legacyMedia.heroVideo(),
+      poster: homeSource?.hero_image ? toImageVM(homeSource.hero_image, locale, 'lg').src : null,
     },
     sectors: sectors.map(s => t(s, 'name', locale).toUpperCase()),
     products,
@@ -231,7 +232,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
     brands: brands.map(b => toBrandVM(b, locale, paths)),
     projects: projects.map(p => toProjectCardVM(p, locale, paths)),
     offices,
-    contactImage: imageOf(settings?.contact_image, locale, tr('contact.imageAlt'), legacyMedia.contactImage(), 'md'),
+    contactImage: imageOf(homeSource?.contact_image, locale, tr('contact.imageAlt'), legacyMedia.contactImage(), 'md'),
   }
 }
 

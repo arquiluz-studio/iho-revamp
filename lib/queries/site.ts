@@ -20,6 +20,34 @@ export function getCountry(code: string) {
   return getCountries().then(rows => rows.find(c => c.code === code) ?? null)
 }
 
+/** Missing row means the country uses the global page. */
+export function getPageChoice(code: string, pageKey: string) {
+  return cachedQuery(
+    ['page-choice', code, pageKey],
+    [cacheTags.country(code, 'pages'), cacheTags.country(code, 'settings')],
+    async ({ db }) =>
+      maybe(
+        await db.from('country_page_choices').select('uses_global').eq('country_code', code).eq('page_key', pageKey).maybeSingle(),
+        'country_page_choices',
+      ),
+  )
+}
+
+export function getSitePage(pageKey: string) {
+  return cachedQuery(['site-page', pageKey], [cacheTags.site], async ({ db }) =>
+    maybe(
+      await db
+        .from('site_pages')
+        .select(
+          `*, hero_video:${media('site_pages_hero_video_media_id_fkey')}, hero_image:${media('site_pages_hero_image_media_id_fkey')}, contact_image:${media('site_pages_contact_image_media_id_fkey')}` as const,
+        )
+        .eq('page_key', pageKey)
+        .maybeSingle(),
+      'site_pages',
+    ),
+  )
+}
+
 export function getCountryPage(code: string, pageKey: string) {
   return cachedQuery(['country-page', code, pageKey], [cacheTags.country(code, 'pages')], async ({ db }) =>
     maybe(

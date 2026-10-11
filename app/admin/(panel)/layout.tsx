@@ -12,7 +12,12 @@ export default async function PanelLayout({ children }: { children: ReactNode })
   const role = session.activeCountry?.role
 
   const sections: NavSection[] = [
-    { items: [{ href: '/admin', label: 'Dashboard', exact: true }] },
+    {
+      items: [
+        { href: '/admin', label: 'Dashboard', exact: true },
+        ...(session.isGlobalScope && session.isSuperAdmin ? [{ href: '/admin/global/content', label: 'Contenido - Global' }] : []),
+      ],
+    },
   ]
   if (session.activeCountry) {
     sections.push(
