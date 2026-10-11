@@ -2,7 +2,7 @@
  * Cache tags shared by public queries (`unstable_cache`) and admin server actions (`revalidateTag`).
  * Country content is tagged per section so publishing an event doesn't purge the brand pages.
  */
-export type CountrySection = 'settings' | 'events' | 'projects' | 'brands' | 'offices' | 'socials' | 'team' | 'catalog'
+export type CountrySection = 'settings' | 'pages' | 'events' | 'projects' | 'brands' | 'offices' | 'socials' | 'team' | 'catalog'
 
 export const cacheTags = {
   countries: 'countries',

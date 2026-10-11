@@ -20,6 +20,22 @@ export function getCountry(code: string) {
   return getCountries().then(rows => rows.find(c => c.code === code) ?? null)
 }
 
+export function getCountryPage(code: string, pageKey: string) {
+  return cachedQuery(['country-page', code, pageKey], [cacheTags.country(code, 'pages')], async ({ db }) =>
+    maybe(
+      await db
+        .from('country_pages')
+        .select(
+          `*, hero_image:${media('country_pages_hero_image_media_id_fkey')}` as const,
+        )
+        .eq('country_code', code)
+        .eq('page_key', pageKey)
+        .maybeSingle(),
+      'country_pages',
+    ),
+  )
+}
+
 export function getCountrySettings(code: string) {
   return cachedQuery(['country-settings', code], [cacheTags.country(code, 'settings')], async ({ db }) =>
     maybe(

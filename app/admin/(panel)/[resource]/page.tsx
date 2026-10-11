@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { ResourceListPage } from '@/components/admin/resource-pages'
 import { resolveResource } from './resolve'
 
@@ -12,5 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params, searchParams }: Props) {
-  return <ResourceListPage {...resolveResource((await params).resource)} searchParams={await searchParams} />
+  const { resource } = await params
+  if (resource === 'home') redirect('/admin/content/home')
+  return <ResourceListPage {...resolveResource(resource)} searchParams={await searchParams} />
 }

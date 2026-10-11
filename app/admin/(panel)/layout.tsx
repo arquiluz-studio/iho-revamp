@@ -23,7 +23,7 @@ export default async function PanelLayout({ children }: { children: ReactNode })
       {
         title: `Contenido · ${session.activeCountry.name_es}`,
         items: [
-          ...(atLeast(role, 'admin') ? [{ href: '/admin/home', label: 'Home del país' }] : []),
+          ...(atLeast(role, 'admin') ? [{ href: '/admin/content', label: 'Contenido' }] : []),
           { href: '/admin/events', label: 'Eventos' },
           { href: '/admin/projects', label: 'Proyectos' },
         ],

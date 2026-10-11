@@ -24,8 +24,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <main className="flex min-h-dvh items-center justify-center p-6">
       <Card className="w-full max-w-sm p-8">
         <div className="mb-6">
-          <p className="text-xs font-semibold tracking-[0.2em] text-zinc-500">GRUPO IHO</p>
-          <h1 className="mt-1 text-xl font-semibold">Panel de administración</h1>
+          <div className="inline-flex items-end gap-2.5">
+            <img src="/images/logo-iho-red.png" alt="IHO" className="h-8 w-auto" />
+            <span className="text-2xl font-bold leading-none tracking-wide text-zinc-900">CMS</span>
+          </div>
+          <h1 className="mt-3 text-xl font-semibold">Panel de administración</h1>
         </div>
         {data.user ? (
           <div className="space-y-4">

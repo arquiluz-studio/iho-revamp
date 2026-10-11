@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { ContactSection } from '@/components/site/ContactSection'
-import { PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MONO, SANS } from '@/components/ui/tokens'
 import { legacyMedia } from '@/lib/content/legacy-media'
+import { resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { imageOf, officesFor } from '@/lib/content/site'
 import { getCountry, getCountrySettings } from '@/lib/queries/site'
@@ -13,8 +14,12 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
-  const tc = await getTranslations({ locale, namespace: 'contact' })
-  return { title: `${tc('title')} — IHO`, alternates: buildAlternates({ href: '/contact', country, locale }) }
+  const [tc, tp] = await Promise.all([
+    getTranslations({ locale, namespace: 'contact' }),
+    getTranslations({ locale, namespace: 'pages.contact' }),
+  ])
+  const hero = await resolvePageHero(country, 'contact', locale, { label: tp('label'), title: tc('title') })
+  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/contact', country, locale }) }
 }
 
 export default async function ContactPage({ params }: { params: Promise<SiteParams> }) {
@@ -34,9 +39,11 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
     countryRow?.email && { label: tc('email'), href: `mailto:${countryRow.email}`, value: countryRow.email },
   ].filter(Boolean) as { label: string; href: string; value: string }[]
 
+  const hero = await resolvePageHero(country, 'contact', locale, { label: tp('label'), title: tc('title') })
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={tc('title')}>
+      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
+        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
         {channels.length > 0 && (
           <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap', marginTop: 32 }}>
             {channels.map(c => (

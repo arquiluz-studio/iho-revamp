@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { EmptyNote, EventRow, PageHero, PageShell, SectionHeading } from '@/components/site/pages/PageParts'
+import { EmptyNote, EventRow, HeroExtra, PageHero, PageShell, SectionHeading } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
+import { resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { getEventsVM } from '@/lib/content/site'
 import { buildAlternates } from '@/lib/seo'
@@ -12,7 +13,8 @@ export const revalidate = 3600
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const tp = await getTranslations({ locale, namespace: 'pages.events' })
-  return { title: `${tp('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/events', country, locale }) }
+  const hero = await resolvePageHero(country, 'events', locale, { label: tp('label'), title: tp('title') })
+  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/events', country, locale }) }
 }
 
 export default async function EventsPage({ params }: { params: Promise<SiteParams> }) {
@@ -25,9 +27,12 @@ export default async function EventsPage({ params }: { params: Promise<SiteParam
   ])
   const upcoming = events.filter(e => !e.isPast)
   const past = events.filter(e => e.isPast).reverse()
+  const hero = await resolvePageHero(country, 'events', locale, { label: tp('label'), title: tp('title') }, upcoming[0]?.image ?? past[0]?.image)
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={tp('title')} image={upcoming[0]?.image ?? past[0]?.image} />
+      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
+        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
+      </PageHero>
       <section className="iho-page-section">
         <SectionHeading label={`— ${tp('upcoming').toUpperCase()}`} />
         {upcoming.length ? upcoming.map(e => <EventRow key={e.slug} event={e} />) : <EmptyNote>{tp('empty')}</EmptyNote>}

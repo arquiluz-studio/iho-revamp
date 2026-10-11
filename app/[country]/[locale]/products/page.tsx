@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { ShopBrowser, type ShopProduct } from '@/components/site/ShopBrowser'
 import { innerChrome } from '@/components/site/SiteChrome'
+import { resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { facetSlug, parseShopQuery } from '@/lib/content/shop-query'
 import { toProductCardVM } from '@/lib/content/site'
@@ -18,7 +19,8 @@ type SearchParams = Record<string, string | string[] | undefined>
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const tp = await getTranslations({ locale, namespace: 'pages.products' })
-  return { title: `${tp('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/products', country, locale }) }
+  const hero = await resolvePageHero(country, 'products', locale, { label: tp('label'), title: tp('title') })
+  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/products', country, locale }) }
 }
 
 export default async function ProductsPage({ params, searchParams }: { params: Promise<SiteParams>; searchParams: Promise<SearchParams> }) {
@@ -42,9 +44,12 @@ export default async function ProductsPage({ params, searchParams }: { params: P
     order,
   }))
 
+  const hero = await resolvePageHero(country, 'products', locale, { label: tp('label'), title: tp('title') })
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={tp('title')} />
+      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
+        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
+      </PageHero>
       <ShopBrowser products={products} query={parseShopQuery(queryParams)} params={queryParams} />
     </PageShell>
   )

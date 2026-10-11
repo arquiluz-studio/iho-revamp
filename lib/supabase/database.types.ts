@@ -408,6 +408,69 @@ export type Database = {
           },
         ]
       }
+      country_pages: {
+        Row: {
+          country_code: string
+          created_at: string
+          hero_extra_en: string | null
+          hero_extra_es: string | null
+          hero_eyebrow_en: string | null
+          hero_eyebrow_es: string | null
+          hero_image_media_id: string | null
+          hero_intro_en: string | null
+          hero_intro_es: string | null
+          hero_title_en: string | null
+          hero_title_es: string | null
+          page_key: string
+          updated_at: string
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          hero_extra_en?: string | null
+          hero_extra_es?: string | null
+          hero_eyebrow_en?: string | null
+          hero_eyebrow_es?: string | null
+          hero_image_media_id?: string | null
+          hero_intro_en?: string | null
+          hero_intro_es?: string | null
+          hero_title_en?: string | null
+          hero_title_es?: string | null
+          page_key: string
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          hero_extra_en?: string | null
+          hero_extra_es?: string | null
+          hero_eyebrow_en?: string | null
+          hero_eyebrow_es?: string | null
+          hero_image_media_id?: string | null
+          hero_intro_en?: string | null
+          hero_intro_es?: string | null
+          hero_title_en?: string | null
+          hero_title_es?: string | null
+          page_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_pages_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "country_pages_hero_image_media_id_fkey"
+            columns: ["hero_image_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       country_settings: {
         Row: {
           contact_image_media_id: string | null

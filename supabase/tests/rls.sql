@@ -187,6 +187,11 @@ begin
     raise exception 'mx_editor: country settings require admin';
   exception when insufficient_privilege then null;
   end;
+  begin
+    insert into public.country_pages (country_code, page_key) values ('mx', 'group');
+    raise exception 'mx_editor: country pages require admin';
+  exception when insufficient_privilege then null;
+  end;
   delete from public.contact_leads where country_code = 'mx';
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'mx_editor: deleting leads requires admin'; end if;

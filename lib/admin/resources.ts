@@ -1,4 +1,5 @@
 import type { CountrySection } from '@/lib/cache-tags'
+import { COUNTRY_PAGE_KEYS } from '@/lib/content/static-pages'
 import { Constants, type Database } from '@/lib/supabase/database.types'
 import type { CountryRole } from './roles'
 
@@ -47,6 +48,10 @@ export type ResourceConfig = {
   globalTag?: 'countries' | 'taxonomies' | 'brands' | 'designers' | 'products' | 'site'
   /** A single row: one per country keyed by country_code (country scope), or `SITE_SETTINGS_ID` (global scope). */
   singleton?: boolean
+  /** Update creates the row when it does not exist yet (static page heroes). */
+  upsert?: boolean
+  /** Save rejects any id outside this list. */
+  fixedIds?: readonly string[]
   /** The primary key is typed by the user on creation (countries.code). */
   pkInput?: boolean
   /** Localized public route used by "Ver en el sitio" / preview. */
@@ -321,7 +326,7 @@ const home: ResourceConfig = {
   scope: 'country',
   pk: 'country_code',
   singleton: true,
-  title: 'Home del país',
+  title: 'Home',
   singular: 'home',
   description: 'Hero, imagen de contacto y SEO del sitio del país.',
   writeRole: 'admin',
@@ -344,6 +349,45 @@ const home: ResourceConfig = {
     { name: 'contact_image_media_id', label: 'Imagen de la sección de contacto', type: 'media', kind: 'generic' },
     { name: 'seo_title', label: 'SEO · título', type: 'text', i18n: true, max: 120 },
     { name: 'seo_description', label: 'SEO · descripción', type: 'textarea', i18n: true, max: 300, rows: 3 },
+  ],
+  columns: [],
+  order: [],
+}
+
+const pages: ResourceConfig = {
+  key: 'pages',
+  table: 'country_pages',
+  scope: 'country',
+  pk: 'page_key',
+  upsert: true,
+  fixedIds: COUNTRY_PAGE_KEYS,
+  title: 'Página',
+  singular: 'página',
+  description: 'Hero de esta página. Un campo vacío conserva el texto que el sitio muestra hoy.',
+  writeRole: 'admin',
+  section: 'pages',
+  fields: [
+    { name: 'hero_eyebrow', label: 'Antetítulo', type: 'text', i18n: true, max: 120 },
+    {
+      name: 'hero_title',
+      label: 'Título',
+      type: 'textarea',
+      i18n: true,
+      max: 200,
+      rows: 3,
+      help: 'Salto de línea = nueva línea. *texto* = resaltado en rojo.',
+    },
+    { name: 'hero_intro', label: 'Introducción', type: 'textarea', i18n: true, max: 800, rows: 4 },
+    {
+      name: 'hero_extra',
+      label: 'Párrafo extra',
+      type: 'textarea',
+      i18n: true,
+      max: 800,
+      rows: 4,
+      help: 'Segundo párrafo del hero. En Grupo IHO reemplaza el texto actual.',
+    },
+    { name: 'hero_image_media_id', label: 'Imagen de fondo', type: 'media', kind: 'hero' },
   ],
   columns: [],
   order: [],
@@ -602,6 +646,7 @@ export const RESOURCES = {
   offices,
   team,
   home,
+  pages,
   'catalog-brands': catalogBrands,
   products,
   countries,

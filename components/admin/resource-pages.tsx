@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { emptyValues, singletonId, type ResourceConfig, type ResourceKey } from '@/lib/admin/resources'
+import { contentPage } from '@/lib/content/static-pages'
 import { listRecords, loadMedia, loadOptions, loadRecord, mediaIdsOf } from '@/lib/admin/data'
 import { toFormValues } from '@/lib/admin/form-schema'
 import { ADMIN_MEDIA_SELECT, toAdminMedia } from '@/lib/admin/media'
@@ -90,7 +91,8 @@ export async function ResourceListPage({
   )
 }
 
-function publicHref(config: ResourceConfig, row: AnyRow | null) {
+function publicHref(config: ResourceConfig, row: AnyRow | null, id: string | null) {
+  if (config.key === 'pages') return contentPage(id ?? '')?.href ?? null
   const slug = row?.slug ? String(row.slug) : null
   switch (config.publicPath) {
     case '/':
@@ -126,13 +128,13 @@ export async function ResourceEditPage({
   if (!canRead) notFound()
 
   const record = id ? await loadRecord(config, id, countryCode) : null
-  if (id && !record && !config.singleton) notFound()
+  if (id && !record && !config.singleton && !config.upsert) notFound()
   const row = record?.row ?? null
   const initialValues = row ? toFormValues(config, row, record!.bridges, timezone) : emptyValues(config)
   const [options, media] = await Promise.all([loadOptions(config, countryCode), loadMedia(mediaIdsOf(config, row))])
 
   const siteCountry = countryCode ?? session.activeCountry?.code ?? 'mx'
-  const href = publicHref(config, row)
+  const href = publicHref(config, row, id)
   const status = row?.status as string | undefined
   const [viewUrl, draftUrl] = href
     ? await Promise.all([publicUrl(siteCountry, href), status && status !== 'published' ? previewUrl(siteCountry, href) : null])
@@ -159,21 +161,24 @@ export async function ResourceEditPage({
     </div>
   )
 
-  const title = id
-    ? config.singleton
-      ? config.scope === 'global'
-        ? config.title
-        : `${config.title} · ${session.activeCountry?.name_es ?? ''}`
-      : String(row?.title_es ?? row?.name ?? row?.name_es ?? row?.full_name ?? row?.city ?? row?.platform ?? config.singular)
-    : `Nuevo ${config.singular}`
+  const pageLabel = config.key === 'pages' ? contentPage(id ?? '')?.label : null
+  const title = pageLabel
+    ? `${pageLabel} · ${session.activeCountry?.name_es ?? ''}`
+    : id
+      ? config.singleton
+        ? config.scope === 'global'
+          ? config.title
+          : `${config.title} · ${session.activeCountry?.name_es ?? ''}`
+        : String(row?.title_es ?? row?.name ?? row?.name_es ?? row?.full_name ?? row?.city ?? row?.platform ?? config.singular)
+      : `Nuevo ${config.singular}`
 
   return (
     <>
       <PageHeader
         title={title}
-        description={config.singleton ? config.description : config.title}
+        description={config.singleton || config.upsert ? config.description : config.title}
         actions={
-          !config.singleton && (
+          (!config.singleton || basePath !== `/admin/${resource}`) && (
             <ButtonLink href={basePath} variant="ghost">
               ← Volver
             </ButtonLink>
@@ -183,6 +188,9 @@ export async function ResourceEditPage({
       {config.singleton && !row && (
         <Notice tone="amber">{config.scope === 'global' ? 'Aún no hay configuración' : 'Este país aún no tiene configuración'}; al guardar se crea.</Notice>
       )}
+      {config.upsert && !row && (
+        <Notice tone="amber">Esta página aún usa el texto del sitio. Al guardar se crea el hero de este país.</Notice>
+      )}
       <ResourceForm
         resource={resource}
         id={config.singleton ? singletonId(config, countryCode) : id}
@@ -191,7 +199,7 @@ export async function ResourceEditPage({
         options={options}
         media={media}
         canEdit={canWrite}
-        canDelete={!config.singleton}
+        canDelete={!config.singleton && !config.upsert}
         basePath={basePath}
         aside={aside}
       />

@@ -57,6 +57,12 @@ export function PageHero({
   )
 }
 
+export function HeroExtra({ children }: { children: string }) {
+  return (
+    <p style={{ fontFamily: SANS, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: 620, margin: '16px 0 0' }}>{children}</p>
+  )
+}
+
 export function SectionHeading({ label, title }: { label: string; title?: string }) {
   return (
     <div style={{ marginBottom: 32 }}>

@@ -29,6 +29,7 @@ export async function saveResource(
   const session = await getAdminSession()
   if (!session) return EXPIRED
   if (!canWrite(session, config, countryCode)) return FORBIDDEN
+  if (config.fixedIds && !config.fixedIds.includes(id ?? '')) return { ok: false, error: 'Página desconocida.' }
 
   const parsed = buildSchema(config).safeParse(input)
   if (!parsed.success) {
@@ -60,7 +61,12 @@ export async function saveResource(
     if (config.scope === 'country') query = query.eq('country_code', countryCode!)
     const { data, error } = await query.select(config.pk).maybeSingle()
     if (error) return dbError(error)
-    if (!data) return FORBIDDEN
+    if (!data) {
+      if (!config.upsert) return FORBIDDEN
+      row[config.pk] = id
+      const inserted = await untypedFrom(supabase, config.table).insert(row as never).select(config.pk).single()
+      if (inserted.error) return dbError(inserted.error)
+    }
     savedId = id
   } else {
     const { data, error } = await table.insert(row as never).select(config.pk).single()

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { DesignerCards, EmptyNote, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { DesignerCards, EmptyNote, HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
+import { resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { toDesignerCardVM } from '@/lib/content/site'
 import { getDesigners } from '@/lib/queries/designers'
@@ -11,7 +12,8 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const tp = await getTranslations({ locale, namespace: 'pages.designers' })
-  return { title: `${tp('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/designers', country, locale }) }
+  const hero = await resolvePageHero(country, 'designers', locale, { label: tp('label'), title: tp('title'), intro: tp('intro') })
+  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/designers', country, locale }) }
 }
 
 export default async function DesignersPage({ params }: { params: Promise<SiteParams> }) {
@@ -23,9 +25,12 @@ export default async function DesignersPage({ params }: { params: Promise<SitePa
     innerChrome(country, locale, paths),
   ])
   const born = (year: number) => tp('born', { year })
+  const hero = await resolvePageHero(country, 'designers', locale, { label: tp('label'), title: tp('title'), intro: tp('intro') })
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={tp('title')} intro={tp('intro')} />
+      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
+        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
+      </PageHero>
       <section className="iho-page-section">
         {designers.length > 0 ? (
           <DesignerCards designers={designers.map(d => toDesignerCardVM(d, locale, paths, born))} />

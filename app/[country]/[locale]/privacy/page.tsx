@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { ACUMIN } from '@/components/ui/tokens'
+import { resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
@@ -10,7 +11,8 @@ import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const tp = await getTranslations({ locale, namespace: 'pages.privacy' })
-  return { title: `${tp('title').replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/privacy', country, locale }) }
+  const hero = await resolvePageHero(country, 'privacy', locale, { label: tp('label'), title: tp('title'), intro: tp('intro') })
+  return { title: `${hero.title.replace(/\n/g, ' ')} — IHO`, alternates: buildAlternates({ href: '/privacy', country, locale }) }
 }
 
 export default async function PrivacyPage({ params }: { params: Promise<SiteParams> }) {
@@ -18,9 +20,12 @@ export default async function PrivacyPage({ params }: { params: Promise<SitePara
   const paths = sitePaths(locale)
   const [tp, chrome] = await Promise.all([getTranslations({ locale, namespace: 'pages.privacy' }), innerChrome(country, locale, paths)])
   const sections = tp.raw('sections') as { title: string; body: string }[]
+  const hero = await resolvePageHero(country, 'privacy', locale, { label: tp('label'), title: tp('title'), intro: tp('intro') })
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={tp('title')} intro={tp('intro')} />
+      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
+        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
+      </PageHero>
       <section className="iho-page-section iho-prose" style={{ maxWidth: 900 }}>
         {sections.map(s => (
           <div key={s.title} style={{ marginBottom: 28 }}>
