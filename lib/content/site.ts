@@ -221,6 +221,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
     hero: {
       eyebrow: t(homeSource, 'hero_eyebrow', locale),
       title: t(homeSource, 'hero_title', locale),
+      subtitle: t(homeSource, 'hero_subtitle', locale),
       videoSrc: videoUrl(homeSource?.hero_video),
       poster: homeSource?.hero_image ? toImageVM(homeSource.hero_image, locale, 'lg').src : null,
     },

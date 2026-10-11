@@ -19,7 +19,7 @@ export function HomeView({ data, chrome, countryCode, solutionsHref, contactHref
     <div style={{ width: '100%', overflowX: 'hidden' }}>
       {chrome.banner}
       {chrome.header}
-      <Hero eyebrow={data.hero.eyebrow} title={data.hero.title} videoSrc={data.hero.videoSrc} poster={data.hero.poster} ctaHref={contactHref} />
+      <Hero eyebrow={data.hero.eyebrow} title={data.hero.title} subtitle={data.hero.subtitle} videoSrc={data.hero.videoSrc} poster={data.hero.poster} ctaHref={contactHref} />
       <SectorStrip items={data.sectors} />
       <SolutionsGrid solutions={data.solutions} ctaHref={solutionsHref} background="#ffffff" />
       <BrandsWall brands={data.brands} />

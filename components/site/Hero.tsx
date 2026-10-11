@@ -1,12 +1,13 @@
 import { useTranslations } from 'next-intl'
 import { ButtonArrow } from '@/components/ui/Arrow'
 import { RichText } from '@/components/ui/Section'
-import { ACUMIN } from '@/components/ui/tokens'
+import { ACUMIN, SANS } from '@/components/ui/tokens'
 import { HeroVideo } from './HeroVideo'
 
-export function Hero({ eyebrow, title, videoSrc, poster, ctaHref }: {
+export function Hero({ eyebrow, title, subtitle, videoSrc, poster, ctaHref }: {
   eyebrow: string
   title: string
+  subtitle?: string
   videoSrc: string | null
   poster?: string | null
   ctaHref: string
@@ -26,10 +27,17 @@ export function Hero({ eyebrow, title, videoSrc, poster, ctaHref }: {
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(8,8,8,0.6) 0%, rgba(8,8,8,0) 26%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         <div className="iho-hero-overlay" style={{ maxWidth: 1240, height: '100%', margin: '0 auto', padding: '0 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 13, letterSpacing: '2.5px', color: 'rgba(255,255,255,0.85)', marginBottom: 26 }}>{eyebrow}</div>
-          <h1 style={{ fontFamily: ACUMIN, fontWeight: 800, color: '#fff', fontSize: 88, lineHeight: 0.9, letterSpacing: '-1px', margin: '0 0 36px', textTransform: 'uppercase' }}>
-            <RichText text={title} />
-          </h1>
+          {eyebrow && <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 13, letterSpacing: '2.5px', color: 'rgba(255,255,255,0.85)', marginBottom: 26 }}>{eyebrow}</div>}
+          {title && (
+            <h1 style={{ fontFamily: ACUMIN, fontWeight: 800, color: '#fff', fontSize: 88, lineHeight: 0.9, letterSpacing: '-1px', margin: subtitle ? '0 0 20px' : '0 0 36px', textTransform: 'uppercase' }}>
+              <RichText text={title} />
+            </h1>
+          )}
+          {subtitle && (
+            <p style={{ fontFamily: SANS, fontSize: 18, lineHeight: 1.55, color: 'rgba(255,255,255,0.82)', maxWidth: 560, margin: '0 0 36px' }}>
+              <RichText text={subtitle} />
+            </p>
+          )}
           <a href={ctaHref} className="iho-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#ef483d', color: '#fff', padding: '14px 26px', borderRadius: 32, fontFamily: '"Source Sans 3", sans-serif', fontWeight: 600, fontSize: 15, pointerEvents: 'auto', alignSelf: 'flex-start', textDecoration: 'none' }}>
             {t('cta')}
             <ButtonArrow />

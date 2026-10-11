@@ -111,7 +111,7 @@ export type StatVM = { value: number; prefix: string; suffix: string; label: str
 export type MapCountryVM = { code: string; name: string; cities: string[]; isCurrent: boolean; hasSite: boolean }
 
 export type HomeVM = {
-  hero: { eyebrow: string; title: string; videoSrc: string | null; poster?: string | null }
+  hero: { eyebrow: string; title: string; subtitle: string; videoSrc: string | null; poster?: string | null }
   sectors: string[]
   products: ProductCardVM[]
   events: EventVM[]

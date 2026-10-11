@@ -32,23 +32,25 @@ export function PageHero({
     <section className="iho-page-hero">
       {image && <MediaImage image={image} priority sizes="100vw" />}
       <div className="iho-page-hero__inner">
-        <SectionLabel>{label}</SectionLabel>
-        <h1
-          style={{
-            fontFamily: ACUMIN,
-            fontWeight: 800,
-            fontSize: 'clamp(48px, 7vw, 86px)',
-            lineHeight: 0.92,
-            letterSpacing: '-1px',
-            textTransform: 'uppercase',
-            margin: 0,
-          }}
-        >
-          <RichText text={title} />
-        </h1>
+        {label && <SectionLabel>{label}</SectionLabel>}
+        {title && (
+          <h1
+            style={{
+              fontFamily: ACUMIN,
+              fontWeight: 800,
+              fontSize: 'clamp(48px, 7vw, 86px)',
+              lineHeight: 0.92,
+              letterSpacing: '-1px',
+              textTransform: 'uppercase',
+              margin: 0,
+            }}
+          >
+            <RichText text={title} />
+          </h1>
+        )}
         {intro && (
           <p style={{ fontFamily: SANS, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: 620, margin: '24px 0 0' }}>
-            {intro}
+            <RichText text={intro} />
           </p>
         )}
         {children}
@@ -59,7 +61,9 @@ export function PageHero({
 
 export function HeroExtra({ children }: { children: string }) {
   return (
-    <p style={{ fontFamily: SANS, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: 620, margin: '16px 0 0' }}>{children}</p>
+    <p style={{ fontFamily: SANS, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: 620, margin: '16px 0 0' }}>
+      <RichText text={children} />
+    </p>
   )
 }
 
