@@ -7,6 +7,7 @@ type Props = { product: ProductCardVM; showCategory?: boolean; ariaHidden?: bool
 export function ProductCard({ product, showCategory = false, ariaHidden }: Props) {
   const t = useTranslations('pages.products')
   const category = showCategory ? product.category : undefined
+  const eyebrow = product.brand || category
   return (
     <a
       href={product.href}
@@ -24,12 +25,21 @@ export function ProductCard({ product, showCategory = false, ariaHidden }: Props
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
       </div>
-      {category && (
-        <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 10, letterSpacing: '1.2px', color: '#8a8478', marginTop: 14 }}>
-          {category}
+      {eyebrow && (
+        <div style={{ marginTop: 14 }}>
+          {product.brand && (
+            <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 10, letterSpacing: '1.2px', color: '#8a8478', textTransform: 'uppercase' }}>
+              {product.brand}
+            </div>
+          )}
+          {category && (
+            <div style={{ fontFamily: '"Space Mono", monospace', fontSize: 10, letterSpacing: '1.2px', color: '#8a8478', marginTop: product.brand ? 4 : 0 }}>
+              {category}
+            </div>
+          )}
         </div>
       )}
-      <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 16, color: '#17150f', marginTop: category ? 5 : 16 }}>
+      <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 16, color: '#17150f', marginTop: eyebrow ? 5 : 16 }}>
         {product.name}
       </div>
       {(product.price || product.inquiry) && (

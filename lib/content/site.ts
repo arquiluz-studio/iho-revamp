@@ -114,6 +114,7 @@ export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: strin
   return {
     key: p.id,
     name,
+    brand: p.catalogBrandName,
     category: category ? t(category, 'name', locale).toUpperCase() : undefined,
     href: labels ? paths.product(localSlug(p, locale)) : `${paths.product(localSlug(p, locale))}#cotizar`,
     image: imageOf(p.cover, locale, name, legacyMedia.productCover(p.slug), 'md'),

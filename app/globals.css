@@ -1348,6 +1348,13 @@ header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .i
 .iho-check-label { flex: 1; }
 .iho-check-count { font-family: "Space Mono", monospace; font-size: 11px; letter-spacing: 1px; color: #8a8478; }
 .iho-browse-count { font-family: "Space Mono", monospace; font-size: 12px; letter-spacing: 1.5px; color: #8a8478; text-transform: uppercase; margin: 0 0 22px; }
+.iho-shop-toolbar { display: flex; align-items: flex-end; gap: 20px; margin-bottom: 22px; }
+.iho-shop-search { flex: 1; min-width: 0; border: 0; border-bottom: 1px solid rgba(20, 18, 12, 0.2); background: transparent; padding: 8px 0; font-family: "Source Sans 3", sans-serif; font-size: 16px; color: #17150f; }
+.iho-shop-search:focus { outline: none; border-bottom-color: #17150f; }
+.iho-shop-search::-webkit-search-cancel-button { cursor: pointer; }
+.iho-shop-sort { display: grid; gap: 6px; font-family: "Space Mono", monospace; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8a8478; }
+.iho-shop-sort select { border: 0; border-bottom: 1px solid rgba(20, 18, 12, 0.2); background: transparent; padding: 8px 0; font-family: "Source Sans 3", sans-serif; font-size: 15px; letter-spacing: 0; text-transform: none; color: #17150f; cursor: pointer; }
+.iho-shop-sort select:focus { outline: none; border-bottom-color: #17150f; }
 .iho-card-grid--two { grid-template-columns: repeat(2, 1fr); }
 @media (max-width: 1024px) {
   .iho-browse { grid-template-columns: 1fr; gap: 28px; }
@@ -1361,6 +1368,7 @@ header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .i
   .iho-page-section { padding: 48px 20px; }
   .iho-card-grid, .iho-card-grid--two, .iho-gallery-grid { grid-template-columns: 1fr; }
   .iho-logo-grid, .iho-product-grid { grid-template-columns: repeat(2, 1fr); }
+  .iho-shop-toolbar { flex-direction: column; align-items: stretch; }
   .iho-event-row { grid-template-columns: 80px 1fr; }
   .iho-event-row > :last-child { display: none; }
 }

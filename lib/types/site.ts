@@ -53,6 +53,8 @@ export type ProductCardVM = {
   key: string
   name: string
   image: ImageVM
+  /** Commercial brand in this country. */
+  brand?: string
   category?: string
   href: string
   price?: string
