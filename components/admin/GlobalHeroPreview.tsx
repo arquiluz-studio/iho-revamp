@@ -35,6 +35,7 @@ export async function GlobalHeroPreview({ pageKey }: { pageKey: ContentPageKey }
   return (
     <>
       <PageHeader title={page?.label ?? 'Página'} description="Contenido global en solo lectura. Se edita en Contenido - Global." />
+      {data?.hero_enabled === false && <Notice>El hero está apagado. Los países que publican este contenido tampoco lo muestran.</Notice>}
       {!data || (filled.length === 0 && images.length === 0) ? (
         <Notice>El contenido global de esta página está vacío.</Notice>
       ) : (

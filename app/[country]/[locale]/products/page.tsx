@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { PageShell } from '@/components/site/pages/PageParts'
 import { ShopBrowser, type ShopProduct } from '@/components/site/ShopBrowser'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
@@ -43,10 +44,8 @@ export default async function ProductsPage({ params, searchParams }: { params: P
 
   const hero = await resolvePageHero(country, 'products', locale)
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
-      </PageHero>
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero} />
       <ShopBrowser products={products} query={parseShopQuery(queryParams)} params={queryParams} />
     </PageShell>
   )

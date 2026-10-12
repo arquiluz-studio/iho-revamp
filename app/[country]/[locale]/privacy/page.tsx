@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { ACUMIN } from '@/components/ui/tokens'
 import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
@@ -21,10 +22,8 @@ export default async function PrivacyPage({ params }: { params: Promise<SitePara
   const sections = tp.raw('sections') as { title: string; body: string }[]
   const hero = await resolvePageHero(country, 'privacy', locale)
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
-      </PageHero>
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero} />
       <section className="iho-page-section iho-prose" style={{ maxWidth: 900 }}>
         {sections.map(s => (
           <div key={s.title} style={{ marginBottom: 28 }}>

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { BrandsWall } from '@/components/site/BrandsWall'
 import { GroupSection } from '@/components/site/GroupSection'
-import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { PageShell } from '@/components/site/pages/PageParts'
 import { ProjectsGrid } from '@/components/site/ProjectsGrid'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { Team } from '@/components/site/Team'
@@ -23,10 +24,8 @@ export default async function GroupPage({ params }: { params: Promise<SiteParams
   const [group, chrome] = await Promise.all([getGroupVM(country, locale, paths), innerChrome(country, locale, paths)])
   const hero = await resolvePageHero(country, 'group', locale)
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
-      </PageHero>
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero} />
       <Team members={group.team} />
       <GroupSection stats={group.stats} mapCountries={group.mapCountries} showIntro={false} />
       <BrandsWall brands={group.brands} />

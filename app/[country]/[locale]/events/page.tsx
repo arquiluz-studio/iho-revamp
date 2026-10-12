@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { EmptyNote, EventRow, HeroExtra, PageHero, PageShell, SectionHeading } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { EmptyNote, EventRow, PageShell, SectionHeading } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
@@ -28,10 +29,8 @@ export default async function EventsPage({ params }: { params: Promise<SiteParam
   const past = events.filter(e => e.isPast).reverse()
   const hero = await resolvePageHero(country, 'events', locale, upcoming[0]?.image ?? past[0]?.image)
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
-      </PageHero>
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero} />
       <section className="iho-page-section">
         <SectionHeading label={`— ${tp('upcoming').toUpperCase()}`} />
         {upcoming.length ? upcoming.map(e => <EventRow key={e.slug} event={e} />) : <EmptyNote>{tp('empty')}</EmptyNote>}

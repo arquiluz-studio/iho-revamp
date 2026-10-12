@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { ContactSection } from '@/components/site/ContactSection'
-import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MONO, SANS } from '@/components/ui/tokens'
 import { heroDocumentTitle, resolveHomeRecord, resolvePageHero } from '@/lib/content/page-hero'
@@ -35,9 +36,8 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
 
   const hero = await resolvePageHero(country, 'contact', locale)
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero}>
         {channels.length > 0 && (
           <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap', marginTop: 32 }}>
             {channels.map(c => (
@@ -48,7 +48,7 @@ export default async function ContactPage({ params }: { params: Promise<SitePara
             ))}
           </div>
         )}
-      </PageHero>
+      </ContentHero>
       <ContactSection
         countryCode={country}
         offices={offices}

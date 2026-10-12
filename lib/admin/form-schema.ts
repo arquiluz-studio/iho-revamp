@@ -1,5 +1,6 @@
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
 import { z } from 'zod'
+import { CONTENT_PAGE_KEYS, type ContentPageKey } from '@/lib/content/static-pages'
 import { fieldColumns, type Field, type ResourceConfig } from './resources'
 
 /**
@@ -23,6 +24,26 @@ export const specSchema = z.object({
   value: z.string().trim().min(1, 'Requerido').max(200),
 })
 export type SpecValue = z.infer<typeof specSchema>
+
+const pageKeySchema = z.enum(CONTENT_PAGE_KEYS as unknown as [ContentPageKey, ...ContentPageKey[]], 'Elige una página')
+const ctaFields = {
+  style: z.enum(['red', 'outline', 'black']),
+  label_es: z.string().trim().min(1, 'Requerido').max(80),
+  label_en: z.string().trim().max(80),
+  open_in: z.enum(['self', 'blank']),
+}
+const URL_HREF = /^(https?:\/\/\S+|#\S+)$/
+
+export const ctaSchema = z.discriminatedUnion('kind', [
+  z.object({ ...ctaFields, kind: z.literal('page'), page: pageKeySchema, url: z.string().trim().max(500) }),
+  z.object({
+    ...ctaFields,
+    kind: z.literal('url'),
+    page: z.string(),
+    url: z.string().trim().regex(URL_HREF, 'Usa https:// o #ancla').max(500),
+  }),
+])
+export type CtaValue = z.infer<typeof ctaSchema>
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATETIME_LOCAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
@@ -75,6 +96,8 @@ function fieldSchema(field: Field, column: string, required: boolean): z.ZodType
       return z.array(statSchema).max(8)
     case 'specs':
       return z.array(specSchema).max(40)
+    case 'ctas':
+      return z.array(ctaSchema).max(2)
     default:
       return textSchema(field, required && column.endsWith('_en') === false)
   }
@@ -83,7 +106,7 @@ function fieldSchema(field: Field, column: string, required: boolean): z.ZodType
 export function buildSchema(config: ResourceConfig) {
   const shape: Record<string, z.ZodType> = {}
   for (const field of config.fields) {
-    if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs') {
+    if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs' || field.type === 'ctas') {
       shape[field.name] = fieldSchema(field, field.name, false)
       continue
     }
@@ -117,6 +140,17 @@ export function toRow(config: ResourceConfig, values: FormValues, fallbackTimezo
     }
     if (field.type === 'specs') {
       row[field.name] = ((values[field.name] as SpecValue[]) ?? []).map(s => ({ ...s, label_en: s.label_en || null }))
+      continue
+    }
+    if (field.type === 'ctas') {
+      row[field.name] = ((values[field.name] as CtaValue[]) ?? []).map(cta => ({
+        style: cta.style,
+        label_es: cta.label_es,
+        label_en: cta.label_en || null,
+        open_in: cta.open_in,
+        kind: cta.kind,
+        ...(cta.kind === 'page' ? { page: cta.page } : { url: cta.url }),
+      }))
       continue
     }
     for (const column of fieldColumns(field)) {
@@ -160,6 +194,19 @@ export function toFormValues(
     if (field.type === 'specs') {
       const specs = Array.isArray(row[field.name]) ? (row[field.name] as Record<string, unknown>[]) : []
       values[field.name] = specs.map(s => ({ label_es: String(s.label_es ?? ''), label_en: String(s.label_en ?? ''), value: String(s.value ?? '') }))
+      continue
+    }
+    if (field.type === 'ctas') {
+      const ctas = Array.isArray(row[field.name]) ? (row[field.name] as Record<string, unknown>[]) : []
+      values[field.name] = ctas.map(cta => ({
+        style: cta.style === 'outline' || cta.style === 'black' ? cta.style : 'red',
+        label_es: String(cta.label_es ?? ''),
+        label_en: String(cta.label_en ?? ''),
+        kind: cta.kind === 'url' ? 'url' : 'page',
+        page: typeof cta.page === 'string' && cta.page ? cta.page : 'contact',
+        url: String(cta.url ?? ''),
+        open_in: cta.open_in === 'blank' ? 'blank' : 'self',
+      }))
       continue
     }
     for (const column of fieldColumns(field)) {

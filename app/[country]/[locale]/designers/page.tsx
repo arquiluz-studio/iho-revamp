@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { DesignerCards, EmptyNote, HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { DesignerCards, EmptyNote, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
@@ -26,10 +27,8 @@ export default async function DesignersPage({ params }: { params: Promise<SitePa
   const born = (year: number) => tp('born', { year })
   const hero = await resolvePageHero(country, 'designers', locale)
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
-      </PageHero>
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero} />
       <section className="iho-page-section">
         {designers.length > 0 ? (
           <DesignerCards designers={designers.map(d => toDesignerCardVM(d, locale, paths, born))} />

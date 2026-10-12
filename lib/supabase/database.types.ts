@@ -444,6 +444,8 @@ export type Database = {
         Row: {
           country_code: string
           created_at: string
+          hero_ctas: Json
+          hero_enabled: boolean
           hero_extra_en: string | null
           hero_extra_es: string | null
           hero_eyebrow_en: string | null
@@ -459,6 +461,8 @@ export type Database = {
         Insert: {
           country_code: string
           created_at?: string
+          hero_ctas?: Json
+          hero_enabled?: boolean
           hero_extra_en?: string | null
           hero_extra_es?: string | null
           hero_eyebrow_en?: string | null
@@ -474,6 +478,8 @@ export type Database = {
         Update: {
           country_code?: string
           created_at?: string
+          hero_ctas?: Json
+          hero_enabled?: boolean
           hero_extra_en?: string | null
           hero_extra_es?: string | null
           hero_eyebrow_en?: string | null
@@ -508,6 +514,8 @@ export type Database = {
           contact_image_media_id: string | null
           country_code: string
           created_at: string
+          hero_ctas: Json
+          hero_enabled: boolean
           hero_eyebrow_en: string | null
           hero_eyebrow_es: string | null
           hero_image_media_id: string | null
@@ -526,6 +534,8 @@ export type Database = {
           contact_image_media_id?: string | null
           country_code: string
           created_at?: string
+          hero_ctas?: Json
+          hero_enabled?: boolean
           hero_eyebrow_en?: string | null
           hero_eyebrow_es?: string | null
           hero_image_media_id?: string | null
@@ -544,6 +554,8 @@ export type Database = {
           contact_image_media_id?: string | null
           country_code?: string
           created_at?: string
+          hero_ctas?: Json
+          hero_enabled?: boolean
           hero_eyebrow_en?: string | null
           hero_eyebrow_es?: string | null
           hero_image_media_id?: string | null
@@ -1688,6 +1700,8 @@ export type Database = {
         Row: {
           contact_image_media_id: string | null
           created_at: string
+          hero_ctas: Json
+          hero_enabled: boolean
           hero_extra_en: string | null
           hero_extra_es: string | null
           hero_eyebrow_en: string | null
@@ -1710,6 +1724,8 @@ export type Database = {
         Insert: {
           contact_image_media_id?: string | null
           created_at?: string
+          hero_ctas?: Json
+          hero_enabled?: boolean
           hero_extra_en?: string | null
           hero_extra_es?: string | null
           hero_eyebrow_en?: string | null
@@ -1732,6 +1748,8 @@ export type Database = {
         Update: {
           contact_image_media_id?: string | null
           created_at?: string
+          hero_ctas?: Json
+          hero_enabled?: boolean
           hero_extra_en?: string | null
           hero_extra_es?: string | null
           hero_eyebrow_en?: string | null

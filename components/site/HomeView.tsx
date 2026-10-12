@@ -7,6 +7,7 @@ import { Hero } from './Hero'
 import { ProductsSlider } from './ProductsSlider'
 import { ProjectsGrid } from './ProjectsGrid'
 import { SectorStrip } from './SectorStrip'
+import { solidHeader } from './solid-header'
 
 export type SiteChrome = {
   header: React.ReactNode
@@ -14,12 +15,16 @@ export type SiteChrome = {
   banner?: React.ReactNode
 }
 
-export function HomeView({ data, chrome, countryCode, solutionsHref, contactHref }: { data: HomeVM; chrome: SiteChrome; countryCode: string; solutionsHref: string; contactHref: string }) {
+export function HomeView({ data, chrome, countryCode, solutionsHref }: { data: HomeVM; chrome: SiteChrome; countryCode: string; solutionsHref: string }) {
   return (
     <div style={{ width: '100%', overflowX: 'hidden' }}>
       {chrome.banner}
-      {chrome.header}
-      <Hero eyebrow={data.hero.eyebrow} title={data.hero.title} subtitle={data.hero.subtitle} videoSrc={data.hero.videoSrc} poster={data.hero.poster} ctaHref={contactHref} />
+      {data.hero.enabled ? chrome.header : solidHeader(chrome.header)}
+      {data.hero.enabled ? (
+        <Hero eyebrow={data.hero.eyebrow} title={data.hero.title} subtitle={data.hero.subtitle} videoSrc={data.hero.videoSrc} poster={data.hero.poster} actions={data.hero.actions} />
+      ) : (
+        <div style={{ height: 88 }} />
+      )}
       <SectorStrip items={data.sectors} />
       <SolutionsGrid solutions={data.solutions} ctaHref={solutionsHref} background="#ffffff" />
       <BrandsWall brands={data.brands} />

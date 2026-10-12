@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { BrandLogos, Chips, HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { BrandLogos, Chips, PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
@@ -26,13 +27,12 @@ export default async function BrandsPage({ params }: { params: Promise<SiteParam
   ])
   const hero = await resolvePageHero(country, 'brands', locale)
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero}>
         <div style={{ marginTop: 32 }} className="iho-chips-dark">
           <Chips links={lines.map(l => ({ href: paths.solution(localSlug(l, locale)), label: t(l, 'name', locale) }))} />
         </div>
-      </PageHero>
+      </ContentHero>
       <section className="iho-page-section">
         <BrandLogos brands={brands.map(b => toBrandVM(b, locale, paths))} />
       </section>

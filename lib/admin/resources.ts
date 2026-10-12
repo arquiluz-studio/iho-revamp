@@ -25,6 +25,7 @@ export type Field =
   | (FieldBase & { type: 'media'; kind: MediaKind; video?: boolean })
   | (FieldBase & { type: 'stats' })
   | (FieldBase & { type: 'specs' })
+  | (FieldBase & { type: 'ctas' })
 
 export type ColumnFormat = 'text' | 'datetime' | 'status' | 'boolean' | 'number' | 'enum'
 export type Column = { key: string; label: string; format?: ColumnFormat; options?: Option[] }
@@ -333,6 +334,12 @@ const home: ResourceConfig = {
   section: 'settings',
   publicPath: '/',
   fields: [
+    {
+      name: 'hero_enabled',
+      label: 'Mostrar hero',
+      type: 'boolean',
+      help: 'Apagado, la página se publica sin hero. Si este contenido es el global, los países que lo usan quedan igual.',
+    },
     { name: 'hero_eyebrow', label: 'Hero · antetítulo', type: 'text', i18n: true, max: 120 },
     {
       name: 'hero_title',
@@ -349,6 +356,13 @@ const home: ResourceConfig = {
     { name: 'contact_image_media_id', label: 'Imagen de la sección de contacto', type: 'media', kind: 'generic' },
     { name: 'seo_title', label: 'SEO · título', type: 'text', i18n: true, max: 120 },
     { name: 'seo_description', label: 'SEO · descripción', type: 'textarea', i18n: true, max: 300, rows: 3 },
+    {
+      name: 'hero_ctas',
+      label: 'Botones',
+      type: 'ctas',
+      wide: true,
+      help: 'Hasta dos, uno al lado del otro. Si no agregas ninguno, el hero se publica sin botones.',
+    },
   ],
   columns: [],
   order: [],
@@ -367,6 +381,12 @@ const pages: ResourceConfig = {
   writeRole: 'admin',
   section: 'pages',
   fields: [
+    {
+      name: 'hero_enabled',
+      label: 'Mostrar hero',
+      type: 'boolean',
+      help: 'Apagado, la página se publica sin hero. Si este contenido es el global, los países que lo usan quedan igual.',
+    },
     { name: 'hero_eyebrow', label: 'Antetítulo', type: 'text', i18n: true, max: 120 },
     {
       name: 'hero_title',
@@ -388,6 +408,13 @@ const pages: ResourceConfig = {
       help: 'Segundo párrafo del hero. En Grupo IHO reemplaza el texto actual.',
     },
     { name: 'hero_image_media_id', label: 'Imagen de fondo', type: 'media', kind: 'hero' },
+    {
+      name: 'hero_ctas',
+      label: 'Botones',
+      type: 'ctas',
+      wide: true,
+      help: 'Hasta dos, uno al lado del otro. Si no agregas ninguno, el hero se publica sin botones.',
+    },
   ],
   columns: [],
   order: [],
@@ -718,8 +745,8 @@ export function fieldColumns(field: Field): string[] {
 export function emptyValues(config: ResourceConfig): Record<string, unknown> {
   const values: Record<string, unknown> = {}
   for (const field of config.fields) {
-    if (field.type === 'boolean') values[field.name] = ['is_active', 'is_published', 'registration_enabled', 'is_visible'].includes(field.name)
-    else if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs') values[field.name] = []
+    if (field.type === 'boolean') values[field.name] = ['is_active', 'is_published', 'registration_enabled', 'is_visible', 'hero_enabled'].includes(field.name)
+    else if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs' || field.type === 'ctas') values[field.name] = []
     else if (field.type === 'select') values[field.name] = field.required ? field.options[0]?.value ?? '' : ''
     else for (const column of fieldColumns(field)) values[column] = ''
   }

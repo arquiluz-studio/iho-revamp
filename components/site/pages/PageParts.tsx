@@ -1,15 +1,17 @@
 import { MediaImage } from '@/components/ui/MediaImage'
 import { RichText, SectionLabel } from '@/components/ui/Section'
 import { ACUMIN, MONO, SANS } from '@/components/ui/tokens'
-import type { BrandVM, DesignerCardVM, EventVM, ImageVM, NavLink, ProjectCardVM } from '@/lib/types/site'
+import type { BrandVM, DesignerCardVM, EventVM, HeroCtaVM, ImageVM, NavLink, ProjectCardVM } from '@/lib/types/site'
+import { HeroCtas } from '../HeroCtas'
 import type { SiteChrome } from '../HomeView'
+import { solidHeader } from '../solid-header'
 
-export function PageShell({ chrome, children }: { chrome: SiteChrome; children: React.ReactNode }) {
+export function PageShell({ chrome, children, hero = true }: { chrome: SiteChrome; children: React.ReactNode; hero?: boolean }) {
   return (
     <div style={{ width: '100%', overflowX: 'hidden', background: '#faf7f1' }}>
       {chrome.banner}
-      {chrome.header}
-      <main>{children}</main>
+      {hero ? chrome.header : solidHeader(chrome.header)}
+      <main style={hero ? undefined : { paddingTop: 28 }}>{children}</main>
       {chrome.footer}
     </div>
   )
@@ -20,12 +22,14 @@ export function PageHero({
   title,
   intro,
   image,
+  actions = [],
   children,
 }: {
   label: string
   title: string
   intro?: string
   image?: ImageVM | null
+  actions?: HeroCtaVM[]
   children?: React.ReactNode
 }) {
   return (
@@ -54,6 +58,7 @@ export function PageHero({
           </p>
         )}
         {children}
+        <HeroCtas actions={actions} marginTop={28} />
       </div>
     </section>
   )

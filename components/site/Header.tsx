@@ -14,6 +14,8 @@ type Props = {
   shop?: NavLink
   /** Fraction of the viewport height after which the header turns solid. */
   threshold?: number
+  /** Start solid. Used when the page has no dark hero behind the bar. */
+  solid?: boolean
   /** Extra controls (country / language switchers). */
   tools?: React.ReactNode
 }
@@ -26,7 +28,7 @@ export function Header(props: Props) {
   )
 }
 
-function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, tools }: Props) {
+function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, solid = false, tools }: Props) {
   const t = useTranslations('common')
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -69,7 +71,8 @@ function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, tools }: Prop
   }, [menuOpen])
 
   // While the panel slides back up the logo and button stay dark, so they never vanish against it.
-  const dark = scrolled || menuOpen || closing
+  const barSolid = solid || scrolled
+  const dark = barSolid || menuOpen || closing
   const navColor = dark ? '#2c2920' : '#ffffff'
   const toggleMenu = () => {
     if (menuOpen) setClosing(true)
@@ -82,7 +85,7 @@ function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, tools }: Prop
   }
 
   return (
-    <header data-solid={scrolled ? 'true' : 'false'} style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: scrolled ? '#faf7f1' : 'transparent', borderBottom: `1px solid ${dark ? 'rgba(20,18,12,0.08)' : 'rgba(255,255,255,0.14)'}`, transition: 'background 0.4s ease, border-color 0.4s ease' }}>
+    <header data-solid={barSolid ? 'true' : 'false'} style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: barSolid ? '#faf7f1' : 'transparent', borderBottom: `1px solid ${dark ? 'rgba(20,18,12,0.08)' : 'rgba(255,255,255,0.14)'}`, transition: 'background 0.4s ease, border-color 0.4s ease' }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <a href={logoHref}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

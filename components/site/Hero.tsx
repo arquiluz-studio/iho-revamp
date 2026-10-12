@@ -1,16 +1,17 @@
 import { useTranslations } from 'next-intl'
-import { ButtonArrow } from '@/components/ui/Arrow'
 import { RichText } from '@/components/ui/Section'
 import { ACUMIN, SANS } from '@/components/ui/tokens'
+import type { HeroCtaVM } from '@/lib/types/site'
+import { HeroCtas } from './HeroCtas'
 import { HeroVideo } from './HeroVideo'
 
-export function Hero({ eyebrow, title, subtitle, videoSrc, poster, ctaHref }: {
+export function Hero({ eyebrow, title, subtitle, videoSrc, poster, actions }: {
   eyebrow: string
   title: string
   subtitle?: string
   videoSrc: string | null
   poster?: string | null
-  ctaHref: string
+  actions: HeroCtaVM[]
 }) {
   const t = useTranslations('hero')
   return (
@@ -38,10 +39,7 @@ export function Hero({ eyebrow, title, subtitle, videoSrc, poster, ctaHref }: {
               <RichText text={subtitle} />
             </p>
           )}
-          <a href={ctaHref} className="iho-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#ef483d', color: '#fff', padding: '14px 26px', borderRadius: 32, fontFamily: '"Source Sans 3", sans-serif', fontWeight: 600, fontSize: 15, pointerEvents: 'auto', alignSelf: 'flex-start', textDecoration: 'none' }}>
-            {t('cta')}
-            <ButtonArrow />
-          </a>
+          <HeroCtas actions={actions} />
         </div>
       </div>
       <div style={{ position: 'absolute', bottom: 34, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, pointerEvents: 'none' }}>

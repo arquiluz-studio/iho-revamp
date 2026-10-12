@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
-import { HeroExtra, PageHero, PageShell } from '@/components/site/pages/PageParts'
+import { ContentHero } from '@/components/site/pages/ContentHero'
+import { PageShell } from '@/components/site/pages/PageParts'
 import { ProjectBrowser, type BrowserProject } from '@/components/site/ProjectBrowser'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { COUNTRIES, COUNTRY_CODES, crossCountryUrl, sortByCountry } from '@/config/countries'
@@ -54,10 +55,8 @@ export default async function ProjectsPage({ params }: { params: Promise<SitePar
   const hero = await resolvePageHero(country, 'projects', locale, projects.find(project => project.country === country)?.image ?? projects[0]?.image)
 
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={hero.label} title={hero.title} intro={hero.intro} image={hero.image}>
-        {hero.extra && <HeroExtra>{hero.extra}</HeroExtra>}
-      </PageHero>
+    <PageShell chrome={chrome} hero={hero.enabled}>
+      <ContentHero hero={hero} />
       <ProjectBrowser projects={projects} countries={countries} spaces={spaces} solutions={solutions} />
     </PageShell>
   )

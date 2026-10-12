@@ -108,10 +108,17 @@ export type DesignerCardVM = {
 
 export type StatVM = { value: number; prefix: string; suffix: string; label: string }
 
+export type HeroCtaVM = {
+  label: string
+  href: string
+  style: 'red' | 'outline' | 'black'
+  newWindow: boolean
+}
+
 export type MapCountryVM = { code: string; name: string; cities: string[]; isCurrent: boolean; hasSite: boolean }
 
 export type HomeVM = {
-  hero: { eyebrow: string; title: string; subtitle: string; videoSrc: string | null; poster?: string | null }
+  hero: { enabled: boolean; eyebrow: string; title: string; subtitle: string; videoSrc: string | null; poster?: string | null; actions: HeroCtaVM[] }
   sectors: string[]
   products: ProductCardVM[]
   events: EventVM[]
