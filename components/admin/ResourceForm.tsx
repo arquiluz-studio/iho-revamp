@@ -485,8 +485,8 @@ const CTA_KINDS: Option[] = [
   { value: 'url', label: 'URL' },
 ]
 const CTA_WINDOWS: Option[] = [
-  { value: 'self', label: 'Esta ventana' },
-  { value: 'blank', label: 'Nueva ventana' },
+  { value: 'self', label: 'La misma ventana' },
+  { value: 'blank', label: 'Una nueva ventana' },
 ]
 const CTA_PAGES: Option[] = CONTENT_PAGES.map(page => ({ value: page.key, label: page.label }))
 

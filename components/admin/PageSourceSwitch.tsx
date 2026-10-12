@@ -4,7 +4,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { setPageSource } from '@/app/admin/actions/page-source'
-import { Button, Notice, cn } from './ui'
+import { Notice, cn } from './ui'
+
+function Check({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={2.25} className={cn('size-4', className)} aria-hidden>
+      <path d="M4.5 10.5 8 14l7.5-8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
 
 export function PageSourceSwitch({
   countryCode,
@@ -44,24 +52,43 @@ export function PageSourceSwitch({
               [true, 'Global'],
               [false, 'De este país'],
             ] as const
-          ).map(([global, label]) => (
-            <Link
-              key={label}
-              href={`/admin/content/${pageKey}?fuente=${global ? 'global' : 'pais'}`}
-              className={cn(
-                'inline-flex h-9 items-center gap-2 px-3',
-                viewingGlobal === global ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-700 hover:bg-zinc-50',
-              )}
-              aria-current={viewingGlobal === global ? 'page' : undefined}
-            >
-              {label}
-              {usesGlobal === global && <span className={cn('text-[10px] font-medium uppercase tracking-wide', viewingGlobal === global ? 'text-zinc-300' : 'text-zinc-400')}>En uso</span>}
-            </Link>
-          ))}
+          ).map(([global, label]) => {
+            const live = usesGlobal === global
+            const open = viewingGlobal === global
+            return (
+              <Link
+                key={label}
+                href={`/admin/content/${pageKey}?fuente=${global ? 'global' : 'pais'}`}
+                className={cn(
+                  'inline-flex h-9 items-center gap-2 px-3',
+                  open ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-700 hover:bg-zinc-50',
+                )}
+                aria-current={open ? 'page' : undefined}
+                aria-label={live ? `${label}, en uso` : label}
+              >
+                {live && (
+                  <span className={cn('size-2 shrink-0 rounded-full', open ? 'bg-emerald-400' : 'bg-emerald-500')} aria-hidden />
+                )}
+                {label}
+              </Link>
+            )
+          })}
         </div>
-        <Button size="sm" className="h-9" disabled={viewingIsLive || pending} onClick={activate}>
-          {viewingIsLive ? 'En uso' : 'Activar'}
-        </Button>
+        <button
+          type="button"
+          className={cn(
+            'inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors',
+            viewingIsLive
+              ? 'cursor-default bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/15'
+              : 'bg-zinc-900 text-white hover:bg-zinc-800 disabled:bg-zinc-400',
+          )}
+          disabled={viewingIsLive || pending}
+          aria-pressed={viewingIsLive}
+          onClick={activate}
+        >
+          {viewingIsLive ? <Check className="text-emerald-600" /> : <span className="size-4 rounded-full border border-white/50" aria-hidden />}
+          {pending ? 'Activando…' : 'Activar'}
+        </button>
       </div>
       <p className="mt-2 text-xs text-zinc-500">
         {viewingIsLive ? 'Esta versión es la que se publica.' : 'Estás viendo esta versión. Actívala para publicarla.'}

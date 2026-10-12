@@ -19,6 +19,34 @@ const HOME_FIELDS = [
   ['SEO · descripción', 'seo_description_es', 'seo_description_en'],
 ] as const
 
+const STYLE_LABEL: Record<string, string> = { red: 'Rojo', outline: 'Contorno blanco', black: 'Negro' }
+
+function previewCtas(raw: unknown) {
+  if (!Array.isArray(raw)) return []
+  return raw.flatMap(item => {
+    if (!item || typeof item !== 'object') return []
+    const row = item as Record<string, unknown>
+    const labelEs = typeof row.label_es === 'string' ? row.label_es.trim() : ''
+    const labelEn = typeof row.label_en === 'string' ? row.label_en.trim() : ''
+    if (!labelEs && !labelEn) return []
+    const destination =
+      row.kind === 'page' && typeof row.page === 'string'
+        ? (contentPage(row.page)?.label ?? row.page)
+        : typeof row.url === 'string'
+          ? row.url
+          : ''
+    return [
+      {
+        labelEs,
+        labelEn,
+        style: STYLE_LABEL[String(row.style)] ?? 'Rojo',
+        destination,
+        window: row.open_in === 'blank' ? 'Nueva ventana' : 'La misma ventana',
+      },
+    ]
+  })
+}
+
 /** Read-only view of the global hero a country is currently publishing. */
 export async function GlobalHeroPreview({ pageKey }: { pageKey: ContentPageKey }) {
   const page = contentPage(pageKey)
@@ -31,12 +59,14 @@ export async function GlobalHeroPreview({ pageKey }: { pageKey: ContentPageKey }
   if (pageKey === 'home' && data?.hero_video_media_id) images.push({ label: 'Video', id: data.hero_video_media_id })
   if (data?.hero_image_media_id) images.push({ label: 'Imagen', id: data.hero_image_media_id })
   if (pageKey === 'home' && data?.contact_image_media_id) images.push({ label: 'Imagen de contacto', id: data.contact_image_media_id })
+  const ctas = previewCtas(data?.hero_ctas)
+  const empty = !data || (filled.length === 0 && images.length === 0 && ctas.length === 0)
 
   return (
     <>
       <PageHeader title={page?.label ?? 'Página'} description="Contenido global en solo lectura. Se edita en Contenido - Global." />
       {data?.hero_enabled === false && <Notice>El hero está apagado. Los países que publican este contenido tampoco lo muestran.</Notice>}
-      {!data || (filled.length === 0 && images.length === 0) ? (
+      {empty ? (
         <Notice>El contenido global de esta página está vacío.</Notice>
       ) : (
         <Card className="space-y-5 p-5">
@@ -47,6 +77,24 @@ export async function GlobalHeroPreview({ pageKey }: { pageKey: ContentPageKey }
               {data[en] && <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-500">{data[en]}</p>}
             </div>
           ))}
+          <div>
+            <p className="text-xs font-medium text-zinc-500">Botones</p>
+            {ctas.length === 0 ? (
+              <p className="mt-1 text-sm text-zinc-500">Ninguno</p>
+            ) : (
+              <ul className="mt-2 space-y-2">
+                {ctas.map((cta, index) => (
+                  <li key={index} className="text-sm text-zinc-900">
+                    <p>{cta.labelEs || cta.labelEn}</p>
+                    {cta.labelEn && cta.labelEs && <p className="text-zinc-500">{cta.labelEn}</p>}
+                    <p className="text-zinc-500">
+                      {[cta.style, cta.destination, cta.window].filter(Boolean).join(' · ')}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           {images.length > 0 && (
             <div className="flex flex-wrap gap-4">
               {images.map(({ label, id }) => (
