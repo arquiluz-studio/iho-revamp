@@ -1,6 +1,7 @@
 import 'server-only'
 import type { AppLocale } from '@/config/countries'
 import { cacheTags } from '@/lib/cache-tags'
+import { isPastDate } from '@/lib/dates'
 import { pickBySlug, SLUG_PATTERN } from '@/lib/i18n-fields'
 import { cachedQuery, media, must, visibleStatuses } from './core'
 
@@ -38,7 +39,13 @@ function eventsBySlug(country: string, slug: string) {
           brands:event_brands(brand:brands(id, slug, name, logo_is_thin, is_active, logo:${media('brands_logo_media_id_fkey')})),
           designers:event_designers(designer:designers(id, slug, name, is_active, nationality_es, nationality_en, birth_year, death_year,
             portrait:${media('designers_portrait_media_id_fkey')})),
-          products:event_products(sort, product_id)` as const,
+          products:event_products(sort, product_id),
+          previous_editions:event_previous_editions!event_previous_editions_event_id_fkey(
+            previous_event:events!event_previous_editions_previous_event_id_fkey(
+              id, slug, slug_en, title_es, title_en, starts_at, ends_at, timezone, status,
+              cover:${media('events_cover_media_id_fkey')}
+            )
+          )` as const,
         )
         .eq('country_code', country)
         .or(`slug.eq.${slug},slug_en.eq.${slug}`)
@@ -47,15 +54,26 @@ function eventsBySlug(country: string, slug: string) {
       'event',
     )
     const bySort = (a: { sort: number }, b: { sort: number }) => a.sort - b.sort
-    return rows.map(event => ({
-      ...event,
-      agenda: [...event.agenda].sort(bySort),
-      gallery: [...event.gallery].sort(bySort),
-      products: [...event.products].sort(bySort),
-      designers: event.designers
-        .flatMap(d => (d.designer?.is_active ? [d.designer] : []))
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    }))
+    const visible = new Set<string>(visibleStatuses(draft))
+    return rows.map(event => {
+      const { previous_editions: links, ...rest } = event
+      return {
+        ...rest,
+        agenda: [...event.agenda].sort(bySort),
+        gallery: [...event.gallery].sort(bySort),
+        products: [...event.products].sort(bySort),
+        designers: event.designers
+          .flatMap(d => (d.designer?.is_active ? [d.designer] : []))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+        previousEditions: links
+          .flatMap(link => {
+            const previous = link.previous_event
+            if (!previous || !visible.has(previous.status) || !isPastDate(previous.ends_at ?? previous.starts_at)) return []
+            return [previous]
+          })
+          .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime()),
+      }
+    })
   })
 }
 

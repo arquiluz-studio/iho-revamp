@@ -12,9 +12,11 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { AgendaEditor } from './AgendaEditor'
 import { ProductExtras } from './catalog/CatalogExtras'
 import { formatDateTime } from '@/lib/admin/format'
+import { isPastDate } from '@/lib/dates'
 import { DataTable } from './DataTable'
 import { EventsCalendar, type CalendarParams } from './EventsCalendar'
 import { GalleryEditor, type GalleryItem } from './GalleryEditor'
+import { PreviousEditionsEditor, type PreviousEditionOption } from './PreviousEditionsEditor'
 import { ResourceForm } from './ResourceForm'
 import { ButtonLink, Notice, PageHeader, cn } from './ui'
 
@@ -264,9 +266,41 @@ async function ContentExtras({
         )
       : null
 
+  let previousEditions: { options: PreviousEditionOption[]; ids: string[] } | null = null
+  if (owner === 'event') {
+    const [{ data: events }, { data: links }] = await Promise.all([
+      supabase
+        .from('events')
+        .select(`id, title_es, starts_at, ends_at, timezone, status, cover:media_assets!events_cover_media_id_fkey(${ADMIN_MEDIA_SELECT})`)
+        .eq('country_code', countryCode)
+        .neq('id', id),
+      supabase.from('event_previous_editions').select('previous_event_id').eq('event_id', id),
+    ])
+    const options = (events ?? []).map(event => {
+      const cover = event.cover
+      return {
+        id: event.id,
+        title: event.title_es,
+        startsAt: event.starts_at,
+        when: formatDateTime(event.starts_at, event.timezone, false),
+        status: event.status,
+        thumbUrl: cover ? toAdminMedia(cover).thumbUrl : null,
+        past: isPastDate(event.ends_at ?? event.starts_at),
+      }
+    })
+    const known = new Set(options.map(option => option.id))
+    previousEditions = {
+      options,
+      ids: (links ?? []).map(link => link.previous_event_id).filter(eventId => known.has(eventId)),
+    }
+  }
+
   return (
     <>
       {agenda && <AgendaEditor eventId={id} initialItems={agenda} canEdit={canEdit} />}
+      {previousEditions && (
+        <PreviousEditionsEditor eventId={id} options={previousEditions.options} initialIds={previousEditions.ids} canEdit={canEdit} />
+      )}
       <GalleryEditor owner={owner} ownerId={id} countryCode={countryCode} initialItems={gallery} initialCoverId={coverId} canEdit={canEdit} />
     </>
   )

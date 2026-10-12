@@ -331,10 +331,18 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
   const body = t(event, 'body', locale) || t(event, 'summary', locale)
   const venueParts = event.is_online ? [labels.online, event.venue_name] : [event.venue_name, event.address]
   const place = event.is_online ? labels.online.toUpperCase() : `${(event.city ?? '').toUpperCase() || countryName.toUpperCase()}, ${countryName.toUpperCase()}`
-  const legacyGallery = legacyMedia.eventCover(event.slug) ? legacyMedia.eventGallery() : []
-  const gallery = event.gallery.length
-    ? event.gallery.flatMap(g => (g.media ? [imageOf(g.media, locale, base.title, null, 'lg')] : []))
-    : legacyGallery.map((src, i) => ({ src, alt: `${base.title} ${i + 1}` }))
+  const gallery = event.gallery.flatMap(g => (g.media ? [imageOf(g.media, locale, base.title, null, 'lg')] : []))
+  const previousEditions = base.isPast
+    ? []
+    : event.previousEditions.map(previous => {
+        const title = t(previous, 'title', locale)
+        return {
+          href: paths.event(localSlug(previous, locale)),
+          title,
+          image: imageOf(previous.cover, locale, title, legacyMedia.eventCover(previous.slug), 'md'),
+          meta: `${dayOfMonth(previous.starts_at, previous.timezone)} ${shortMonth(previous.starts_at, previous.timezone, locale as Locale)}`,
+        }
+      })
   const enabled = event.registration_enabled && event.access_type !== 'invite_only'
   const closed = new Date(event.registration_closes_at ?? event.starts_at) < new Date()
   const url = String(buildAlternates({ href: { pathname: '/events/[slug]', params: { slug: localSlug(event, locale) } }, country, locale, availableIn: [country] }).canonical)
@@ -350,6 +358,7 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
     description: paragraphs(body),
     agenda: event.agenda.map((a, i) => ({ num: a.time_label || String(i + 1).padStart(2, '0'), text: t(a, 'text', locale) })),
     gallery,
+    previousEditions,
     brands: event.brands.flatMap(b => (b.brand && b.brand.is_active ? [toBrandVM(b.brand, locale, paths)] : [])),
     designers: event.designers.map(d => toDesignerCardVM(d, locale, paths, year => td('born', { year }))),
     products: eventProducts(event, catalog).map(p => toProductCardVM(p, locale, country, paths)),

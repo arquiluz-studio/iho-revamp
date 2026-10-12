@@ -125,3 +125,42 @@ export async function saveAgenda(eventId: string, rawItems: z.input<typeof agend
   revalidateTags(ownerTags('event', eventId, country))
   return { ok: true }
 }
+
+/** Replaces the past events shown as previous editions. Order is the events' own dates, not this list. */
+export async function savePreviousEditions(eventId: string, rawIds: string[]): Promise<ActionResult> {
+  const session = await getAdminSession()
+  if (!session) return EXPIRED
+  const ids = z.array(z.uuid()).max(50).safeParse(rawIds)
+  if (!ids.success || !z.uuid().safeParse(eventId).success || new Set(ids.data).size !== ids.data.length) {
+    return { ok: false, error: 'Datos inválidos.' }
+  }
+  if (ids.data.includes(eventId)) return { ok: false, error: 'Un evento no puede ser edición anterior de sí mismo.' }
+  const country = await ownerCountry('event', eventId)
+  if (!country || !hasRole(session, country, 'editor')) return FORBIDDEN
+
+  const supabase = await createSupabaseServerClient()
+  if (ids.data.length) {
+    const { data: rows, error } = await supabase.from('events').select('id, country_code, starts_at, ends_at').in('id', ids.data)
+    if (error) return dbError(error)
+    const now = Date.now()
+    const allowed = new Set(
+      (rows ?? [])
+        .filter(row => row.country_code === country && new Date(row.ends_at ?? row.starts_at).getTime() < now)
+        .map(row => row.id),
+    )
+    if (ids.data.some(id => !allowed.has(id))) {
+      return { ok: false, error: 'Solo se pueden elegir eventos de este país que ya ocurrieron.' }
+    }
+  }
+
+  const removed = await supabase.from('event_previous_editions').delete().eq('event_id', eventId)
+  if (removed.error) return dbError(removed.error)
+  if (ids.data.length) {
+    const added = await supabase
+      .from('event_previous_editions')
+      .insert(ids.data.map(previousEventId => ({ event_id: eventId, previous_event_id: previousEventId })))
+    if (added.error) return dbError(added.error)
+  }
+  revalidateTags(ownerTags('event', eventId, country))
+  return { ok: true }
+}

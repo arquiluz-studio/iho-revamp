@@ -38,6 +38,8 @@ export type EventDetailVM = EventVM & {
   description: string[]
   agenda: { num: string; text: string }[]
   gallery: ImageVM[]
+  /** Past events linked from an upcoming event, newest first. Empty hides the section. */
+  previousEditions: { href: string; title: string; image: ImageVM; meta: string }[]
   brands: BrandVM[]
   designers: DesignerCardVM[]
   products: ProductCardVM[]

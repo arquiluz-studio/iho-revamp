@@ -73,6 +73,32 @@ export function EventProducts({ products }: { products: ProductCardVM[] }) {
   )
 }
 
+export function EventPreviousEditions({ editions }: { editions: { href: string; title: string; image: ImageVM; meta: string }[] }) {
+  const t = useTranslations('event.gallery')
+  if (editions.length === 0) return null
+  return (
+    <section id="ediciones" style={{ background: '#f1ece3', padding: '88px 40px' }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+        <div style={{ marginBottom: 44 }}>
+          <div style={labelStyle}>{t('label')}</div>
+          <h2 style={titleStyle}><RichText text={t('title')} /></h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }} className="iho-galeria-grid">
+          {editions.map(edition => (
+            <a key={edition.href} href={edition.href} className="iho-prod-card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ aspectRatio: '1/1', borderRadius: 4, overflow: 'hidden', background: '#e7e2d8' }}>
+                <MediaImage image={edition.image} alt={edition.title} sizes="(max-width: 768px) 50vw, 300px" className="iho-gallery-img" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.6s cubic-bezier(0.2,0,0.2,1)' }} />
+              </div>
+              <div style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 20, lineHeight: 1, textTransform: 'uppercase', color: '#17150f', marginTop: 14 }}>{edition.title}</div>
+              {edition.meta && <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '1.2px', color: '#8a8478', marginTop: 6 }}>{edition.meta}</div>}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export function EventGallery({ images, past }: { images: ImageVM[]; past: boolean }) {
   const t = useTranslations('event.gallery')
   if (images.length === 0) return null

@@ -804,6 +804,36 @@ export type Database = {
           },
         ]
       }
+      event_previous_editions: {
+        Row: {
+          event_id: string
+          previous_event_id: string
+        }
+        Insert: {
+          event_id: string
+          previous_event_id: string
+        }
+        Update: {
+          event_id?: string
+          previous_event_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_previous_editions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_previous_editions_previous_event_id_fkey"
+            columns: ["previous_event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_products: {
         Row: {
           event_id: string

@@ -3,7 +3,7 @@ import type { SiteChrome } from '../HomeView'
 import { EventHero } from './EventHero'
 import { EventAbout, EventFacts } from './EventInfo'
 import { EventRegistration, type RegistrationResult } from './EventRegistration'
-import { EventBrands, EventCta, EventDesigners, EventGallery, EventProducts } from './EventShowcase'
+import { EventBrands, EventCta, EventDesigners, EventGallery, EventPreviousEditions, EventProducts } from './EventShowcase'
 
 type Props = {
   event: EventDetailVM
@@ -28,7 +28,7 @@ export function EventView({ event, chrome, contactHref, privacyHref, register }:
       <EventBrands brands={event.brands} />
       <EventDesigners designers={event.designers} />
       <EventProducts products={event.products} />
-      <EventGallery images={event.gallery} past={event.isPast} />
+      {event.isPast ? <EventGallery images={event.gallery} past /> : <EventPreviousEditions editions={event.previousEditions} />}
       <EventCta href={contactHref} />
       {event.jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(event.jsonLd).replace(/</g, '\\u003c') }} />}
       {chrome.footer}

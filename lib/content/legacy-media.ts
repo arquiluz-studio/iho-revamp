@@ -72,7 +72,6 @@ export const legacyMedia = {
   teamPhoto: (fullName: string) => (LEGACY_TEAM_FILES[fullName] ? url(`images/equipo/${LEGACY_TEAM_FILES[fullName]}.png`) : null),
   projectCover: (slug: string) => (LEGACY_PROJECT_SLUGS.includes(slug) ? url(`images/proyectos/proyecto-${slug}.webp`) : null),
   eventCover: (slug: string) => (LEGACY_EVENT_COVERS[slug] ? url(`images/eventos/${LEGACY_EVENT_COVERS[slug]}.webp`) : null),
-  eventGallery: () => LEGACY_EVENT_GALLERY.map(url),
   businessLineCover: (slug: string) => (LEGACY_BUSINESS_LINE_COVERS[slug] ? url(`images/areas/${LEGACY_BUSINESS_LINE_COVERS[slug]}.webp`) : null),
   productCover: (slug: string) => {
     const product = LEGACY_PRODUCTS.find(p => p.slug === slug)

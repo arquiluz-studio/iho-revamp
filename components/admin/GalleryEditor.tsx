@@ -95,7 +95,7 @@ export function GalleryEditor({
             ? 'Arrastra para ordenar. La estrella marca la portada. "Descargable" permite bajar la foto en alta resolución tras dejar sus datos.'
             : hasCover
               ? 'Arrastra para ordenar. La estrella marca la foto principal.'
-              : 'Arrastra para ordenar. La portada del evento se elige en el formulario.'
+              : 'Estas fotos se publican como «Así se vivió» cuando el evento ya pasó. La portada se elige en el formulario.'
         }
         actions={
           canEdit && (
