@@ -6,14 +6,6 @@ import { useState, useTransition } from 'react'
 import { setPageSource } from '@/app/admin/actions/page-source'
 import { Notice, cn } from './ui'
 
-function Check({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={2.25} className={cn('size-4', className)} aria-hidden>
-      <path d="M4.5 10.5 8 14l7.5-8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
 export function PageSourceSwitch({
   countryCode,
   pageKey,
@@ -74,21 +66,33 @@ export function PageSourceSwitch({
             )
           })}
         </div>
-        <button
-          type="button"
-          className={cn(
-            'inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors',
-            viewingIsLive
-              ? 'cursor-default bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/15'
-              : 'bg-zinc-900 text-white hover:bg-zinc-800 disabled:bg-zinc-400',
-          )}
-          disabled={viewingIsLive || pending}
-          aria-pressed={viewingIsLive}
-          onClick={activate}
-        >
-          {viewingIsLive ? <Check className="text-emerald-600" /> : <span className="size-4 rounded-full border border-white/50" aria-hidden />}
-          {pending ? 'Activando…' : 'Activar'}
-        </button>
+        <div className="flex items-center gap-3">
+          <span className={cn('text-sm', viewingIsLive ? 'font-medium text-emerald-700' : 'text-zinc-600')}>
+            {pending ? 'Activando…' : viewingIsLive ? 'Activo' : 'Activar'}
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={viewingIsLive}
+            aria-label={viewingIsLive ? 'Esta versión está activa' : 'Activar esta versión'}
+            disabled={pending}
+            onClick={activate}
+            className={cn(
+              'relative h-[30px] w-[52px] shrink-0 rounded-full transition-colors duration-200',
+              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900',
+              viewingIsLive ? 'bg-emerald-500' : 'bg-zinc-300 hover:bg-zinc-400',
+              pending && 'opacity-60',
+            )}
+          >
+            <span
+              aria-hidden
+              className={cn(
+                'absolute top-[3px] left-[3px] size-6 rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.2)] transition-transform duration-200',
+                viewingIsLive && 'translate-x-[22px]',
+              )}
+            />
+          </button>
+        </div>
       </div>
       <p className="mt-2 text-xs text-zinc-500">
         {viewingIsLive ? 'Esta versión es la que se publica.' : 'Estás viendo esta versión. Actívala para publicarla.'}
