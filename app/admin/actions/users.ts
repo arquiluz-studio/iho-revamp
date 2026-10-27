@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { mayDeleteUser } from '@/lib/admin/delete-user'
 import { adminOrigin } from '@/lib/admin/origin'
 import { getAdminSession, hasRole } from '@/lib/admin/session'
 import { createSupabaseAdminClient, hasServiceRole } from '@/lib/supabase/admin'
@@ -101,6 +102,29 @@ export async function setGlobalRole(userId: string, role: string | null): Promis
   const { data, error } = await supabase.from('profiles').update({ global_role: parsed.data }).eq('id', userId).select('id').maybeSingle()
   if (error) return dbError(error)
   return data ? { ok: true } : FORBIDDEN
+}
+
+/** Removes the auth account. The profile and country roles cascade. The signed-in account cannot be deleted. */
+export async function deleteUser(userId: string): Promise<ActionResult> {
+  const session = await getAdminSession()
+  if (!session) return EXPIRED
+  if (!z.uuid().safeParse(userId).success) return { ok: false, error: 'Usuario inválido.' }
+  if (userId === session.userId) return { ok: false, error: 'No puedes eliminar tu propia cuenta.' }
+  if (!hasServiceRole()) return { ok: false, error: 'Falta SUPABASE_SERVICE_ROLE_KEY en el servidor para eliminar cuentas.' }
+
+  const admin = createSupabaseAdminClient()
+  const [{ data: profile, error: profileError }, { data: roles, error: rolesError }] = await Promise.all([
+    admin.from('profiles').select('id, global_role').eq('id', userId).maybeSingle(),
+    admin.from('user_country_roles').select('country_code').eq('user_id', userId),
+  ])
+  if (profileError) return dbError(profileError)
+  if (rolesError) return dbError(rolesError)
+  if (!profile) return { ok: false, error: 'Ese usuario ya no existe.' }
+  if (!mayDeleteUser(session, { id: profile.id, globalRole: profile.global_role, countryCodes: (roles ?? []).map(role => role.country_code) })) return FORBIDDEN
+
+  const { error } = await admin.auth.admin.deleteUser(userId)
+  if (error) return { ok: false, error: `No se pudo eliminar la cuenta: ${error.message}` }
+  return { ok: true }
 }
 
 export async function setUserActive(userId: string, isActive: boolean): Promise<ActionResult> {

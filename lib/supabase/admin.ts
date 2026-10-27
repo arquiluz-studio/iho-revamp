@@ -4,8 +4,8 @@ import type { Database } from './database.types'
 import { SUPABASE_URL } from './env'
 
 /**
- * Service-role client. Bypasses RLS: only for user invitations, validated public
- * form inserts and the media pipeline. Never import from client components.
+ * Service-role client. Bypasses RLS: only for user invitations and account deletion,
+ * validated public form inserts and the media pipeline. Never import from client components.
  */
 export function createSupabaseAdminClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY

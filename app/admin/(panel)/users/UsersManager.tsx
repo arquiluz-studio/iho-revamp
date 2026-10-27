@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
-import { inviteUser, setCountryRole, setGlobalRole, setUserActive } from '@/app/admin/actions/users'
+import { deleteUser, inviteUser, setCountryRole, setGlobalRole, setUserActive } from '@/app/admin/actions/users'
 import { Dropdown } from '@/components/admin/Dropdown'
 import { Badge, Button, Card, CardHeader, Checkbox, FieldShell, Input, Notice } from '@/components/admin/ui'
 import { GLOBAL_ROLE_LABELS, ROLE_LABELS, type CountryRole, type GlobalRole } from '@/lib/admin/roles'
@@ -14,6 +14,7 @@ export type StaffUser = {
   globalRole: GlobalRole | null
   isActive: boolean
   roles: Record<string, CountryRole>
+  canDelete: boolean
 }
 
 const ROLE_OPTIONS = (Object.keys(ROLE_LABELS) as CountryRole[]).map(r => ({ value: r, label: ROLE_LABELS[r] }))
@@ -140,6 +141,7 @@ export function UsersManager({
               {showOtherCountries && <th className="px-4 py-2.5 font-medium">Otros países</th>}
               {isSuperAdmin && <th className="px-4 py-2.5 font-medium">Rol global</th>}
               {isSuperAdmin && <th className="px-4 py-2.5 font-medium">Activo</th>}
+              <th className="px-4 py-2.5 font-medium"><span className="sr-only">Eliminar</span></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
@@ -206,6 +208,21 @@ export function UsersManager({
                       />
                     </td>
                   )}
+                  <td className="px-4 py-2.5 text-right">
+                    {user.canDelete && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        disabled={pending}
+                        onClick={() => {
+                          if (!confirm(`¿Eliminar la cuenta de ${user.email}? Esta persona ya no podrá entrar al panel.`)) return
+                          run(() => deleteUser(user.id), 'Cuenta eliminada.')
+                        }}
+                      >
+                        Eliminar
+                      </Button>
+                    )}
+                  </td>
                 </tr>
               )
             })}
