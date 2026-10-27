@@ -374,6 +374,7 @@ export type Database = {
           brand_id: string
           country_code: string
           is_exclusive: boolean
+          is_featured: boolean
           is_visible: boolean
           sort: number
         }
@@ -381,6 +382,7 @@ export type Database = {
           brand_id: string
           country_code: string
           is_exclusive?: boolean
+          is_featured?: boolean
           is_visible?: boolean
           sort?: number
         }
@@ -388,6 +390,7 @@ export type Database = {
           brand_id?: string
           country_code?: string
           is_exclusive?: boolean
+          is_featured?: boolean
           is_visible?: boolean
           sort?: number
         }
@@ -1522,14 +1525,17 @@ export type Database = {
       project_business_lines: {
         Row: {
           business_line_id: string
+          is_featured: boolean
           project_id: string
         }
         Insert: {
           business_line_id: string
+          is_featured?: boolean
           project_id: string
         }
         Update: {
           business_line_id?: string
+          is_featured?: boolean
           project_id?: string
         }
         Relationships: [

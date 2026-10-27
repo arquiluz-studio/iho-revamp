@@ -7,6 +7,7 @@ const COLS = 4
 
 export function BrandsWall({ brands }: { brands: BrandVM[] }) {
   const t = useTranslations('home.brands')
+  if (brands.length === 0) return null
   const lastRowStart = brands.length - (brands.length % COLS || COLS)
   return (
     <section id="marcas" style={{ background: '#f1ece3' }}>

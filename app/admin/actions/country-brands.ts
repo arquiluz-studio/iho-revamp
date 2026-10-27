@@ -10,6 +10,7 @@ const rowSchema = z.object({
   brandId: z.uuid(),
   isVisible: z.boolean(),
   isExclusive: z.boolean(),
+  isFeatured: z.boolean(),
   sort: z.number().int().min(0).max(10000),
 })
 
@@ -28,6 +29,7 @@ export async function saveCountryBrands(countryCode: string, rows: z.input<typeo
       brand_id: r.brandId,
       is_visible: r.isVisible,
       is_exclusive: r.isExclusive,
+      is_featured: r.isVisible && r.isFeatured,
       sort: r.sort,
     })),
     { onConflict: 'country_code,brand_id' },

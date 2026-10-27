@@ -48,8 +48,8 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
   ])
   const name = t(line, 'name', locale)
   const hero = imageOf(line.cover, locale, name, legacyMedia.businessLineCover(line.slug), 'lg')
-  const ordered = [...projects].sort((a, b) => Number(b.is_featured) - Number(a.is_featured))
-  const photos = ordered.flatMap(project => {
+  const featured = projects.filter(project => project.business_lines.some(link => link.business_line?.slug === line.slug && link.is_featured))
+  const photos = projects.flatMap(project => {
     const title = t(project, 'title', locale)
     const image = imageOrNull(project.cover, locale, title, legacyMedia.projectCover(project.slug), 'lg')
     return image ? [image] : []
@@ -68,7 +68,7 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
         hero={hero}
         statementImage={photos[0] ?? hero}
         includes={includes}
-        projects={ordered.slice(0, 4).map(project => {
+        projects={featured.slice(0, 4).map(project => {
           const title = t(project, 'title', locale)
           return {
             key: project.id,

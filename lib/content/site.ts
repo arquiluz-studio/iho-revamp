@@ -239,7 +239,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
         href: paths.solution(localSlug(b, locale)),
       }),
     ),
-    brands: brands.map(b => toBrandVM(b, locale, paths)),
+    brands: brands.filter(b => b.is_featured).map(b => toBrandVM(b, locale, paths)),
     projects: projects.map(p => toProjectCardVM(p, locale, paths)),
     offices,
     contactImage: imageOrNull(homeSource?.contact_image, locale, tr('contact.imageAlt'), null, 'md'),

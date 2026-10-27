@@ -8,7 +8,7 @@ import { cachedQuery, media, must, visibleStatuses } from './core'
 const PROJECT_LIST_SELECT = `id, slug, slug_en, title_es, title_en, summary_es, summary_en, client_name, city, year, is_featured, sort, published_at,
   cover:${media('projects_cover_media_id_fkey')},
   sector:sectors(id, slug, slug_en, name_es, name_en),
-  business_lines:project_business_lines(business_line:business_lines(id, slug, slug_en, name_es, name_en)),
+  business_lines:project_business_lines(is_featured, business_line:business_lines(id, slug, slug_en, name_es, name_en)),
   brands:project_brands(brand_id)` as const
 
 export type ProjectFilters = { featured?: boolean; sector?: string; businessLine?: string; brandId?: string }
@@ -43,7 +43,7 @@ function projectsBySlug(country: string, slug: string) {
         .select(
           `*, cover:${media('projects_cover_media_id_fkey')},
           sector:sectors(id, slug, slug_en, name_es, name_en),
-          business_lines:project_business_lines(business_line:business_lines(id, slug, slug_en, name_es, name_en)),
+          business_lines:project_business_lines(is_featured, business_line:business_lines(id, slug, slug_en, name_es, name_en)),
           brands:project_brands(brand:brands(id, slug, name, logo_is_thin, is_active, logo:${media('brands_logo_media_id_fkey')})),
           gallery:project_media(sort, caption_es, caption_en, media:media_assets!project_media_media_id_fkey(${MEDIA_SELECT}, is_downloadable))` as const,
         )

@@ -77,11 +77,22 @@ export async function saveResource(
   for (const field of config.fields) {
     if (field.type !== 'multi') continue
     const { table: bridge, selfKey, otherKey } = field.through
+    const featuredByLine = new Map<string, boolean>()
+    if (bridge === 'project_business_lines') {
+      const { data } = await supabase.from('project_business_lines').select('business_line_id, is_featured').eq('project_id', savedId)
+      for (const link of data ?? []) featuredByLine.set(link.business_line_id, link.is_featured)
+    }
     const removed = await untypedFrom(supabase, bridge).delete().eq(selfKey, savedId)
     if (removed.error) return dbError(removed.error)
     const ids = bridges[field.name] ?? []
     if (ids.length) {
-      const added = await untypedFrom(supabase, bridge).insert(ids.map(other => ({ [selfKey]: savedId, [otherKey]: other })) as never)
+      const added = await untypedFrom(supabase, bridge).insert(
+        ids.map(other => ({
+          [selfKey]: savedId,
+          [otherKey]: other,
+          ...(bridge === 'project_business_lines' ? { is_featured: featuredByLine.get(other) ?? false } : {}),
+        })) as never,
+      )
       if (added.error) return dbError(added.error)
     }
   }

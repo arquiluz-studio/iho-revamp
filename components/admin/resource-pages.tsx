@@ -16,6 +16,7 @@ import { isPastDate } from '@/lib/dates'
 import { DataTable } from './DataTable'
 import { EventsCalendar, type CalendarParams } from './EventsCalendar'
 import { GalleryEditor, type GalleryItem } from './GalleryEditor'
+import { ProjectsOrderPage } from './ProjectsOrderPage'
 import { PreviousEditionsEditor, type PreviousEditionOption } from './PreviousEditionsEditor'
 import { ResourceForm } from './ResourceForm'
 import { ButtonLink, Notice, PageHeader, cn } from './ui'
@@ -67,6 +68,9 @@ export async function ResourceListPage({
   const { countryCode, canRead, canWrite, timezone } = access(session, config)
   if (!canRead) notFound()
   if (config.singleton) return <ResourceEditPage resource={resource} config={config} id={singletonId(config, countryCode)} basePath={basePath} />
+  if (resource === 'projects' && session.activeCountry) {
+    return <ProjectsOrderPage countryCode={session.activeCountry.code} countryName={session.activeCountry.name_es} canEdit={canWrite} />
+  }
 
   const hasCalendar = resource === 'events' && session.activeCountry
   const view = hasCalendar && searchParams.view === 'calendar' ? 'calendar' : 'list'

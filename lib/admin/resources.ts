@@ -202,7 +202,7 @@ const projects: ResourceConfig = {
     { name: 'slug', label: 'Slug en español (URL)', type: 'slug', required: true },
     { name: 'slug_en', label: 'Slug en inglés (URL)', type: 'slug', help: 'Opcional. Si queda vacío, la versión en inglés usa el slug en español.' },
     { name: 'status', label: 'Estado', type: 'select', options: STATUS_OPTIONS, required: true },
-    { name: 'is_featured', label: 'Destacado en home', type: 'boolean' },
+    { name: 'is_featured', label: 'Destacado en home', type: 'boolean', help: 'La portada muestra hasta 6, en el orden de la lista. Las soluciones se marcan en esa misma lista.' },
     { name: 'client_name', label: 'Cliente', type: 'text', max: 200 },
     { name: 'city', label: 'Ciudad', type: 'text', max: 120 },
     { name: 'year', label: 'Año', type: 'number', min: 1950, max: 2100 },
