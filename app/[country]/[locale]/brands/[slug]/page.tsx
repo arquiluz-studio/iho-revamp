@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { Chips, Facts, PageHero, PageShell, ProjectCards, Prose, SectionHeading } from '@/components/site/pages/PageParts'
-import { ProductCard } from '@/components/site/ProductCard'
+import { BrandProfile } from '@/components/site/BrandProfile'
+import { PageShell, SectionHeading } from '@/components/site/pages/PageParts'
+import { PhotoMosaic } from '@/components/site/PhotoMosaic'
 import { innerChrome } from '@/components/site/SiteChrome'
-import { MediaImage } from '@/components/ui/MediaImage'
+import { legacyMedia } from '@/lib/content/legacy-media'
 import { sitePaths } from '@/lib/content/paths'
-import { toBrandVM, toProductCardVM, toProjectCardVM } from '@/lib/content/site'
+import { imageOf, imageOrNull, priceLabels } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
-import { getCountryBrand, getCountryBrands } from '@/lib/queries/brands'
+import { getBrandMedia, getCountryBrand, getCountryBrands } from '@/lib/queries/brands'
 import { getCatalog } from '@/lib/queries/catalog'
-import { getProjects } from '@/lib/queries/projects'
+import { getDesigners } from '@/lib/queries/designers'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
 
@@ -46,58 +47,78 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
   const { country, locale } = await resolveSiteParams(params)
   const { slug } = await params
   const paths = sitePaths(locale)
-  const [brand, catalog, tp, chrome] = await Promise.all([
-    getCountryBrand(country, slug),
+  const brand = await getCountryBrand(country, slug)
+  if (!brand) notFound()
+  const [catalog, designers, inspiration, tp, td, chrome] = await Promise.all([
     getCatalog(country),
+    getDesigners(),
+    getBrandMedia(brand.id),
     getTranslations({ locale, namespace: 'pages.brands' }),
+    getTranslations({ locale, namespace: 'pages.designers' }),
     innerChrome(country, locale, paths),
   ])
-  if (!brand) notFound()
-  const products = catalog.filter(p => p.brand?.id === brand.id)
-  const projects = await getProjects(country, { brandId: brand.id })
-  const vm = toBrandVM(brand, locale)
-  const lines = brand.business_lines.flatMap(b => (b.business_line ? [b.business_line] : []))
+  const products = catalog.filter(product => product.brand?.id === brand.id)
+  const designerIds = new Set(products.flatMap(product => product.designers.map(designer => designer.id)))
+  const related = designers.filter(designer => designerIds.has(designer.id))
+  const lines = brand.business_lines.flatMap(link => (link.business_line ? [link.business_line] : []))
+  const logo = imageOrNull(brand.logo, locale, brand.name, legacyMedia.brandLogo(brand.slug), 'lg')
+  const pieces = products.map(product => {
+    const name = t(product, 'name', locale)
+    const labels = product.is_purchasable ? priceLabels(product.price, locale, country) : null
+    const image = imageOrNull(product.cover, locale, name, legacyMedia.productCover(product.slug), 'md')
+    return {
+      key: product.id,
+      name,
+      href: paths.product(localSlug(product, locale)),
+      price: labels?.price ?? null,
+      image: image ? { ...image, color: null, placeholder: null } : null,
+    }
+  })
+  const photos = inspiration.flatMap(item => {
+    if (!item.media) return []
+    const caption = t(item, 'caption', locale)
+    return [{ key: item.media.id, image: imageOf(item.media, locale, caption || brand.name, null, 'lg'), caption: caption || undefined }]
+  })
+  const exploreHref = related.length ? '#disenadores' : pieces.length ? '#piezas' : photos.length ? '#inspiracion' : undefined
 
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={brand.name}>
-        {lines.length > 0 && (
-          <div style={{ marginTop: 28 }} className="iho-chips-dark">
-            <Chips links={lines.map(l => ({ href: paths.solution(localSlug(l, locale)), label: t(l, 'name', locale) }))} />
-          </div>
-        )}
-      </PageHero>
-      <section className="iho-page-section">
-        <div className="iho-detail-grid">
-          <div>
-            <div style={{ height: 160, display: 'flex', alignItems: 'center', marginBottom: 36 }}>
-              <MediaImage image={vm.logo} alt={brand.name} style={{ maxHeight: vm.thin ? 150 : 90, maxWidth: 360, width: 'auto', height: 'auto', objectFit: 'contain' }} />
-            </div>
-            <Prose paragraphs={paragraphs(t(brand, 'description', locale))} />
-          </div>
-          <Facts
-            items={[
-              { label: tp('website'), value: brand.website_url && <a href={brand.website_url} target="_blank" rel="noopener noreferrer" style={{ color: '#ef483d', textDecoration: 'none' }}>{hostOf(brand.website_url)}</a> },
-              { label: tp('exclusive'), value: brand.is_exclusive ? '✓' : null },
-              { label: tp('origin'), value: brand.origin_country },
-            ]}
-          />
-        </div>
-      </section>
-      {products.length > 0 && (
-        <section className="iho-page-section" style={{ paddingTop: 0 }}>
-          <SectionHeading label={`— ${tp('products').toUpperCase()}`} />
-          <div className="iho-product-grid">
-            {products.map(p => (
-              <ProductCard key={p.id} product={toProductCardVM(p, locale, country, paths)} showCategory />
-            ))}
-          </div>
-        </section>
-      )}
-      {projects.length > 0 && (
-        <section className="iho-page-section" style={{ paddingTop: 0 }}>
-          <SectionHeading label={`— ${tp('projects').toUpperCase()}`} />
-          <ProjectCards projects={projects.map(p => toProjectCardVM(p, locale, paths))} />
+    <PageShell chrome={chrome} hero={false}>
+      <BrandProfile
+        brandsHref={paths.brands}
+        brandsLabel={tp('heading')}
+        name={brand.name}
+        kicker={brand.origin_country || undefined}
+        description={paragraphs(t(brand, 'description', locale))}
+        website={brand.website_url ? { href: brand.website_url, label: hostOf(brand.website_url) } : null}
+        exclusive={brand.is_exclusive ? tp('exclusive') : null}
+        solutions={lines.map(line => ({ href: paths.solution(localSlug(line, locale)), label: t(line, 'name', locale) }))}
+        logo={logo ? { ...logo, color: null, placeholder: null } : null}
+        thin={brand.logo_is_thin}
+        exploreHref={exploreHref}
+        exploreLabel={td('explore')}
+        designersLabel={tp('designersLabel')}
+        designersTitle={tp('designersTitle')}
+        photoPending={td('photoPending')}
+        productsLabel={tp('productsLabel')}
+        productsTitle={tp('productsTitle')}
+        pricePending={td('pricePending')}
+        imagePending={td('imagePending')}
+        detailLabel={td('detail')}
+        designers={related.map(designer => {
+          const portrait = imageOrNull(designer.portrait ?? designer.cover, locale, designer.name, null, 'md')
+          return {
+            slug: designer.slug,
+            name: designer.name,
+            href: paths.designer(designer.slug),
+            portrait: portrait ? { ...portrait, color: null, placeholder: null } : null,
+          }
+        })}
+        pieces={pieces}
+      />
+      {photos.length > 0 && (
+        <section id="inspiracion" className="iho-page-section" style={{ paddingTop: 0 }}>
+          <SectionHeading label={`— ${tp('inspiration').toUpperCase()}`} />
+          <PhotoMosaic photos={photos} />
         </section>
       )}
     </PageShell>

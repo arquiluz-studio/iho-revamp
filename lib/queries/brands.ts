@@ -28,4 +28,18 @@ export async function getCountryBrand(country: string, slug: string) {
   return brands.find(b => b.slug === slug) ?? null
 }
 
+/** Inspiration photos of one brand, in the order saved from the admin. */
+export function getBrandMedia(brandId: string) {
+  return cachedQuery(['brand-media', brandId], [cacheTags.brands, cacheTags.brand(brandId)], async ({ db }) =>
+    must(
+      await db
+        .from('brand_media')
+        .select(`sort, caption_es, caption_en, media:${media('brand_media_media_id_fkey')}` as const)
+        .eq('brand_id', brandId)
+        .order('sort'),
+      'brand_media',
+    ),
+  )
+}
+
 export type CountryBrandRow = Awaited<ReturnType<typeof getCountryBrands>>[number]

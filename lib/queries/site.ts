@@ -141,3 +141,15 @@ export function getSectors() {
     ),
   )
 }
+
+/** One row per solution and space: the sentence and photo shared by both public pages. */
+export function getSolutionSpaceFits() {
+  return cachedQuery(['solution-space-fits'], [cacheTags.taxonomies], async ({ db }) =>
+    must(
+      await db
+        .from('solution_space_fits')
+        .select(`business_line_id, sector_id, body_es, body_en, image:${media('solution_space_fits_image_media_id_fkey')}` as const),
+      'solution_space_fits',
+    ),
+  )
+}

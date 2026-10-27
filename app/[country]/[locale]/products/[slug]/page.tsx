@@ -2,11 +2,10 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { ContactForm } from '@/components/site/ContactForm'
-import { Chips, Facts, PageHero, PageShell, Prose, SectionHeading } from '@/components/site/pages/PageParts'
+import { Chips, Facts, PageShell, Prose, SectionHeading } from '@/components/site/pages/PageParts'
 import { ProductCard } from '@/components/site/ProductCard'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MediaImage } from '@/components/ui/MediaImage'
-import { ACUMIN, MONO } from '@/components/ui/tokens'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { imageOf, priceLabels, toProductCardVM } from '@/lib/content/site'
@@ -64,112 +63,52 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   ]
 
   return (
-    <PageShell chrome={chrome}>
-      <PageHero label={`— ${brandName.toUpperCase()}`} title={name}>
-        {chips.length > 0 && (
-          <div style={{ marginTop: 28 }} className="iho-chips-dark">
-            <Chips links={chips} />
-          </div>
-        )}
-      </PageHero>
-      <section className="iho-page-section">
+    <PageShell chrome={chrome} hero={false}>
+      <section className="iho-product-buy">
         <div className="iho-product-detail">
           <div>
-            <div style={{ aspectRatio: '1/1', background: '#f1ece3', borderRadius: 4, overflow: 'hidden' }}>
-              <MediaImage
-                image={cover}
-                priority
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              />
+            <div className="iho-product-photo">
+              <MediaImage image={cover} priority sizes="(max-width: 1024px) 100vw, 55vw" />
             </div>
             {gallery.length > 0 && (
-              <div className="iho-gallery-grid" style={{ marginTop: 14 }}>
-                {gallery.map((img, i) => (
-                  <div key={i} style={{ aspectRatio: '1/1', background: '#f1ece3', borderRadius: 4, overflow: 'hidden' }}>
-                    <MediaImage
-                      image={img}
-                      sizes="(max-width: 768px) 100vw, 28vw"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    />
+              <div className="iho-gallery-grid iho-product-gallery">
+                {gallery.map(img => (
+                  <div key={img.src} className="iho-product-photo">
+                    <MediaImage image={img} sizes="(max-width: 768px) 100vw, 28vw" />
                   </div>
                 ))}
               </div>
             )}
           </div>
-          <div style={{ display: 'grid', gap: 30 }}>
-            {labels && (
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 36, color: '#17150f' }}>
-                  {product.multiplePrices ? tp('from', { price: labels.price }) : labels.price}
-                </span>
-              </div>
-            )}
-            <Prose paragraphs={paragraphs(t(product, 'description', locale))} />
-            <Facts
-              items={[
-                {
-                  label: tp('brand'),
-                  value: product.brand ? (
-                    <a href={paths.brand(product.brand.slug)} style={{ color: '#ef483d', textDecoration: 'none' }}>
-                      {product.brand.name}
-                    </a>
-                  ) : (
-                    brandName
-                  ),
-                },
-                {
-                  label: tp('designer'),
-                  value:
-                    product.designers.length > 0 &&
-                    product.designers.map((d, i) => (
-                      <span key={d.id}>
-                        {i > 0 && ', '}
-                        <a href={paths.designer(d.slug)} style={{ color: '#ef483d', textDecoration: 'none' }}>
-                          {d.name}
-                        </a>
-                      </span>
-                    )),
-                },
-                { label: tp('availability'), value: availability },
-                ...product.specs.map(s => ({ label: t(s, 'label', locale), value: s.value })),
-              ]}
-            />
-            {variants.length > 0 && (
-              <div>
-                <SectionHeading label={`— ${tp('variants').toUpperCase()}`} />
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 10 }}>
-                  {variants.map(v => {
-                    const vLabels = product.is_purchasable ? priceLabels(v.offer, locale, country) : null
-                    return (
-                      <li
-                        key={v.id}
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          gap: 16,
-                          fontFamily: MONO,
-                          fontSize: 13,
-                          color: '#2c2920',
-                          borderBottom: '1px solid rgba(20,18,12,0.12)',
-                          paddingBottom: 10,
-                        }}
-                      >
-                        <span>
-                          {t(v, 'name', locale)}
-                          {v.sku && <span style={{ color: '#8a8478' }}> · {v.sku}</span>}
-                        </span>
-                        {vLabels && <span>{vLabels.price}</span>}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )}
-            <div id="cotizar" style={{ background: '#f1ece3', borderRadius: 4, padding: 28, scrollMarginTop: 96 }}>
-              <h2 style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 26, textTransform: 'uppercase', margin: '0 0 20px', color: '#17150f' }}>
-                {tp('inquiryTitle')}
-              </h2>
+          <div className="iho-product-buy-col">
+            <div className="iho-product-intro">
+              {product.brand ? (
+                <a className="iho-product-brand" href={paths.brand(product.brand.slug)}>
+                  {product.brand.name}
+                </a>
+              ) : (
+                <p className="iho-product-brand">{brandName}</p>
+              )}
+              <h1>{name}</h1>
+              {product.designers.length > 0 && (
+                <p className="iho-product-designer">
+                  {tp('designedBy')}{' '}
+                  {product.designers.map((designer, index) => (
+                    <span key={designer.id}>
+                      {index > 0 && ', '}
+                      <a href={paths.designer(designer.slug)}>{designer.name}</a>
+                    </span>
+                  ))}
+                </p>
+              )}
+              {chips.length > 0 && <Chips links={chips} />}
+            </div>
+            <div className="iho-product-offer">
+              {labels && <p className="iho-product-price">{product.multiplePrices ? tp('from', { price: labels.price }) : labels.price}</p>}
+              <p className="iho-product-availability">{availability}</p>
+            </div>
+            <div id="cotizar" className="iho-product-inquiry">
+              <h2>{tp('inquiryTitle')}</h2>
               <ContactForm
                 countryCode={country}
                 inquiry={{
@@ -180,6 +119,27 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                 }}
               />
             </div>
+            <Prose paragraphs={paragraphs(t(product, 'description', locale))} />
+            <Facts items={product.specs.map(spec => ({ label: t(spec, 'label', locale), value: spec.value }))} />
+            {variants.length > 0 && (
+              <div>
+                <SectionHeading label={`— ${tp('variants').toUpperCase()}`} />
+                <ul className="iho-product-variants">
+                  {variants.map(variant => {
+                    const variantLabels = product.is_purchasable ? priceLabels(variant.offer, locale, country) : null
+                    return (
+                      <li key={variant.id}>
+                        <span>
+                          {t(variant, 'name', locale)}
+                          {variant.sku && <span className="is-sku"> · {variant.sku}</span>}
+                        </span>
+                        {variantLabels && <span>{variantLabels.price}</span>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </section>

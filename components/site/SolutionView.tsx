@@ -5,6 +5,30 @@ import type { ImageVM } from '@/lib/types/site'
 
 export type SolutionInclude = { title: string; text: string; image: ImageVM | null }
 export type SolutionProject = { key: string; title: string; href: string; image: ImageVM | null; meta?: string }
+export type SolutionFitCard = { key: string; title: string; text: string; href: string; image: ImageVM | null }
+
+export function FitSection({ id, label, title, items }: { id: string; label: string; title: string; items: SolutionFitCard[] }) {
+  if (!items.length) return null
+  return (
+    <section className="iho-solution-block" aria-labelledby={id}>
+      <p className="iho-solution-kicker">{label}</p>
+      <h2 id={id}>
+        <RichText text={title} />
+      </h2>
+      <div className="iho-solution-includes">
+        {items.map(item => (
+          <a key={item.key} href={item.href} className="iho-solution-include">
+            <div className="iho-solution-photo">
+              {item.image && <MediaImage image={item.image} alt="" sizes="(max-width: 768px) 100vw, 400px" />}
+            </div>
+            <h3>{item.title}</h3>
+            {item.text && <p>{item.text}</p>}
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
 
 export function SolutionView({
   name,
@@ -12,12 +36,15 @@ export function SolutionView({
   hero,
   statementImage,
   includes,
+  spaces,
   projects,
   quoteHref,
   quoteLabel,
   statementTitle,
   includesLabel,
   includesTitle,
+  spacesLabel,
+  spacesTitle,
   projectsLabel,
   projectsTitle,
   allProjectsHref,
@@ -30,12 +57,15 @@ export function SolutionView({
   hero: ImageVM | null
   statementImage: ImageVM | null
   includes: SolutionInclude[]
+  spaces: SolutionFitCard[]
   projects: SolutionProject[]
   quoteHref: string
   quoteLabel: string
   statementTitle: string
   includesLabel: string
   includesTitle: string
+  spacesLabel: string
+  spacesTitle: string
   projectsLabel: string
   projectsTitle: string
   allProjectsHref: string
@@ -90,6 +120,8 @@ export function SolutionView({
           </div>
         </section>
       )}
+
+      <FitSection id="solution-spaces" label={spacesLabel} title={spacesTitle} items={spaces} />
 
       {projects.length > 0 && (
         <section className="iho-solution-block" aria-labelledby="solution-projects">

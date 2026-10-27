@@ -226,8 +226,31 @@ export async function ResourceEditPage({
           <ProductExtras productId={id} countryCode={countryCode} coverId={(row?.cover_media_id as string) ?? null} canEdit={canWrite} />
         </div>
       )}
+      {id && resource === 'brands' && (
+        <div className="mt-6 lg:max-w-[calc(100%-304px)]">
+          <BrandGallery id={id} canEdit={canWrite} />
+        </div>
+      )}
     </>
   )
+}
+
+async function BrandGallery({ id, canEdit }: { id: string; canEdit: boolean }) {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('brand_media')
+    .select(`sort, caption_es, caption_en, media_assets(${ADMIN_MEDIA_SELECT})`)
+    .eq('brand_id', id)
+    .order('sort')
+  const gallery = (data ?? [])
+    .filter(row => row.media_assets)
+    .map(row => ({
+      media: toAdminMedia(row.media_assets!),
+      captionEs: row.caption_es ?? '',
+      captionEn: row.caption_en ?? '',
+      isDownloadable: false,
+    }))
+  return <GalleryEditor owner="brand" ownerId={id} countryCode={null} initialItems={gallery} initialCoverId={null} canEdit={canEdit} />
 }
 
 async function ContentExtras({

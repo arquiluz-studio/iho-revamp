@@ -1339,6 +1339,26 @@ header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .i
 .iho-gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 .iho-product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 36px 22px; }
 .iho-product-detail { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: start; }
+.iho-product-buy { max-width: 1240px; margin: 0 auto; padding: 124px 40px 72px; }
+.iho-product-buy-col { display: grid; gap: 28px; align-content: start; }
+.iho-product-intro { display: grid; gap: 14px; }
+.iho-product-brand { margin: 0; font-family: "Space Mono", monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #8a8478; text-decoration: none; }
+a.iho-product-brand:hover { color: #ef483d; }
+.iho-product-buy h1 { margin: 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: clamp(44px, 5vw, 68px); line-height: 0.9; letter-spacing: -0.5px; text-transform: uppercase; color: #17150f; }
+.iho-product-designer { margin: 0; font-family: "Source Sans 3", sans-serif; font-size: 16px; color: #6d675e; }
+.iho-product-designer a { color: #17150f; text-decoration: none; }
+.iho-product-designer a:hover { color: #ef483d; }
+.iho-product-offer { display: grid; gap: 8px; }
+.iho-product-price { margin: 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: 36px; line-height: 1; color: #17150f; }
+.iho-product-availability { margin: 0; font-family: "Space Mono", monospace; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: #8a8478; }
+.iho-product-inquiry { background: #f1ece3; border-radius: 4px; padding: 28px; scroll-margin-top: 96px; }
+.iho-product-inquiry h2 { font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: 26px; text-transform: uppercase; margin: 0 0 20px; color: #17150f; }
+.iho-product-variants { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.iho-product-variants li { display: flex; justify-content: space-between; gap: 16px; font-family: "Space Mono", monospace; font-size: 13px; color: #2c2920; border-bottom: 1px solid rgba(20, 18, 12, 0.12); padding-bottom: 10px; }
+.iho-product-variants .is-sku { color: #8a8478; }
+.iho-product-photo { aspect-ratio: 1; background: #f1ece3; border-radius: 4px; overflow: hidden; }
+.iho-product-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iho-product-gallery { margin-top: 14px; }
 .iho-event-row { display: grid; grid-template-columns: 110px 1fr 220px; gap: 28px; align-items: center; padding: 22px 0; border-bottom: 1px solid rgba(20, 18, 12, 0.12); color: inherit; text-decoration: none; }
 .iho-event-row:hover h3 { color: #ef483d; }
 .iho-chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -1386,6 +1406,7 @@ header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .i
 @media (max-width: 768px) {
   .iho-page-hero__inner { padding: 130px 20px 44px; }
   .iho-page-section { padding: 48px 20px; }
+  .iho-product-buy { padding: 108px 20px 48px; }
   .iho-card-grid, .iho-card-grid--two, .iho-gallery-grid { grid-template-columns: 1fr; }
   .iho-logo-grid, .iho-product-grid { grid-template-columns: repeat(2, 1fr); }
   .iho-shop-toolbar { flex-direction: column; align-items: stretch; }
@@ -1435,6 +1456,12 @@ header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .i
 .iho-explore svg { display: block; }
 .iho-designer-portrait { aspect-ratio: 1; background: #e4dfd6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .iho-designer-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iho-designer-portrait--logo { padding: 56px; }
+.iho-designer-portrait--logo.iho-designer-portrait--thin { padding: 32px; }
+.iho-designer-portrait--logo img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+.iho-brand-solutions { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 18px 0 0; }
+.iho-brand-solutions a { font-family: "Source Sans 3", sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6d675e; text-decoration: none; }
+.iho-brand-solutions a:hover { color: #ef483d; }
 .iho-designer-portrait span { max-width: 220px; padding: 24px; font-family: "Source Sans 3", sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; color: #b7b1a6; }
 .iho-designer-block { margin-top: 92px; scroll-margin-top: 108px; }
 .iho-designer-heading { display: flex; flex-direction: column; align-items: flex-start; padding-bottom: 32px; }
@@ -1471,6 +1498,9 @@ header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .i
 .iho-solution-includes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 42px 22px; margin-top: 36px; }
 .iho-solution-include h3 { margin: 14px 0 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: 24px; line-height: 0.95; letter-spacing: -0.2px; text-transform: uppercase; color: #17150f; }
 .iho-solution-include p { margin: 8px 0 0; font-family: "Source Sans 3", sans-serif; font-size: 15px; line-height: 1.5; color: #6d675e; }
+a.iho-solution-include { display: block; color: inherit; text-decoration: none; }
+a.iho-solution-include:hover h3 { color: #ef483d; }
+a.iho-solution-include:focus-visible { outline: 2px solid #ef483d; outline-offset: 4px; }
 .iho-solution-projects-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
 .iho-solution-more { display: inline-flex; align-items: center; gap: 8px; flex: none; margin-bottom: 8px; font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #ef483d; text-decoration: none; }
 .iho-solution-projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 22px; margin-top: 36px; }

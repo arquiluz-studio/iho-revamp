@@ -41,6 +41,33 @@ insert into public.sectors (slug, name_es, name_en, description_es, description_
   ('residential', 'Residencial', 'Residential', 'Vivienda y desarrollos residenciales.', 'Homes and residential developments.', 6)
 on conflict (slug) do nothing;
 
+insert into public.solution_space_fits (business_line_id, sector_id, body_es, body_en)
+select bl.id, s.id, v.body_es, v.body_en
+from (
+  values
+    ('furniture', 'workspace', 'Sillería, escritorios y lounge para la jornada, la junta y el encuentro.', 'Seating, desks and lounge for the working day, the meeting and the gathering.'),
+    ('furniture', 'hospitality', 'Piezas de sala, comedor y terraza para la estadía y el servicio.', 'Lounge, dining and terrace pieces for the stay and the service.'),
+    ('furniture', 'retail', 'Mobiliario de exhibición, espera y apoyo que acompaña la marca.', 'Display, waiting and support furniture that carries the brand.'),
+    ('furniture', 'healthcare', 'Espera, sillería y equipamiento para el cuidado y la circulación.', 'Waiting, seating and equipment for care and circulation.'),
+    ('furniture', 'cultural', 'Butacas, lounge y apoyo para la visita y el evento.', 'Seating, lounge and support for the visit and the event.'),
+    ('furniture', 'residential', 'Estar, comedor y exterior para la vida en casa.', 'Living, dining and outdoor pieces for life at home.'),
+    ('specialty', 'workspace', 'Pisos, plafones y acústica para el puesto, la sala y la circulación.', 'Floors, ceilings and acoustics for the workstation, the room and circulation.'),
+    ('specialty', 'hospitality', 'Acabados y cielos para lobby, habitación y comedor.', 'Finishes and ceilings for the lobby, the room and the dining room.'),
+    ('specialty', 'retail', 'Pisos y recubrimientos que arman el recorrido de la tienda.', 'Floors and coverings that shape the path through the store.'),
+    ('specialty', 'healthcare', 'Superficies y acústica para higiene, calma y continuidad.', 'Surfaces and acoustics for hygiene, calm and continuity.'),
+    ('specialty', 'cultural', 'Materiales y acústica para sala, galería y foyer.', 'Materials and acoustics for the hall, the gallery and the foyer.'),
+    ('specialty', 'residential', 'Pisos y recubrimientos que dan carácter a la vivienda.', 'Floors and coverings that give the home its character.'),
+    ('lighting', 'workspace', 'Luz de trabajo y de ambiente según la tarea y la hora.', 'Task and ambient light for the work and the hour.'),
+    ('lighting', 'hospitality', 'Atmósferas para lobby, habitación, comedor y fachada.', 'Atmospheres for the lobby, the room, dining and the facade.'),
+    ('lighting', 'retail', 'Acentos que destacan el producto y recorren la tienda.', 'Accents that highlight the product and lead through the store.'),
+    ('lighting', 'healthcare', 'Luz técnica y cálida para consulta, circulación y espera.', 'Technical and warm light for the consult, circulation and waiting.'),
+    ('lighting', 'cultural', 'Iluminación de obra, sala y recorrido.', 'Light for the work, the hall and the route.'),
+    ('lighting', 'residential', 'Luz arquitectónica y decorativa para habitar la casa.', 'Architectural and decorative light for living at home.')
+) as v(line_slug, sector_slug, body_es, body_en)
+join public.business_lines bl on bl.slug = v.line_slug
+join public.sectors s on s.slug = v.sector_slug
+on conflict (business_line_id, sector_id) do nothing;
+
 -- Brands ----------------------------------------------------------------------
 insert into public.brands (slug, name, logo_is_thin) values
   ('allermuir', 'Allermuir', false),

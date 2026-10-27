@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { FitSection } from '@/components/site/SolutionView'
 import { Chips, EmptyNote, PageHero, PageShell, ProjectCards, Prose, SectionHeading } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { legacyMedia } from '@/lib/content/legacy-media'
+import { solutionsForSpace } from '@/lib/content/solution-fits'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { imageOf, toProjectCardVM } from '@/lib/content/site'
 import { localSlug, paragraphs, pickBySlug, t } from '@/lib/i18n-fields'
 import { getProjects } from '@/lib/queries/projects'
-import { getSectors } from '@/lib/queries/site'
+import { getBusinessLines, getSectors, getSolutionSpaceFits } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
 
@@ -39,11 +41,13 @@ export default async function SpacePage({ params }: { params: Promise<Params> })
   const row = pickBySlug(sectors, sector, locale)
   if (!row) notFound()
   if (localSlug(row, locale) !== sector) permanentRedirect(paths.space(localSlug(row, locale)))
-  const [tp, tpp, chrome, projects] = await Promise.all([
+  const [tp, tpp, chrome, projects, lines, fits] = await Promise.all([
     getTranslations({ locale, namespace: 'pages.spaces' }),
     getTranslations({ locale, namespace: 'pages.projects' }),
     innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/spaces/[sector]', params: { sector: localSlug(row, l) } }))),
     getProjects(country, { sector: row.slug }),
+    getBusinessLines(),
+    getSolutionSpaceFits(),
   ])
   const name = t(row, 'name', locale)
 
@@ -59,7 +63,13 @@ export default async function SpacePage({ params }: { params: Promise<Params> })
           <Prose paragraphs={paragraphs(t(row, 'description', locale))} />
         </section>
       )}
-      <section className="iho-page-section" style={{ paddingTop: t(row, 'description', locale) ? 0 : undefined }}>
+      <FitSection
+        id="space-solutions"
+        label={tp('solutionsLabel')}
+        title={tp('solutionsTitle')}
+        items={solutionsForSpace(row, lines, fits, locale, paths)}
+      />
+      <section className="iho-page-section" style={{ paddingTop: 28 }}>
         <SectionHeading label={`— ${tp('projects').toUpperCase()}`} />
         {projects.length ? <ProjectCards projects={projects.map(p => toProjectCardVM(p, locale, paths))} /> : <EmptyNote>{tpp('empty')}</EmptyNote>}
       </section>

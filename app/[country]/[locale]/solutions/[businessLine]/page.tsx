@@ -4,12 +4,13 @@ import { getTranslations } from 'next-intl/server'
 import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { SolutionView, type SolutionInclude } from '@/components/site/SolutionView'
+import { spacesForSolution } from '@/lib/content/solution-fits'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { imageOf, imageOrNull } from '@/lib/content/site'
 import { localSlug, paragraphs, pickBySlug, t } from '@/lib/i18n-fields'
 import { getProjects } from '@/lib/queries/projects'
-import { getBusinessLines } from '@/lib/queries/site'
+import { getBusinessLines, getSectors, getSolutionSpaceFits } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
 
@@ -41,10 +42,12 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
   if (!line) notFound()
   if (localSlug(line, locale) !== businessLine) permanentRedirect(paths.solution(localSlug(line, locale)))
 
-  const [tp, chrome, projects] = await Promise.all([
+  const [tp, chrome, projects, sectors, fits] = await Promise.all([
     getTranslations({ locale, namespace: 'pages.solutions' }),
     innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/solutions/[businessLine]', params: { businessLine: localSlug(line, l) } }))),
     getProjects(country, { businessLine: line.slug }),
+    getSectors(),
+    getSolutionSpaceFits(),
   ])
   const name = t(line, 'name', locale)
   const hero = imageOf(line.cover, locale, name, legacyMedia.businessLineCover(line.slug), 'lg')
@@ -68,6 +71,9 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
         hero={hero}
         statementImage={photos[0] ?? hero}
         includes={includes}
+        spaces={spacesForSolution(line, sectors, fits, locale, paths)}
+        spacesLabel={tp('spacesLabel')}
+        spacesTitle={tp('spacesTitle')}
         projects={featured.slice(0, 4).map(project => {
           const title = t(project, 'title', locale)
           return {

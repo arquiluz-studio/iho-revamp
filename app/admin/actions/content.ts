@@ -32,6 +32,34 @@ const galleryItem = z.object({
   isDownloadable: z.boolean().optional(),
 })
 
+/** Replaces a brand's inspiration gallery. Order is the array order. */
+export async function saveBrandGallery(brandId: string, rawItems: z.input<typeof galleryItem>[]): Promise<ActionResult> {
+  const session = await getAdminSession()
+  if (!session) return EXPIRED
+  if (!session.canManageCatalog) return FORBIDDEN
+  const items = z.array(galleryItem).max(200).safeParse(rawItems)
+  if (!items.success || !z.uuid().safeParse(brandId).success) return { ok: false, error: 'Datos inválidos.' }
+
+  const supabase = await createSupabaseServerClient()
+  const removed = await supabase.from('brand_media').delete().eq('brand_id', brandId)
+  if (removed.error) return dbError(removed.error)
+  if (items.data.length) {
+    const added = await supabase.from('brand_media').insert(
+      items.data.map((item, sort) => ({
+        brand_id: brandId,
+        media_id: item.mediaId,
+        sort,
+        caption_es: item.captionEs || null,
+        caption_en: item.captionEn || null,
+      })),
+    )
+    if (added.error) return dbError(added.error)
+  }
+
+  revalidateTags([cacheTags.brands, cacheTags.brand(brandId)])
+  return { ok: true }
+}
+
 /**
  * Replaces the gallery of an event or project (order = array order). Projects pick their cover from the
  * gallery (`coverId`); events keep the cover in the main form and pass `undefined`.

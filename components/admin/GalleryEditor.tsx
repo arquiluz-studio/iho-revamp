@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { getMediaByIds } from '@/app/admin/actions/media'
 import { saveProductGallery } from '@/app/admin/actions/catalog'
-import { saveGallery } from '@/app/admin/actions/content'
+import { saveBrandGallery, saveGallery } from '@/app/admin/actions/content'
 import type { AdminMedia } from '@/lib/admin/media'
 import { MediaThumb, UploadButton } from './MediaUpload'
 import { Button, Card, CardHeader, Checkbox, Input, Notice, cn } from './ui'
@@ -20,7 +20,7 @@ export function GalleryEditor({
   initialCoverId,
   canEdit,
 }: {
-  owner: 'event' | 'project' | 'product'
+  owner: 'event' | 'project' | 'product' | 'brand'
   ownerId: string
   countryCode: string | null
   initialItems: GalleryItem[]
@@ -35,8 +35,9 @@ export function GalleryEditor({
   const [message, setMessage] = useState<{ tone: 'green' | 'red'; text: string } | null>(null)
   const [pending, startTransition] = useTransition()
   const isProject = owner === 'project'
-  const hasCover = owner !== 'event'
-  const kind = owner === 'project' ? 'project_photo' : owner === 'product' ? 'product_photo' : 'event_photo'
+  const hasCover = owner === 'project' || owner === 'product'
+  const hasCaptions = owner === 'project' || owner === 'brand'
+  const kind = owner === 'project' ? 'project_photo' : owner === 'product' ? 'product_photo' : owner === 'brand' ? 'generic' : 'event_photo'
 
   const update = (next: GalleryItem[]) => {
     setItems(next)
@@ -68,7 +69,16 @@ export function GalleryEditor({
               items.map(i => i.media.id),
               coverId,
             )
-          : await saveGallery(
+          : owner === 'brand'
+            ? await saveBrandGallery(
+                ownerId,
+                items.map(i => ({
+                  mediaId: i.media.id,
+                  captionEs: i.captionEs,
+                  captionEn: i.captionEn,
+                })),
+              )
+            : await saveGallery(
               owner,
               ownerId,
               items.map(i => ({
@@ -93,9 +103,11 @@ export function GalleryEditor({
         description={
           isProject
             ? 'Arrastra para ordenar. La estrella marca la portada. "Descargable" permite bajar la foto en alta resolución tras dejar sus datos.'
-            : hasCover
-              ? 'Arrastra para ordenar. La estrella marca la foto principal.'
-              : 'Estas fotos se publican como «Así se vivió» cuando el evento ya pasó. La portada se elige en el formulario.'
+            : owner === 'brand'
+              ? 'Fotos de inspiración de la ficha. Arrastra para ordenar. El pie de foto es opcional.'
+              : hasCover
+                ? 'Arrastra para ordenar. La estrella marca la foto principal.'
+                : 'Estas fotos se publican como «Así se vivió» cuando el evento ya pasó. La portada se elige en el formulario.'
         }
         actions={
           canEdit && (
@@ -150,7 +162,7 @@ export function GalleryEditor({
                   )}
                   <span className="absolute right-1.5 top-1.5 rounded bg-zinc-900/70 px-1.5 text-xs text-white">{index + 1}</span>
                 </div>
-                {isProject && (
+                {hasCaptions && (
                   <div className="mt-2 space-y-1.5">
                     <Input
                       className="h-8 text-xs"
@@ -166,14 +178,16 @@ export function GalleryEditor({
                       disabled={!canEdit}
                       onChange={e => patch(index, { captionEn: e.target.value })}
                     />
-                    <label className="flex items-center gap-2 text-xs text-zinc-700">
-                      <Checkbox
-                        checked={item.isDownloadable}
-                        disabled={!canEdit}
-                        onChange={e => patch(index, { isDownloadable: e.target.checked })}
-                      />
-                      Descargable en alta resolución
-                    </label>
+                    {isProject && (
+                      <label className="flex items-center gap-2 text-xs text-zinc-700">
+                        <Checkbox
+                          checked={item.isDownloadable}
+                          disabled={!canEdit}
+                          onChange={e => patch(index, { isDownloadable: e.target.checked })}
+                        />
+                        Descargable en alta resolución
+                      </label>
+                    )}
                   </div>
                 )}
                 {canEdit && (

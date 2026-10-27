@@ -85,6 +85,45 @@ export type Database = {
           },
         ]
       }
+      brand_media: {
+        Row: {
+          brand_id: string
+          caption_en: string | null
+          caption_es: string | null
+          media_id: string
+          sort: number
+        }
+        Insert: {
+          brand_id: string
+          caption_en?: string | null
+          caption_es?: string | null
+          media_id: string
+          sort?: number
+        }
+        Update: {
+          brand_id?: string
+          caption_en?: string | null
+          caption_es?: string | null
+          media_id?: string
+          sort?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_media_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_media_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           created_at: string
@@ -1900,6 +1939,55 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "countries"
             referencedColumns: ["code"]
+          },
+        ]
+      }
+      solution_space_fits: {
+        Row: {
+          body_en: string | null
+          body_es: string | null
+          business_line_id: string
+          image_media_id: string | null
+          sector_id: string
+          updated_at: string
+        }
+        Insert: {
+          body_en?: string | null
+          body_es?: string | null
+          business_line_id: string
+          image_media_id?: string | null
+          sector_id: string
+          updated_at?: string
+        }
+        Update: {
+          body_en?: string | null
+          body_es?: string | null
+          business_line_id?: string
+          image_media_id?: string | null
+          sector_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solution_space_fits_business_line_id_fkey"
+            columns: ["business_line_id"]
+            isOneToOne: false
+            referencedRelation: "business_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solution_space_fits_image_media_id_fkey"
+            columns: ["image_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solution_space_fits_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
           },
         ]
       }
