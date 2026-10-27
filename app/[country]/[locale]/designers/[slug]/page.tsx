@@ -102,10 +102,8 @@ export default async function DesignerPage({ params }: { params: Promise<Params>
         exploreLabel={tp('explore')}
         brandsLabel={tp('brandsLabel')}
         collaborationsTitle={tp('collaborations')}
-        collaborationsIntro={tp('collaborationsIntro', { name: designer.name })}
         piecesLabel={tp('piecesLabel')}
         piecesTitle={tp('pieces')}
-        piecesIntro={tp('piecesIntro')}
         pricePending={tp('pricePending')}
         imagePending={tp('imagePending')}
         detailLabel={tp('detail')}

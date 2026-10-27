@@ -34,7 +34,6 @@ export default async function DesignersPage({ params }: { params: Promise<SitePa
       <BrandDirectory
         label={tp('label')}
         title={tp('heading')}
-        intro={tp('intro')}
         photo
         idPrefix="disenador"
         locale={locale}

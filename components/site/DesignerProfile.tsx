@@ -29,10 +29,8 @@ export function DesignerProfile({
   exploreLabel,
   brandsLabel,
   collaborationsTitle,
-  collaborationsIntro,
   piecesLabel,
   piecesTitle,
-  piecesIntro,
   pricePending,
   imagePending,
   detailLabel,
@@ -50,10 +48,8 @@ export function DesignerProfile({
   exploreLabel: string
   brandsLabel: string
   collaborationsTitle: string
-  collaborationsIntro: string
   piecesLabel: string
   piecesTitle: string
-  piecesIntro: string
   pricePending: string
   imagePending: string
   detailLabel: string
@@ -104,12 +100,9 @@ export function DesignerProfile({
 
       {brands.length > 0 && (
         <section id="colaboraciones" className="iho-designer-block" aria-labelledby="colaboraciones-title">
-          <div className="iho-brands-intro">
-            <div>
-              <p className="iho-designer-kicker">{brandsLabel}</p>
-              <h2 id="colaboraciones-title">{collaborationsTitle}</h2>
-            </div>
-            {collaborationsIntro && <p>{collaborationsIntro}</p>}
+          <div className="iho-designer-heading">
+            <p className="iho-designer-kicker">{brandsLabel}</p>
+            <h2 id="colaboraciones-title">{collaborationsTitle}</h2>
           </div>
           <div className="iho-brand-cards">
             {brands.map(brand => (
@@ -131,12 +124,9 @@ export function DesignerProfile({
 
       {pieces.length > 0 && (
         <section id="piezas" className="iho-designer-block" aria-labelledby="piezas-title">
-          <div className="iho-brands-intro">
-            <div>
-              <p className="iho-designer-kicker">{piecesLabel}</p>
-              <h2 id="piezas-title">{piecesTitle}</h2>
-            </div>
-            {piecesIntro && <p>{piecesIntro}</p>}
+          <div className="iho-designer-heading">
+            <p className="iho-designer-kicker">{piecesLabel}</p>
+            <h2 id="piezas-title">{piecesTitle}</h2>
           </div>
           <div className="iho-piece-grid">
             {pieces.map(piece => (

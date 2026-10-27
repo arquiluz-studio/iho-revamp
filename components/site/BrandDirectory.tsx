@@ -29,7 +29,6 @@ function letterOf(name: string) {
 export function BrandDirectory({
   label,
   title,
-  intro,
   brands,
   filters,
   locale,
@@ -43,7 +42,6 @@ export function BrandDirectory({
 }: {
   label: string
   title: string
-  intro: string
   brands: DirectoryBrand[]
   filters: DirectoryFilter[]
   locale: string
@@ -82,7 +80,6 @@ export function BrandDirectory({
           <SectionLabel>{label}</SectionLabel>
           <h1>{title}</h1>
         </div>
-        {intro && <p>{intro}</p>}
       </div>
 
       <nav className="iho-alpha" aria-label={lettersLabel}>

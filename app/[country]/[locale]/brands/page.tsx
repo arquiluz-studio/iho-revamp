@@ -48,7 +48,6 @@ export default async function BrandsPage({ params }: { params: Promise<SiteParam
       <BrandDirectory
         label={tp('label')}
         title={tp('heading')}
-        intro={tp('intro')}
         brands={directory}
         filters={filters}
         locale={locale}
