@@ -58,7 +58,7 @@
       "title": "UN GRUPO,\nTODAS LAS\nESCALAS.",
       "p1": "Somos un grupo empresarial latinoamericano que ofrece productos y servicios desde el interiorismo corporativo, industrial, comercial y residencial hasta soluciones arquitectónicas y de iluminación.",
       "p2": "Una fortaleza logística que permite que tu proyecto, sin importar su tamaño, se resuelva con un solo proveedor.",
-      "mapTitle": "Mapa de presencia en LATAM"
+      "mapTitle": "Mapa de presencia en LATAM", "places": "Países y ciudades", "mapEyebrow": "Grupo IHO", "mapCaption": "Mapa de cobertura · Latinoamérica"
     },
     "solutions": { "label": "— SOLUCIONES IHO", "title": "UNA PUERTA\nPOR INDUSTRIA.", "cta": "Ver todas las soluciones" },
     "projects": {
@@ -74,7 +74,8 @@
     "team": {
       "label": "— EQUIPO",
       "title": "SOMOS MÁS DE +120\nPROFESIONALES.",
-      "intro": "En IHO, nuestro éxito se construye gracias al talento y la diversidad de nuestro equipo."
+      "intro": "En IHO, nuestro éxito se construye gracias al talento y la diversidad de nuestro equipo.",
+      "contact": "Contacto"
     }
   },
   "eventTypes": {
@@ -153,16 +154,17 @@
     "brands": { "label": "— MARCAS PARTICIPANTES" },
     "designers": { "label": "— DISEÑADORES" },
     "products": { "label": "— CATÁLOGO DEL EVENTO", "title": "Productos en\nexhibición.", "count": "{count} PIEZAS", "quote": "Cotizar" },
-    "gallery": { "label": "— GALERÍA", "title": "Ediciones\nanteriores.", "pastTitle": "Así se\nvivió.", "item": "Galería {n}" },
+    "gallery": { "label": "— GALERÍA", "title": "Ediciones\nanteriores.", "pastTitle": "Así se\nvivió.", "item": "Galería {n}", "previous": "Anterior", "next": "Siguiente", "close": "Cerrar", "download": "Descargar alta resolución" },
     "cta": { "title": "¿Te interesa alguna pieza\npara tu proyecto?", "button": "Hablar con un especialista" }
   },
   "pages": {
     "events": { "label": "— EVENTOS", "title": "Eventos y\nlanzamientos.", "upcoming": "Próximos", "past": "Realizados", "empty": "No hay eventos por ahora." },
     "group": { "label": "— GRUPO IHO" },
+    "team": { "back": "Grupo IHO", "linkedin": "LinkedIn" },
     "projects": { "label": "— PROYECTOS", "title": "Proyectos\nIHO.", "empty": "Aún no hay proyectos publicados.", "noMatch": "Ningún proyecto coincide con estos filtros.", "count": "{count} proyectos", "filters": "Filtros", "clear": "Limpiar", "filterCountry": "País", "filterSpace": "Espacio", "filterSolution": "Solución", "client": "Cliente", "year": "Año", "city": "Ciudad", "sector": "Espacio", "brandsUsed": "Marcas", "gallery": "Galería", "download": "Descargar alta resolución", "solutions": "Soluciones", "related": "— MÁS PROYECTOS" },
     "brands": { "label": "— MARCAS", "heading": "Marcas", "title": "Nuestras\nmarcas.", "search": "Buscar por nombre", "letters": "Índice alfabético", "all": "Todas", "empty": "Aún no hay marcas publicadas.", "noMatch": "Ninguna marca coincide con esta búsqueda.", "website": "Sitio web", "exclusive": "Distribución exclusiva", "products": "Productos", "projects": "Proyectos con esta marca", "origin": "Origen" },
     "designers": { "label": "— DISEÑADORES", "heading": "Diseñadores", "single": "— DISEÑADOR", "title": "Diseñadores.", "search": "Buscar por nombre", "letters": "Índice alfabético", "allFilter": "Todos", "noMatch": "Ningún diseñador coincide con esta búsqueda.", "empty": "Aún no hay diseñadores publicados.", "role": "Diseñador", "explore": "Explorar", "photoPending": "Foto pendiente", "brandsLabel": "— Marcas", "collaborations": "Colaboraciones", "piecesLabel": "— Productos", "pieces": "Piezas", "pricePending": "Precio por definir", "imagePending": "Imagen de producto por definir", "detail": "Ver detalle", "nationality": "Nacionalidad", "years": "Años", "born": "n. {year}", "website": "Sitio web", "brands": "Marcas", "products": "Piezas de {name}", "events": "Eventos", "all": "Todos los diseñadores" },
-    "solutions": { "label": "— SOLUCIONES", "empty": "Aún no hay soluciones publicadas.", "brands": "Marcas de la solución", "projects": "Proyectos" },
+    "solutions": { "label": "— SOLUCIONES", "empty": "Aún no hay soluciones publicadas.", "brands": "Marcas de la solución", "projects": "Proyectos", "quote": "Cotizar", "statementTitle": "Cada espacio,\nuna respuesta", "includesLabel": "— Qué incluye", "includesTitle": "Elementos que construyen\nel conjunto", "projectsLabel": "— Proyectos", "projectsTitle": "Cada decisión forma parte\ndel proyecto", "allProjects": "Ver todos los proyectos", "closeTitle": "Un espacio,\nmuchas posibilidades", "closeBody": "Cuéntanos el proyecto y preparamos la propuesta.", "includes": { "mobiliario": [{ "title": "Mobiliario interior", "text": "Sillas, mesas y lounge para el espacio cerrado." }, { "title": "Mobiliario exterior", "text": "Colecciones para terrazas y áreas abiertas." }, { "title": "Puestos de trabajo", "text": "Escritorios y sistemas para el día a día." }, { "title": "Equipamiento", "text": "Almacenamiento, juntas y soporte del puesto." }, { "title": "Accesorios", "text": "Complementos que cierran el conjunto." }, { "title": "Piezas a medida", "text": "Cuando el proyecto pide una pieza propia." }], "architectural": [{ "title": "Pisos", "text": "Textiles, vinílicos y duros para el plano de piso." }, { "title": "Plafones", "text": "Cielos que ordenan la luz, la acústica y la instalación." }, { "title": "Muros y recubrimientos", "text": "Acabados que dan materia y color al espacio." }, { "title": "Acústica", "text": "Paneles y sistemas que cuidan cómo se escucha el lugar." }, { "title": "Exterior", "text": "Piezas para el paisaje y las áreas abiertas." }, { "title": "Piezas a medida", "text": "Cuando el proyecto pide una solución propia." }], "lighting": [{ "title": "Arquitectónica", "text": "Luz integrada a la arquitectura del espacio." }, { "title": "Decorativa", "text": "Luminarias que definen la atmósfera." }, { "title": "Exterior", "text": "Iluminación para fachadas, terrazas y paisaje." }, { "title": "Técnica", "text": "Sistemas para el puesto y el plano de trabajo." }, { "title": "Diseño", "text": "Piezas de autor para el punto que el proyecto pide." }, { "title": "Piezas a medida", "text": "Cuando la luz tiene que hacerse para el lugar." }] } },
     "spaces": { "label": "— ESPACIOS", "title": "Espacios\nIHO.", "empty": "Aún no hay espacios publicados.", "projects": "Proyectos" },
     "products": { "label": "— COMPRAR", "title": "Comprar.", "empty": "No hay productos disponibles en este país.", "noMatch": "Ningún producto coincide con esta búsqueda.", "count": "{count} productos", "search": "Buscar", "searchPlaceholder": "Buscar productos, marcas o diseñadores", "sort": "Ordenar", "sortFeatured": "Destacados", "sortName": "Nombre", "sortPriceAsc": "Precio: menor", "sortPriceDesc": "Precio: mayor", "filters": "Filtros", "clear": "Limpiar", "filterSolution": "Solución", "filterSpace": "Espacio", "filterBrand": "Marca", "filterDesigner": "Diseñador", "filterPriced": "Con precio", "all": "Todos", "brand": "Marca", "designer": "Diseño", "specs": "Especificaciones", "variants": "Variantes", "leadTime": "Entrega en {days} días", "onRequest": "Bajo pedido", "inStock": "En existencia", "inquiry": "Solicitar cotización", "inquirySent": "Recibimos tu solicitud.", "price": "Precio", "availability": "Disponibilidad", "sale": "Oferta", "from": "Desde {price}", "quote": "Cotizar",
       "inquiryTitle": "¿Te interesa este producto?", "inquiryMessage": "Me interesa cotizar {product}." },

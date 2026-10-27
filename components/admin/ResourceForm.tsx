@@ -247,7 +247,7 @@ function FieldInput({
         />,
       )
     case 'number':
-      return shell(<Input id={column} inputMode="numeric" disabled={disabled} {...register(column)} />)
+      return shell(<Input id={column} inputMode={field.decimals ? 'decimal' : 'numeric'} disabled={disabled} {...register(column)} />)
     case 'datetime':
       return shell(<Input id={column} type="datetime-local" disabled={disabled} {...register(column)} />)
     case 'multi':

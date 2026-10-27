@@ -33,13 +33,12 @@ export function StatsCounter({ stats }: { stats: StatVM[] }) {
     return () => obs.disconnect()
   }, [stats])
 
-  const last = stats.length - 1
   return (
-    <div id="iho-stats" ref={ref} style={{ display: 'flex', flexDirection: 'column' }}>
+    <div id="iho-stats" className="iho-stats-row" ref={ref}>
       {stats.map((s, i) => (
-        <div key={i} style={{ padding: i === 0 ? '0 0 22px' : i === last ? '22px 0 0' : '22px 0', borderBottom: i < last ? '1px solid rgba(20,18,12,0.12)' : 'none' }}>
-          <div className="iho-counter" style={{ fontFamily: ACUMIN, fontWeight: 800, fontSize: 52, lineHeight: 1, letterSpacing: '-1px' }}>{format(s, s.value)}</div>
-          <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 13, color: '#8a8478', marginTop: 4, whiteSpace: 'pre-line' }}>{s.label}</div>
+        <div key={i}>
+          <div className="iho-counter" style={{ fontFamily: ACUMIN, fontWeight: 800, letterSpacing: '-1px' }}>{format(s, s.value)}</div>
+          <div className="iho-stats-row__label">{s.label}</div>
         </div>
       ))}
     </div>

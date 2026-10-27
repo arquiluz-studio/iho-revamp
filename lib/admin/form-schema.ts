@@ -48,6 +48,7 @@ export type CtaValue = z.infer<typeof ctaSchema>
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATETIME_LOCAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 const INTEGER = /^-?\d+$/
+const DECIMAL = /^-?\d+(\.\d+)?$/
 
 const optional = (schema: z.ZodString, required: boolean) =>
   required ? schema.min(1, 'Requerido') : schema.or(z.literal(''))
@@ -76,7 +77,7 @@ function fieldSchema(field: Field, column: string, required: boolean): z.ZodType
     case 'number': {
       const number = z
         .string()
-        .regex(INTEGER, 'Número entero')
+        .regex(field.decimals ? DECIMAL : INTEGER, field.decimals ? 'Número' : 'Número entero')
         .refine(v => field.min === undefined || Number(v) >= field.min, `Mínimo ${field.min}`)
         .refine(v => field.max === undefined || Number(v) <= field.max, `Máximo ${field.max}`)
       return required ? number : number.or(z.literal(''))

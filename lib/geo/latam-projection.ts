@@ -1,12 +1,12 @@
 import { geoMercator } from 'd3-geo'
 
-export const MAP_WIDTH = 920
-export const MAP_HEIGHT = 1110
+export const MAP_WIDTH = 980
+export const MAP_HEIGHT = 640
 const PAD = 8
 
 const BBOX = {
   type: 'Polygon' as const,
-  coordinates: [[[-119, 42], [-72, 42], [-72, -9], [-119, -9], [-119, 42]]],
+  coordinates: [[[-118.5, 33.4], [-59, 33.4], [-59, 1], [-118.5, 1], [-118.5, 33.4]]],
 }
 
 export function latamProjection() {
@@ -31,10 +31,16 @@ export const CITY_COORDS: Record<string, [number, number]> = {
   'san josé': [-84.09, 9.93],
   'panamá': [-79.52, 8.98],
   'ciudad de panamá': [-79.52, 8.98],
+  'caracas': [-66.9, 10.48],
 }
 
-export function projectCity(name: string): [number, number] | null {
+export function projectPoint(longitude: number, latitude: number): [number, number] | null {
+  return latamProjection()([longitude, latitude]) ?? null
+}
+
+export function projectCity(name: string, point?: { longitude: number | null; latitude: number | null }): [number, number] | null {
+  if (point?.longitude != null && point.latitude != null) return projectPoint(point.longitude, point.latitude)
   const coords = CITY_COORDS[name.trim().toLowerCase()]
   if (!coords) return null
-  return latamProjection()(coords) ?? null
+  return projectPoint(coords[0], coords[1])
 }

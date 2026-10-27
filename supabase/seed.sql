@@ -95,15 +95,15 @@ from (values
 where not exists (select 1 from public.offices o where o.country_code = v.country_code and o.city = v.city);
 
 -- Team (MX) -------------------------------------------------------------------
-insert into public.team_members (country_code, full_name, role_es, role_en, photo_position, sort)
-select 'mx', v.full_name, v.role, v.role, v.photo_position, v.sort
+insert into public.team_members (country_code, full_name, slug, role_es, role_en, photo_position, sort)
+select 'mx', v.full_name, v.slug, v.role, v.role, v.photo_position, v.sort
 from (values
-  ('Salvador Miranda', 'CEO', '0% 0%', 1),
-  ('Daniela García', 'Regional Workspace Director', '0% 9.5%', 2),
-  ('Lupina Cornejo', 'Comercial Director, Ciento Once', '0% 0%', 3),
-  ('Manuel Macedo', 'Lighting Director', '0% 0%', 4),
-  ('Estefania Lara', 'Flooring Manager', '0% 9.5%', 5)
-) as v (full_name, role, photo_position, sort)
+  ('Salvador Miranda', 'salvador-miranda', 'CEO', '0% 0%', 1),
+  ('Daniela García', 'daniela-garcia', 'Regional Workspace Director', '0% 9.5%', 2),
+  ('Lupina Cornejo', 'lupina-cornejo', 'Comercial Director, Ciento Once', '0% 0%', 3),
+  ('Manuel Macedo', 'manuel-macedo', 'Lighting Director', '0% 0%', 4),
+  ('Estefania Lara', 'estefania-lara', 'Flooring Manager', '0% 9.5%', 5)
+) as v (full_name, slug, role, photo_position, sort)
 where not exists (select 1 from public.team_members t where t.country_code = 'mx' and t.full_name = v.full_name);
 
 -- Projects (MX) ---------------------------------------------------------------

@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { BrandLogos, Chips, PageHero, PageShell, ProjectCards, Prose, SectionHeading } from '@/components/site/pages/PageParts'
+import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
+import { SolutionView, type SolutionInclude } from '@/components/site/SolutionView'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
-import { imageOf, toBrandVM, toProjectCardVM } from '@/lib/content/site'
+import { imageOf, imageOrNull } from '@/lib/content/site'
 import { localSlug, paragraphs, pickBySlug, t } from '@/lib/i18n-fields'
-import { getCountryBrands } from '@/lib/queries/brands'
 import { getProjects } from '@/lib/queries/projects'
 import { getBusinessLines } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
@@ -41,39 +41,64 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
   if (!line) notFound()
   if (localSlug(line, locale) !== businessLine) permanentRedirect(paths.solution(localSlug(line, locale)))
 
-  const [tp, chrome, brands, projects] = await Promise.all([
+  const [tp, chrome, projects] = await Promise.all([
     getTranslations({ locale, namespace: 'pages.solutions' }),
     innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/solutions/[businessLine]', params: { businessLine: localSlug(line, l) } }))),
-    getCountryBrands(country),
     getProjects(country, { businessLine: line.slug }),
   ])
-  const solutionBrands = brands.filter(b => b.business_lines.some(l => l.business_line?.id === line.id))
   const name = t(line, 'name', locale)
+  const hero = imageOf(line.cover, locale, name, legacyMedia.businessLineCover(line.slug), 'lg')
+  const ordered = [...projects].sort((a, b) => Number(b.is_featured) - Number(a.is_featured))
+  const photos = ordered.flatMap(project => {
+    const title = t(project, 'title', locale)
+    const image = imageOrNull(project.cover, locale, title, legacyMedia.projectCover(project.slug), 'lg')
+    return image ? [image] : []
+  })
+  const catalog = readIncludes(tp.raw(`includes.${line.slug}`))
+  const includes: SolutionInclude[] = catalog.map((item, index) => ({
+    ...item,
+    image: photos.length ? photos[index % photos.length] : hero,
+  }))
 
   return (
     <PageShell chrome={chrome}>
-      <PageHero label={tp('label')} title={name} image={imageOf(line.cover, locale, name, legacyMedia.businessLineCover(line.slug))}>
-        <div style={{ marginTop: 32 }} className="iho-chips-dark">
-          <Chips links={lines.map(l => ({ href: paths.solution(localSlug(l, locale)), label: t(l, 'name', locale) }))} current={paths.solution(localSlug(line, locale))} />
-        </div>
-      </PageHero>
-      {t(line, 'description', locale) && (
-        <section className="iho-page-section" style={{ maxWidth: 900 }}>
-          <Prose paragraphs={paragraphs(t(line, 'description', locale))} />
-        </section>
-      )}
-      {solutionBrands.length > 0 && (
-        <section className="iho-page-section" style={{ paddingTop: 0 }}>
-          <SectionHeading label={`— ${tp('brands').toUpperCase()}`} />
-          <BrandLogos brands={solutionBrands.map(b => toBrandVM(b, locale, paths))} />
-        </section>
-      )}
-      {projects.length > 0 && (
-        <section className="iho-page-section" style={{ paddingTop: 0 }}>
-          <SectionHeading label={`— ${tp('projects').toUpperCase()}`} />
-          <ProjectCards projects={projects.map(p => toProjectCardVM(p, locale, paths))} />
-        </section>
-      )}
+      <SolutionView
+        name={name}
+        description={paragraphs(t(line, 'description', locale))}
+        hero={hero}
+        statementImage={photos[0] ?? hero}
+        includes={includes}
+        projects={ordered.slice(0, 4).map(project => {
+          const title = t(project, 'title', locale)
+          return {
+            key: project.id,
+            title,
+            href: paths.project(localSlug(project, locale)),
+            image: imageOrNull(project.cover, locale, title, legacyMedia.projectCover(project.slug), 'lg'),
+            meta: project.city || undefined,
+          }
+        })}
+        quoteHref={paths.contact}
+        quoteLabel={tp('quote')}
+        statementTitle={tp('statementTitle')}
+        includesLabel={tp('includesLabel')}
+        includesTitle={tp('includesTitle')}
+        projectsLabel={tp('projectsLabel')}
+        projectsTitle={tp('projectsTitle')}
+        allProjectsHref={paths.projects}
+        allProjectsLabel={tp('allProjects')}
+        closeTitle={tp('closeTitle')}
+        closeBody={tp('closeBody')}
+      />
     </PageShell>
   )
+}
+
+function readIncludes(value: unknown): { title: string; text: string }[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap(item => {
+    if (!item || typeof item !== 'object') return []
+    const row = item as { title?: unknown; text?: unknown }
+    return typeof row.title === 'string' ? [{ title: row.title, text: typeof row.text === 'string' ? row.text : '' }] : []
+  })
 }

@@ -1,6 +1,7 @@
 import 'server-only'
 import { COUNTRY_CODES } from '@/config/countries'
 import { cacheTags } from '@/lib/cache-tags'
+import { SLUG_PATTERN } from '@/lib/i18n-fields'
 import { cachedQuery, maybe, media, must } from './core'
 
 export function getCountries() {
@@ -87,7 +88,7 @@ export function getSiteSettings() {
 
 export function getOffices() {
   return cachedQuery(['offices'], COUNTRY_CODES.map(c => cacheTags.country(c, 'offices')), async ({ db }) =>
-    must(await db.from('offices').select('id, country_code, city, address, maps_url, phone, email, is_main, sort').order('sort'), 'offices'),
+    must(await db.from('offices').select('id, country_code, city, address, maps_url, phone, email, is_main, sort, latitude, longitude').order('sort'), 'offices'),
   )
 }
 
@@ -104,11 +105,17 @@ export function getTeam(code: string) {
   return cachedQuery(['team', code], [cacheTags.country(code, 'team')], async ({ db, draft }) => {
     let query = db
       .from('team_members')
-      .select(`id, full_name, role_es, role_en, photo_position, linkedin_url, sort, photo:${media('team_members_photo_media_id_fkey')}` as const)
+      .select(`id, slug, full_name, role_es, role_en, bio_es, bio_en, email, phone, photo_position, linkedin_url, sort, photo:${media('team_members_photo_media_id_fkey')}` as const)
       .eq('country_code', code)
     if (!draft) query = query.eq('is_published', true)
     return must(await query.order('sort'), 'team_members')
   })
+}
+
+export async function getTeamMember(code: string, slug: string) {
+  if (!SLUG_PATTERN.test(slug)) return null
+  const members = await getTeam(code)
+  return members.find(member => member.slug === slug) ?? null
 }
 
 export function getBusinessLines() {

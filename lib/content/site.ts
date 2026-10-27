@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { countryOrigin, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
 import { dayOfMonth, isPastDate, longDate, shortMonth, timeOfDay, timeRange, type Locale } from '@/lib/dates'
 import { plainTitle } from '@/lib/events/ics'
+import { projectCity } from '@/lib/geo/latam-projection'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { toImageVM, videoUrl, type ImageVariant, type MediaRef } from '@/lib/media'
 import { getCountryBrands, type CountryBrandRow } from '@/lib/queries/brands'
@@ -148,21 +149,19 @@ function toStats(value: unknown, locale: AppLocale): StatVM[] {
   }))
 }
 
-async function mapCountries(current: CountryCode, locale: AppLocale): Promise<MapCountryVM[]> {
+async function mapCountries(locale: AppLocale): Promise<MapCountryVM[]> {
   const [countries, offices] = await Promise.all([getCountries(), getOffices()])
-  return sortByCountry(countries, c => c.code)
-    .map(c => {
-      const own = offices.filter(o => o.country_code === c.code)
-      const main = own.filter(o => o.is_main).map(o => cityDisplay(o.city))
-      const rest = own
-        .filter(o => !o.is_main)
-        .map(o => cityDisplay(o.city))
-        .sort((a, b) => a.localeCompare(b, 'es'))
-      const name = t(c, 'name', locale)
-      const cities = [...main, ...rest]
-      // Single-office countries are labelled with the country name, as on the map legend.
-      return { code: c.code, name, cities: cities.length > 1 ? cities : [name], isCurrent: c.code === current, hasSite: true }
-    })
+  return sortByCountry(countries, c => c.code).flatMap(c => {
+    const cities = offices
+      .filter(o => o.country_code === c.code)
+      .sort((a, b) => a.sort - b.sort || a.city.localeCompare(b.city, locale))
+      .map(o => {
+        const xy = projectCity(o.city, o)
+        return { id: o.id, name: cityDisplay(o.city), address: o.address, mapsUrl: o.maps_url, x: xy?.[0] ?? null, y: xy?.[1] ?? null }
+      })
+    if (!cities.length) return []
+    return [{ code: c.code, name: t(c, 'name', locale), cities }]
+  })
 }
 
 /** Offices grouped by country in site order (see `sortByCountry`), cities alphabetical within each country; other countries muted. */
@@ -181,7 +180,7 @@ export async function getGroupVM(country: CountryCode, locale: AppLocale, paths:
   const [settings, members, countries, brands, projects] = await Promise.all([
     getSiteSettings(),
     getTeam(country),
-    mapCountries(country, locale),
+    mapCountries(locale),
     getCountryBrands(country),
     getProjects(country, { featured: true }),
   ])
@@ -194,7 +193,7 @@ export async function getGroupVM(country: CountryCode, locale: AppLocale, paths:
       name: m.full_name,
       role: t(m, 'role', locale),
       objectPosition: m.photo_position ?? undefined,
-      linkedinUrl: m.linkedin_url,
+      href: paths.team(m.slug),
       photo: imageOf(m.photo, locale, m.full_name, legacyMedia.teamPhoto(m.full_name), 'md'),
     })),
   }

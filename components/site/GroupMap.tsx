@@ -1,33 +1,89 @@
+'use client'
+
+import { useState } from 'react'
 import { CONTEXT_PATH, COUNTRY_PATHS } from '@/lib/geo/latam-map-data'
-import { MAP_HEIGHT, MAP_WIDTH, projectCity } from '@/lib/geo/latam-projection'
+import { MAP_HEIGHT, MAP_WIDTH } from '@/lib/geo/latam-projection'
 import type { MapCountryVM } from '@/lib/types/site'
 
-const LAND = '#a2a2a2'
-const LAND_CURRENT = '#8c8c8c'
-const CONTEXT = '#dcdcdc'
+const LAND = '#c6c6c6'
+const LAND_CURRENT = '#9a9a9a'
+const CONTEXT = '#e4e4e4'
 
-export function GroupMap({ countries, title }: { countries: MapCountryVM[]; title: string }) {
-  const current = new Set(countries.filter(c => c.isCurrent).map(c => c.code))
-  const pins = countries.flatMap(c => (c.cities.length ? c.cities : [c.name]).map(city => ({ key: `${c.code}-${city}`, xy: projectCity(city) })))
+export function GroupMap({
+  countries,
+  title,
+  placesLabel,
+  eyebrow,
+  caption,
+}: {
+  countries: MapCountryVM[]
+  title: string
+  placesLabel: string
+  eyebrow: string
+  caption: string
+}) {
+  const [active, setActive] = useState<string | null>(null)
+  const selectedCountry = countries.find(country => country.cities.some(city => city.id === active))?.code
+  const pins = countries.flatMap(country => country.cities.filter(city => city.x != null && city.y != null))
 
   return (
-    <div id="iho-map-frame" style={{ width: '100%', height: 560, display: 'block', background: '#ffffff', overflow: 'hidden' }}>
-      <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} role="img" aria-label={title} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', width: '100%', height: '100%' }}>
-        <defs>
-          <filter id="iho-pin-shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#000" floodOpacity="0.28" />
-          </filter>
-        </defs>
-        <path d={CONTEXT_PATH} fill={CONTEXT} />
-        <g stroke="#ffffff" strokeWidth={0.8} strokeLinejoin="round">
-          {Object.entries(COUNTRY_PATHS).map(([code, d]) => (
-            <path key={code} d={d} fill={current.has(code) ? LAND_CURRENT : LAND} />
+    <div className="iho-presence">
+      <div className="iho-presence__list">
+        <h3>{placesLabel}</h3>
+        {countries.map(country => (
+          <div key={country.code} className="iho-presence__block">
+            <p className="iho-presence__country">{country.name}</p>
+            <ul>
+              {country.cities.map(city => (
+                <li
+                  key={city.id}
+                  onMouseEnter={() => setActive(city.id)}
+                  onMouseLeave={() => setActive(currentId => (currentId === city.id ? null : currentId))}
+                >
+                  <button type="button" className={active === city.id ? 'iho-presence__city is-active' : 'iho-presence__city'} aria-expanded={active === city.id} onFocus={() => setActive(city.id)} onBlur={() => setActive(null)}>
+                    {city.name}
+                  </button>
+                  {active === city.id &&
+                    (city.mapsUrl ? (
+                      <a className="iho-presence__address" href={city.mapsUrl} target="_blank" rel="noopener noreferrer">
+                        {city.address}
+                      </a>
+                    ) : (
+                      <p className="iho-presence__address">{city.address}</p>
+                    ))}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="iho-presence__map">
+        <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} role="img" aria-label={title} preserveAspectRatio="xMidYMid meet">
+          <path d={CONTEXT_PATH} fill={CONTEXT} />
+          <g stroke="#ffffff" strokeWidth={0.8} strokeLinejoin="round">
+            {Object.entries(COUNTRY_PATHS).map(([code, d]) => (
+              <path key={code} d={d} fill={code === selectedCountry ? LAND_CURRENT : LAND} />
+            ))}
+          </g>
+          {pins.map(city => (
+            <circle
+              key={city.id}
+              cx={city.x ?? 0}
+              cy={city.y ?? 0}
+              r={active === city.id ? 7 : 4.5}
+              fill="#ef483d"
+              onMouseEnter={() => setActive(city.id)}
+              onMouseLeave={() => setActive(currentId => (currentId === city.id ? null : currentId))}
+            >
+              <title>{city.name}</title>
+            </circle>
           ))}
-        </g>
-        <g filter="url(#iho-pin-shadow)">
-          {pins.map(p => p.xy && <circle key={p.key} cx={p.xy[0]} cy={p.xy[1]} r={11} fill="#ffffff" />)}
-        </g>
-      </svg>
+        </svg>
+        <p className="iho-presence__caption">
+          <span>{eyebrow}</span>
+          <strong>{caption}</strong>
+        </p>
+      </div>
     </div>
   )
 }

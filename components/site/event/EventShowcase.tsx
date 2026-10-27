@@ -4,6 +4,7 @@ import { MediaImage } from '@/components/ui/MediaImage'
 import { RichText } from '@/components/ui/Section'
 import { ACUMIN } from '@/components/ui/tokens'
 import type { BrandVM, DesignerCardVM, ImageVM, ProductCardVM } from '@/lib/types/site'
+import { PhotoMosaic } from '../PhotoMosaic'
 import { ProductCard } from '../ProductCard'
 
 const MONO = '"Space Mono", monospace'
@@ -109,13 +110,13 @@ export function EventGallery({ images, past }: { images: ImageVM[]; past: boolea
           <div style={labelStyle}>{t('label')}</div>
           <h2 style={titleStyle}><RichText text={past ? t('pastTitle') : t('title')} /></h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }} className="iho-galeria-grid">
-          {images.map((image, i) => (
-            <div key={i} style={{ gridColumn: i === 0 ? 'span 2' : undefined, gridRow: i === 0 ? 'span 2' : undefined, aspectRatio: '1/1', borderRadius: 4, overflow: 'hidden', background: '#e7e2d8', cursor: 'pointer' }}>
-              <MediaImage image={image} alt={image.alt || t('item', { n: i + 1 })} sizes={i === 0 ? '(max-width: 768px) 100vw, 600px' : '(max-width: 768px) 50vw, 300px'} className="iho-gallery-img" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.6s cubic-bezier(0.2,0,0.2,1)' }} />
-            </div>
-          ))}
-        </div>
+        <PhotoMosaic
+          photos={images.map((image, index) => ({
+            key: `${image.src}-${index}`,
+            image: { ...image, alt: image.alt || t('item', { n: index + 1 }) },
+            download: { src: image.src },
+          }))}
+        />
       </div>
     </section>
   )

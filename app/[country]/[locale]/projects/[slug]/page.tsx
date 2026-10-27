@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { DownloadButton } from '@/components/site/DownloadButton'
+import { PhotoMosaic } from '@/components/site/PhotoMosaic'
 import { BrandLogos, Facts, PageHero, PageShell, ProjectCards, Prose, SectionHeading } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
-import { MediaImage } from '@/components/ui/MediaImage'
-import { SANS } from '@/components/ui/tokens'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { imageOf, toBrandVM, toProjectCardVM } from '@/lib/content/site'
@@ -15,6 +13,18 @@ import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
 
 type Params = SiteParams & { slug: string }
+
+function readFacts(value: unknown): { label_es: string; label_en: string | null; value: string }[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap(item => {
+    if (!item || typeof item !== 'object') return []
+    const row = item as Record<string, unknown>
+    const label = typeof row.label_es === 'string' ? row.label_es.trim() : ''
+    const text = typeof row.value === 'string' ? row.value.trim() : ''
+    if (!label || !text) return []
+    return [{ label_es: label, label_en: typeof row.label_en === 'string' ? row.label_en : null, value: text }]
+  })
+}
 
 export async function generateStaticParams() {
   const params = siteStaticParams()
@@ -69,6 +79,7 @@ export default async function ProjectPage({ params }: { params: Promise<Params> 
                 label: tp('solutions'),
                 value: lines.length > 0 && lines.map((l, i) => <span key={l.id}>{i > 0 && ', '}{link(paths.solution(localSlug(l, locale)), t(l, 'name', locale))}</span>),
               },
+              ...readFacts(project.facts).map(fact => ({ label: t(fact, 'label', locale), value: fact.value })),
             ]}
           />
         </div>
@@ -77,23 +88,18 @@ export default async function ProjectPage({ params }: { params: Promise<Params> 
       {project.gallery.length > 0 && (
         <section className="iho-page-section" style={{ paddingTop: 0 }}>
           <SectionHeading label={`— ${tp('gallery').toUpperCase()}`} />
-          <div className="iho-gallery-grid">
-            {project.gallery.flatMap(g => {
+          <PhotoMosaic
+            photos={project.gallery.flatMap(g => {
               if (!g.media) return []
               const caption = t(g, 'caption', locale)
-              return [
-                <figure key={g.media.id} style={{ margin: 0 }}>
-                  <div style={{ borderRadius: 4, overflow: 'hidden', aspectRatio: '4 / 3', background: '#e9e4da' }}>
-                    <MediaImage image={imageOf(g.media, locale, caption || title, null, 'lg')} sizes="(max-width: 768px) 100vw, 50vw" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  </div>
-                  <figcaption style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginTop: 10, fontFamily: SANS, fontSize: 14, color: '#5a554b' }}>
-                    <span>{caption}</span>
-                    {g.media.is_downloadable && <DownloadButton mediaId={g.media.id} countryCode={country} label={tp('download')} />}
-                  </figcaption>
-                </figure>,
-              ]
+              return [{
+                key: g.media.id,
+                image: imageOf(g.media, locale, caption || title, null, 'lg'),
+                caption: caption || undefined,
+                download: g.media.is_downloadable ? { mediaId: g.media.id, countryCode: country } : null,
+              }]
             })}
-          </div>
+          />
         </section>
       )}
 

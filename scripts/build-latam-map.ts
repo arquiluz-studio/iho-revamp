@@ -20,6 +20,8 @@ const COUNTRIES: Record<string, string> = {
   Nicaragua: 'ni',
   'Costa Rica': 'cr',
   Panama: 'pa',
+  Colombia: 'co',
+  Venezuela: 've',
 }
 
 const path = geoPath(latamProjection()).digits(1)

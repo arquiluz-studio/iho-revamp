@@ -16,7 +16,7 @@ export type Bridge = { table: TableName; selfKey: string; otherKey: string }
 type FieldBase = { name: string; label: string; required?: boolean; help?: string; wide?: boolean }
 export type Field =
   | (FieldBase & { type: 'text' | 'textarea' | 'url' | 'email' | 'slug'; i18n?: boolean; max?: number; rows?: number })
-  | (FieldBase & { type: 'number'; min?: number; max?: number })
+  | (FieldBase & { type: 'number'; min?: number; max?: number; decimals?: boolean })
   | (FieldBase & { type: 'boolean' })
   | (FieldBase & { type: 'select'; options: Option[] })
   | (FieldBase & { type: 'datetime' })
@@ -56,7 +56,7 @@ export type ResourceConfig = {
   /** The primary key is typed by the user on creation (countries.code). */
   pkInput?: boolean
   /** Localized public route used by "Ver en el sitio" / preview. */
-  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/designers/[slug]' | '/products/[slug]' | '/solutions/[businessLine]' | '/spaces/[sector]' | '/'
+  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/designers/[slug]' | '/products/[slug]' | '/team/[slug]' | '/solutions/[businessLine]' | '/spaces/[sector]' | '/'
   /** Datetime fields are entered in this row field's timezone (falls back to the country timezone). */
   timezoneField?: string
 }
@@ -211,6 +211,13 @@ const projects: ResourceConfig = {
     { name: 'summary', label: 'Resumen', type: 'textarea', i18n: true, max: 600, rows: 3 },
     { name: 'body', label: 'Descripción', type: 'textarea', i18n: true, max: 20000, rows: 10 },
     {
+      name: 'facts',
+      label: 'Datos del proyecto',
+      type: 'specs',
+      wide: true,
+      help: 'Cada fila es un título y un valor, por ejemplo m² y 1,200. El título en inglés es opcional.',
+    },
+    {
       name: 'business_lines',
       label: 'Soluciones',
       type: 'multi',
@@ -276,8 +283,10 @@ const offices: ResourceConfig = {
   writeRole: 'admin',
   section: 'offices',
   fields: [
-    { name: 'city', label: 'Ciudad', type: 'text', required: true, max: 120 },
+    { name: 'city', label: 'Ciudad', type: 'text', required: true, max: 120, help: 'Nombre que aparece en el mapa, por ejemplo Ciudad de Guatemala.' },
     { name: 'is_main', label: 'Oficina principal', type: 'boolean' },
+    { name: 'latitude', label: 'Latitud', type: 'number', decimals: true, min: -90, max: 90, help: 'Opcional. Si se deja vacía, el mapa usa una ubicación conocida de la ciudad.' },
+    { name: 'longitude', label: 'Longitud', type: 'number', decimals: true, min: -180, max: 180 },
     { name: 'address', label: 'Dirección', type: 'textarea', required: true, max: 500, rows: 3, wide: true },
     { name: 'maps_url', label: 'URL de Google Maps', type: 'url', wide: true },
     { name: 'phone', label: 'Teléfono', type: 'text', max: 60 },
@@ -303,18 +312,24 @@ const team: ResourceConfig = {
   singular: 'integrante',
   writeRole: 'editor',
   section: 'team',
+  publicPath: '/team/[slug]',
   fields: [
     { name: 'full_name', label: 'Nombre', type: 'text', required: true, max: 160 },
+    { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true, help: 'Dirección de la ficha, por ejemplo salvador-miranda.' },
     { name: 'role', label: 'Puesto', type: 'text', i18n: true, required: true, max: 160 },
     { name: 'photo_media_id', label: 'Foto', type: 'media', kind: 'team_photo' },
     { name: 'photo_position', label: 'Encuadre de la foto', type: 'text', max: 40, help: 'object-position CSS, ej. "50% 20%".' },
-    { name: 'linkedin_url', label: 'LinkedIn', type: 'url' },
+    { name: 'bio', label: 'Biografía', type: 'textarea', i18n: true, max: 4000, rows: 6, wide: true, help: 'Una línea en blanco separa párrafos. Se muestra en la ficha.' },
+    { name: 'email', label: 'Correo', type: 'email' },
+    { name: 'phone', label: 'Teléfono', type: 'text', max: 60 },
+    { name: 'linkedin_url', label: 'LinkedIn', type: 'url', wide: true },
     SORT_FIELD,
     { name: 'is_published', label: 'Visible en el sitio', type: 'boolean' },
   ],
   columns: [
     { key: 'full_name', label: 'Nombre' },
     { key: 'role_es', label: 'Puesto' },
+    { key: 'slug', label: 'Slug' },
     { key: 'sort', label: 'Orden', format: 'number' },
     { key: 'is_published', label: 'Visible', format: 'boolean' },
   ],

@@ -6,12 +6,27 @@ import { DOWNLOAD_FLAG_COOKIE, downloadHref } from '@/lib/downloads'
 import { SANS } from '@/components/ui/tokens'
 import { Turnstile } from '@/components/ui/Turnstile'
 
+const iconButton: React.CSSProperties = {
+  width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  border: 0, borderRadius: 20, padding: 0, cursor: 'pointer', color: '#fff', background: 'rgba(23,21,15,0.55)',
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M12 4v11" />
+      <path d="M7 11l5 5 5-5" />
+      <path d="M5 20h14" />
+    </svg>
+  )
+}
+
 const input: React.CSSProperties = {
   width: '100%', padding: '12px 14px', border: '1px solid rgba(20,18,12,0.15)', borderRadius: 8,
   fontFamily: SANS, fontSize: 15, background: '#fff', color: '#2c2920',
 }
 
-export function DownloadButton({ mediaId, countryCode, label }: { mediaId: string; countryCode: string; label: string }) {
+export function DownloadButton({ mediaId, countryCode, label, icon = false }: { mediaId: string; countryCode: string; label: string; icon?: boolean }) {
   const t = useTranslations('download')
   const tc = useTranslations('common')
   const locale = useLocale()
@@ -53,8 +68,8 @@ export function DownloadButton({ mediaId, countryCode, label }: { mediaId: strin
 
   return (
     <>
-      <button type="button" onClick={start} className="iho-btn" style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, background: 'transparent', border: '1px solid currentColor', borderRadius: 30, padding: '8px 16px', cursor: 'pointer', color: 'inherit' }}>
-        {label}
+      <button type="button" onClick={start} className="iho-btn" aria-label={label} style={icon ? iconButton : { fontFamily: SANS, fontSize: 14, fontWeight: 600, background: 'transparent', border: '1px solid currentColor', borderRadius: 30, padding: '8px 16px', cursor: 'pointer', color: 'inherit' }}>
+        {icon ? <DownloadIcon /> : label}
       </button>
       {open && (
         <div role="dialog" aria-modal="true" aria-label={t('title')} onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(20,18,12,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>

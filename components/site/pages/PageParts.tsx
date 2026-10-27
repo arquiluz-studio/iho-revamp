@@ -199,8 +199,8 @@ export function Facts({ items }: { items: { label: string; value: React.ReactNod
   if (!visible.length) return null
   return (
     <dl style={{ margin: 0, display: 'grid', gap: 18, borderTop: '1px solid rgba(20,18,12,0.12)', paddingTop: 22 }}>
-      {visible.map(i => (
-        <div key={i.label}>
+      {visible.map((i, n) => (
+        <div key={`${i.label}-${n}`}>
           <dt style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '1.2px', color: '#8a8478', marginBottom: 6, textTransform: 'uppercase' }}>
             {i.label}
           </dt>

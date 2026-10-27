@@ -1134,6 +1134,8 @@ export type Database = {
           email: string | null
           id: string
           is_main: boolean
+          latitude: number | null
+          longitude: number | null
           maps_url: string | null
           phone: string | null
           sort: number
@@ -1147,6 +1149,8 @@ export type Database = {
           email?: string | null
           id?: string
           is_main?: boolean
+          latitude?: number | null
+          longitude?: number | null
           maps_url?: string | null
           phone?: string | null
           sort?: number
@@ -1160,6 +1164,8 @@ export type Database = {
           email?: string | null
           id?: string
           is_main?: boolean
+          latitude?: number | null
+          longitude?: number | null
           maps_url?: string | null
           phone?: string | null
           sort?: number
@@ -1591,6 +1597,7 @@ export type Database = {
           country_code: string
           cover_media_id: string | null
           created_at: string
+          facts: Json
           id: string
           is_featured: boolean
           published_at: string | null
@@ -1614,6 +1621,7 @@ export type Database = {
           country_code: string
           cover_media_id?: string | null
           created_at?: string
+          facts?: Json
           id?: string
           is_featured?: boolean
           published_at?: string | null
@@ -1637,6 +1645,7 @@ export type Database = {
           country_code?: string
           cover_media_id?: string | null
           created_at?: string
+          facts?: Json
           id?: string
           is_featured?: boolean
           published_at?: string | null
@@ -1890,44 +1899,59 @@ export type Database = {
       }
       team_members: {
         Row: {
+          bio_en: string | null
+          bio_es: string | null
           country_code: string
           created_at: string
+          email: string | null
           full_name: string
           id: string
           is_published: boolean
           linkedin_url: string | null
+          phone: string | null
           photo_media_id: string | null
           photo_position: string | null
           role_en: string | null
           role_es: string
+          slug: string
           sort: number
           updated_at: string
         }
         Insert: {
+          bio_en?: string | null
+          bio_es?: string | null
           country_code: string
           created_at?: string
+          email?: string | null
           full_name: string
           id?: string
           is_published?: boolean
           linkedin_url?: string | null
+          phone?: string | null
           photo_media_id?: string | null
           photo_position?: string | null
           role_en?: string | null
           role_es: string
+          slug: string
           sort?: number
           updated_at?: string
         }
         Update: {
+          bio_en?: string | null
+          bio_es?: string | null
           country_code?: string
           created_at?: string
+          email?: string | null
           full_name?: string
           id?: string
           is_published?: boolean
           linkedin_url?: string | null
+          phone?: string | null
           photo_media_id?: string | null
           photo_position?: string | null
           role_en?: string | null
           role_es?: string
+          slug?: string
           sort?: number
           updated_at?: string
         }
