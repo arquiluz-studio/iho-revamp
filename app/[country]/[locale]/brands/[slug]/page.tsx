@@ -7,7 +7,7 @@ import { PhotoMosaic } from '@/components/site/PhotoMosaic'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { sitePaths } from '@/lib/content/paths'
-import { imageOf, imageOrNull, priceLabels } from '@/lib/content/site'
+import { imageOf, imageOrNull, priceLabels, productShot } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getBrandMedia, getCountryBrand, getCountryBrands } from '@/lib/queries/brands'
 import { getCatalog } from '@/lib/queries/catalog'
@@ -62,10 +62,11 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
   const related = designers.filter(designer => designerIds.has(designer.id))
   const lines = brand.business_lines.flatMap(link => (link.business_line ? [link.business_line] : []))
   const logo = imageOrNull(brand.logo, locale, brand.name, legacyMedia.brandLogo(brand.slug), 'lg')
+  const cover = imageOrNull(brand.cover, locale, brand.name, null, 'lg')
   const pieces = products.map(product => {
     const name = t(product, 'name', locale)
     const labels = product.is_purchasable ? priceLabels(product.price, locale, country) : null
-    const image = imageOrNull(product.cover, locale, name, legacyMedia.productCover(product.slug), 'md')
+    const image = productShot(product, locale, name, 'md')
     return {
       key: product.id,
       name,
@@ -93,6 +94,7 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
         exclusive={brand.is_exclusive ? tp('exclusive') : null}
         solutions={lines.map(line => ({ href: paths.solution(localSlug(line, locale)), label: t(line, 'name', locale) }))}
         logo={logo ? { ...logo, color: null, placeholder: null } : null}
+        cover={cover ? { ...cover, color: null, placeholder: null } : null}
         thin={brand.logo_is_thin}
         exploreHref={exploreHref}
         exploreLabel={td('explore')}

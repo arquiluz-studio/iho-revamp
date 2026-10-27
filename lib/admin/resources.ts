@@ -538,6 +538,13 @@ const brands: ResourceConfig = {
     { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true },
     { name: 'logo_media_id', label: 'Logo', type: 'media', kind: 'brand_logo' },
     { name: 'logo_is_thin', label: 'Logo delgado (se muestra más grande)', type: 'boolean' },
+    {
+      name: 'cover_media_id',
+      label: 'Portada',
+      type: 'media',
+      kind: 'generic',
+      help: 'Foto de la marca en el directorio y en la ficha. Puede ser un producto, un espacio o el logo sobre una foto. Si queda vacía, se usa el logo.',
+    },
     { name: 'website_url', label: 'Sitio web', type: 'url' },
     { name: 'origin_country', label: 'País de origen', type: 'text', max: 80 },
     { name: 'is_active', label: 'Activa', type: 'boolean' },

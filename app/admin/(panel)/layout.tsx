@@ -60,7 +60,6 @@ export default async function PanelLayout({ children }: { children: ReactNode })
         { href: '/admin/global/designers', label: 'Diseñadores' },
         { href: '/admin/global/solutions', label: 'Soluciones' },
         { href: '/admin/global/spaces', label: 'Espacios' },
-        { href: '/admin/global/solution-spaces', label: 'Soluciones por espacio' },
         ...(session.isSuperAdmin
           ? [
               { href: '/admin/global/countries', label: 'Países' },

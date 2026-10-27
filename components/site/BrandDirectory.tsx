@@ -9,6 +9,7 @@ export type DirectoryBrand = {
   name: string
   href?: string
   logo: ImageVM | null
+  cover?: ImageVM | null
   thin?: boolean
   lines: string[]
 }
@@ -126,13 +127,15 @@ export function BrandDirectory({
               <h2 id={`${idPrefix}-h-${letter}`}>{letter}</h2>
               <div className="iho-brand-cards">
                 {groups.get(letter)?.map(brand => {
+                  const image = brand.cover ?? brand.logo
+                  const isPhoto = photo || Boolean(brand.cover)
                   const body = (
                     <>
                       <div className="iho-brand-tile__mark">
-                        {brand.logo ? (
-                          <MediaImage image={brand.logo} alt="" />
+                        {image ? (
+                          <MediaImage image={image} alt="" />
                         ) : (
-                          <span aria-hidden="true" className={photo ? 'iho-brand-tile__word iho-brand-tile__word--name' : 'iho-brand-tile__word'}>{brand.name}</span>
+                          <span aria-hidden="true" className={isPhoto ? 'iho-brand-tile__word iho-brand-tile__word--name' : 'iho-brand-tile__word'}>{brand.name}</span>
                         )}
                       </div>
                       <span className="iho-brand-tile__meta">
@@ -143,7 +146,7 @@ export function BrandDirectory({
                       </span>
                     </>
                   )
-                  const className = `iho-brand-tile${photo ? ' iho-brand-tile--photo' : ''}${!photo && brand.thin ? ' iho-brand-tile--thin' : ''}`
+                  const className = `iho-brand-tile${isPhoto ? ' iho-brand-tile--photo' : ''}${!isPhoto && brand.thin ? ' iho-brand-tile--thin' : ''}`
                   return brand.href ? (
                     <a key={brand.slug} href={brand.href} className={className}>
                       {body}

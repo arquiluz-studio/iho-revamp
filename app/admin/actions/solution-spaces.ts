@@ -15,7 +15,7 @@ const rowSchema = z.object({
   imageId: z.uuid().nullable(),
 })
 
-/** Saves the photo and the bilingual sentence for every solution × space pair. */
+/** Saves the photo and the bilingual sentence for the pairs of one solution or one space. */
 export async function saveSolutionSpaceFits(rows: z.input<typeof rowSchema>[]): Promise<ActionResult> {
   const session = await getAdminSession()
   if (!session) return EXPIRED

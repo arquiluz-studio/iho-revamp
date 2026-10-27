@@ -126,6 +126,7 @@ export type Database = {
       }
       brands: {
         Row: {
+          cover_media_id: string | null
           created_at: string
           description_en: string | null
           description_es: string | null
@@ -140,6 +141,7 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          cover_media_id?: string | null
           created_at?: string
           description_en?: string | null
           description_es?: string | null
@@ -154,6 +156,7 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          cover_media_id?: string | null
           created_at?: string
           description_en?: string | null
           description_es?: string | null
@@ -168,6 +171,13 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "brands_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "brands_logo_media_id_fkey"
             columns: ["logo_media_id"]

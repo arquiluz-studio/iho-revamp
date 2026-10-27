@@ -139,7 +139,7 @@ export async function saveProductGallery(productId: string, mediaIds: string[], 
     const added = await supabase.from('product_media').insert(ids.data.map((media_id, sort) => ({ product_id: productId, media_id, sort })))
     if (added.error) return dbError(added.error)
   }
-  const cover = coverId && z.uuid().safeParse(coverId).success ? coverId : null
+  const cover = coverId && z.uuid().safeParse(coverId).success ? coverId : (ids.data[0] ?? null)
   const updated = await supabase.from('products').update({ cover_media_id: cover }).eq('id', productId)
   if (updated.error) return dbError(updated.error)
   revalidateProduct(productId, owner.country)

@@ -19,6 +19,7 @@ export function BrandProfile({
   exclusive,
   solutions,
   logo,
+  cover,
   thin,
   exploreHref,
   exploreLabel,
@@ -42,6 +43,7 @@ export function BrandProfile({
   exclusive?: string | null
   solutions: { href: string; label: string }[]
   logo: ImageVM | null
+  cover?: ImageVM | null
   thin?: boolean
   exploreHref?: string
   exploreLabel: string
@@ -97,8 +99,14 @@ export function BrandProfile({
             </a>
           )}
         </div>
-        <div className={thin ? 'iho-designer-portrait iho-designer-portrait--logo iho-designer-portrait--thin' : 'iho-designer-portrait iho-designer-portrait--logo'}>
-          {logo ? <MediaImage image={logo} alt={name} sizes="(max-width: 768px) 100vw, 520px" /> : <span>{name}</span>}
+        <div className={cover ? 'iho-designer-portrait' : thin ? 'iho-designer-portrait iho-designer-portrait--logo iho-designer-portrait--thin' : 'iho-designer-portrait iho-designer-portrait--logo'}>
+          {cover ? (
+            <MediaImage image={cover} alt={name} sizes="(max-width: 768px) 100vw, 520px" />
+          ) : logo ? (
+            <MediaImage image={logo} alt={name} sizes="(max-width: 768px) 100vw, 520px" />
+          ) : (
+            <span>{name}</span>
+          )}
         </div>
       </div>
 

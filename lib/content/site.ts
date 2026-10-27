@@ -28,6 +28,20 @@ export function imageOf(media: MediaRef | null | undefined, locale: AppLocale, a
   return imageOrNull(media, locale, alt, fallback, largest) ?? { src: PLACEHOLDER_SRC, alt, color: PLACEHOLDER_COLOR }
 }
 
+/**
+ * Product photo: the cover, otherwise the first gallery shot. The old stock photo is only used when the
+ * product has no picture of its own, so removing the cover does not bring that placeholder back.
+ */
+export function productShot(
+  product: { slug: string; cover: MediaRef | null | undefined; gallery?: readonly { sort: number; media: MediaRef | null }[] },
+  locale: AppLocale,
+  name: string,
+  largest: ImageVariant,
+): ImageVM | null {
+  const shot = product.cover ?? [...(product.gallery ?? [])].sort((a, b) => a.sort - b.sort).find(item => item.media)?.media
+  return imageOrNull(shot, locale, name, shot ? null : legacyMedia.productCover(product.slug), largest)
+}
+
 /** No media and no fallback means the slot stays empty, instead of a placeholder. */
 export function imageOrNull(media: MediaRef | null | undefined, locale: AppLocale, alt: string, fallback?: string | null, largest: ImageVariant = 'md'): ImageVM | null {
   if (media) return toImageVM(media, locale, largest, alt)
@@ -125,7 +139,7 @@ export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: strin
     brand: p.catalogBrandName,
     category: category ? t(category, 'name', locale).toUpperCase() : undefined,
     href: labels ? paths.product(localSlug(p, locale)) : `${paths.product(localSlug(p, locale))}#cotizar`,
-    image: imageOf(p.cover, locale, name, legacyMedia.productCover(p.slug), 'md'),
+    image: productShot(p, locale, name, 'md') ?? imageOf(null, locale, name, null, 'md'),
     price: labels?.price,
     inquiry: !labels,
   }

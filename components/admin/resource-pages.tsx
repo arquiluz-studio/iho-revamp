@@ -19,6 +19,7 @@ import { GalleryEditor, type GalleryItem } from './GalleryEditor'
 import { ProjectsOrderPage } from './ProjectsOrderPage'
 import { PreviousEditionsEditor, type PreviousEditionOption } from './PreviousEditionsEditor'
 import { ResourceForm } from './ResourceForm'
+import { SolutionFitEditor, type SolutionSpaceRow } from './SolutionSpacesEditor'
 import { ButtonLink, Notice, PageHeader, cn } from './ui'
 
 type AnyRow = Record<string, unknown>
@@ -231,7 +232,64 @@ export async function ResourceEditPage({
           <BrandGallery id={id} canEdit={canWrite} />
         </div>
       )}
+      {id && (resource === 'solutions' || resource === 'spaces') && (
+        <div className="mt-6 lg:max-w-[calc(100%-304px)]">
+          <SolutionFits owner={resource} id={id} canEdit={canWrite} />
+        </div>
+      )}
     </>
+  )
+}
+
+async function SolutionFits({ owner, id, canEdit }: { owner: 'solutions' | 'spaces'; id: string; canEdit: boolean }) {
+  const supabase = await createSupabaseServerClient()
+  const [{ data: lines }, { data: sectors }, { data: fits }] = await Promise.all([
+    supabase.from('business_lines').select('id, name_es, sort').order('sort'),
+    supabase.from('sectors').select('id, name_es, sort').order('sort'),
+    supabase
+      .from('solution_space_fits')
+      .select('business_line_id, sector_id, body_es, body_en, image_media_id')
+      .eq(owner === 'solutions' ? 'business_line_id' : 'sector_id', id),
+  ])
+  const byPair = new Map((fits ?? []).map(fit => [`${fit.business_line_id}:${fit.sector_id}`, fit]))
+  const rows: SolutionSpaceRow[] =
+    owner === 'solutions'
+      ? (sectors ?? []).map(sector => {
+          const fit = byPair.get(`${id}:${sector.id}`)
+          return {
+            businessLineId: id,
+            sectorId: sector.id,
+            label: sector.name_es,
+            bodyEs: fit?.body_es ?? '',
+            bodyEn: fit?.body_en ?? '',
+            imageId: fit?.image_media_id ?? null,
+          }
+        })
+      : (lines ?? []).map(line => {
+          const fit = byPair.get(`${line.id}:${id}`)
+          return {
+            businessLineId: line.id,
+            sectorId: id,
+            label: line.name_es,
+            bodyEs: fit?.body_es ?? '',
+            bodyEn: fit?.body_en ?? '',
+            imageId: fit?.image_media_id ?? null,
+          }
+        })
+  const imageIds = [...new Set(rows.flatMap(row => (row.imageId ? [row.imageId] : [])))]
+  const { data: media } = imageIds.length ? await supabase.from('media_assets').select(ADMIN_MEDIA_SELECT).in('id', imageIds) : { data: [] }
+  return (
+    <SolutionFitEditor
+      title={owner === 'solutions' ? 'Espacios' : 'Soluciones'}
+      description={
+        owner === 'solutions'
+          ? 'Foto y texto de esta solución en cada tipo de espacio. La misma ficha se edita dentro del espacio.'
+          : 'Foto y texto de cada solución en este espacio. La misma ficha se edita dentro de la solución.'
+      }
+      rows={rows}
+      media={(media ?? []).map(toAdminMedia)}
+      canEdit={canEdit}
+    />
   )
 }
 

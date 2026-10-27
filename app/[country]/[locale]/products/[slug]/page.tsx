@@ -6,9 +6,8 @@ import { Chips, Facts, PageShell, Prose, SectionHeading } from '@/components/sit
 import { ProductCard } from '@/components/site/ProductCard'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { MediaImage } from '@/components/ui/MediaImage'
-import { legacyMedia } from '@/lib/content/legacy-media'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
-import { imageOf, priceLabels, toProductCardVM } from '@/lib/content/site'
+import { imageOf, priceLabels, productShot, toProductCardVM } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getCatalog, getProductBySlug } from '@/lib/queries/catalog'
 import { buildAlternates } from '@/lib/seo'
@@ -51,8 +50,9 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
   const name = t(product, 'name', locale)
   const brandName = product.brand?.name ?? product.catalogBrandName
-  const cover = imageOf(product.cover, locale, name, legacyMedia.productCover(product.slug), 'lg')
-  const gallery = product.gallery.flatMap(g => (g.media && g.media.id !== product.cover?.id ? [imageOf(g.media, locale, name, null, 'md')] : []))
+  const cover = productShot(product, locale, name, 'lg') ?? imageOf(null, locale, name, null, 'lg')
+  const mainId = product.cover?.id ?? [...product.gallery].sort((a, b) => a.sort - b.sort).find(item => item.media)?.media?.id
+  const gallery = product.gallery.flatMap(item => (item.media && item.media.id !== mainId ? [imageOf(item.media, locale, name, null, 'md')] : []))
   const labels = product.is_purchasable ? priceLabels(product.price, locale, country) : null
   const availability = product.lead_time_days ? tp('leadTime', { days: product.lead_time_days }) : tp('onRequest')
   const variants = product.variants.length > 1 ? product.variants : []

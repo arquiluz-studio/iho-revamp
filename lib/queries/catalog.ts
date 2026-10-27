@@ -14,6 +14,7 @@ const catalogTags = (country: string) => [
 
 const CATALOG_SELECT = `id, slug, slug_en, name_es, name_en, status, is_purchasable, is_featured, lead_time_days, sort,
   cover:${media('products_cover_media_id_fkey')},
+  gallery:product_media(sort, media:${media('product_media_media_id_fkey')}),
   catalog_brand:catalog_brands!inner(id, name, brand:brands(id, slug, name, is_active)),
   designers:product_designers(designer:designers(id, slug, name, is_active)),
   business_line:business_lines(id, slug, slug_en, name_es, name_en),
@@ -59,7 +60,7 @@ function summarize(list: VariantOffer[] = []) {
 
 /** Products visible in the country, with their current sale price. */
 export function getCatalog(country: string) {
-  return cachedQuery(['catalog', country], catalogTags(country), async ({ db, draft }) => {
+  return cachedQuery(['catalog', country, 'gallery'], catalogTags(country), async ({ db, draft }) => {
     const [rows, prices] = await Promise.all([
       db
         .from('products')
