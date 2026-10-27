@@ -1277,6 +1277,8 @@
 .iho-subnav-label { position: absolute; left: var(--iho-bar-edge); top: 50%; transform: translateY(-50%); font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; color: #8a8478; }
 .iho-subnav ul { display: flex; flex-wrap: wrap; gap: 8px 34px; margin: 0; padding: 0; list-style: none; }
 .iho-subnav li a { color: #2c2920; text-decoration: none; font-size: 15px; font-weight: 500; letter-spacing: 0.02em; transition: color 0.2s ease; }
+.iho-subnav-out { display: inline-flex; align-items: center; gap: 6px; }
+.iho-subnav-out svg { display: block; flex: none; }
 .iho-subnav li a:hover, .iho-subnav li a[aria-current="true"] { color: #ef483d; }
 .iho-subnav li a[aria-current="true"] { font-weight: 700; }
 .iho-subnav, .iho-subnav-label, .iho-subnav li a { transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.25s ease; }
@@ -1371,6 +1373,86 @@ header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .i
   .iho-shop-toolbar { flex-direction: column; align-items: stretch; }
   .iho-event-row { grid-template-columns: 80px 1fr; }
   .iho-event-row > :last-child { display: none; }
+}
+.iho-brands-directory { max-width: 1240px; margin: 0 auto; padding: 124px 40px 88px; }
+.iho-brands-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 420px); gap: 48px; align-items: center; padding-bottom: 42px; }
+.iho-brands-intro h1 { margin: 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: clamp(64px, 8vw, 96px); line-height: 0.84; letter-spacing: -1px; text-transform: uppercase; color: #17150f; }
+.iho-brands-intro p { margin: 0; justify-self: end; max-width: 420px; font-family: "Source Sans 3", sans-serif; font-size: 15.5px; line-height: 1.55; color: #6d675e; }
+.iho-alpha { display: flex; justify-content: space-between; gap: 8px; margin: 0; padding: 14px 0; border-top: 1px solid rgba(20, 18, 12, 0.12); border-bottom: 1px solid rgba(20, 18, 12, 0.12); overflow-x: auto; }
+.iho-alpha button { flex: none; background: none; border: 0; padding: 2px; font-family: "Source Sans 3", sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.04em; color: #c9c2b6; cursor: default; }
+.iho-alpha button.is-on { color: #1c1a16; cursor: pointer; }
+.iho-alpha button.is-on:hover { color: #ef483d; }
+.iho-alpha button:focus-visible { outline: 2px solid #ef483d; outline-offset: 3px; }
+.iho-brands-tools { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 22px 0; border-bottom: 1px solid rgba(20, 18, 12, 0.12); }
+.iho-brands-search { display: flex; align-items: center; gap: 10px; width: min(340px, 46%); color: #8a8478; border-bottom: 1px solid rgba(20, 18, 12, 0.35); padding-bottom: 8px; }
+.iho-brands-search svg { flex: none; }
+.iho-brands-search input { width: 100%; border: 0; background: transparent; padding: 0; font-family: "Source Sans 3", sans-serif; font-size: 15px; color: #17150f; }
+.iho-brands-search input:focus { outline: none; }
+.iho-brands-search input::placeholder { color: #8a8478; }
+.iho-brands-filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.iho-brands-filters button { font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 999px; padding: 8px 16px; border: 1px solid #1a1916; background: transparent; color: #1a1916; cursor: pointer; }
+.iho-brands-filters button[aria-pressed="true"] { background: #1a1916; color: #fff; }
+.iho-brands-filters button:focus-visible { outline: 2px solid #ef483d; outline-offset: 2px; }
+.iho-brands-empty { margin: 36px 0 0; font-family: "Source Sans 3", sans-serif; font-size: 16px; color: #8a8478; }
+.iho-brand-group { display: grid; grid-template-columns: 92px minmax(0, 1fr); column-gap: 18px; padding: 40px 0 36px; border-bottom: 1px solid rgba(20, 18, 12, 0.12); scroll-margin-top: 108px; }
+.iho-brand-group h2 { margin: 8px 0 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: 88px; line-height: 0.76; color: #ef483d; }
+.iho-brand-cards { display: flex; flex-wrap: wrap; gap: 32px 36px; align-items: start; }
+.iho-brand-tile { display: block; width: 200px; max-width: 100%; color: inherit; text-decoration: none; }
+.iho-brand-tile__mark { aspect-ratio: 1; background: #e6e1d7; display: flex; align-items: center; justify-content: center; padding: 28px; }
+.iho-brand-tile__mark img { max-width: 100%; max-height: 72px; width: auto; height: auto; object-fit: contain; }
+.iho-brand-tile--thin .iho-brand-tile__mark img { max-height: 130px; }
+.iho-brand-tile--photo .iho-brand-tile__mark { padding: 0; overflow: hidden; }
+.iho-brand-tile--photo .iho-brand-tile__mark img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; }
+.iho-brand-tile__word.iho-brand-tile__word--name { letter-spacing: 0; text-transform: none; font-size: 16px; line-height: 1.25; color: #8a8478; }
+.iho-designer { max-width: 1240px; margin: 0 auto; padding: 124px 40px 88px; }
+.iho-crumb { margin: 0 0 42px; font-family: "Source Sans 3", sans-serif; font-size: 14px; color: #8a8478; }
+.iho-crumb a { color: inherit; text-decoration: none; }
+.iho-crumb a:hover { color: #17150f; }
+.iho-designer-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 520px); gap: 40px 72px; align-items: center; }
+.iho-designer-kicker { margin: 0 0 14px; font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #8a8478; }
+.iho-designer-hero h1 { margin: 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: clamp(52px, 6.4vw, 84px); line-height: 0.86; letter-spacing: -1px; text-transform: uppercase; color: #17150f; }
+.iho-designer-bio { margin: 22px 0 0; max-width: 440px; font-family: "Source Sans 3", sans-serif; font-size: 15.5px; line-height: 1.6; color: #6d675e; }
+.iho-designer-bio + .iho-designer-bio { margin-top: 12px; }
+.iho-designer-site { display: inline-block; margin-top: 16px; color: #ef483d; font-family: "Source Sans 3", sans-serif; font-size: 14px; text-decoration: none; }
+.iho-explore { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #17150f; text-decoration: none; }
+.iho-explore svg { display: block; }
+.iho-designer-portrait { aspect-ratio: 1; background: #e4dfd6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.iho-designer-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iho-designer-portrait span { max-width: 220px; padding: 24px; font-family: "Source Sans 3", sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; color: #b7b1a6; }
+.iho-designer-block { margin-top: 92px; scroll-margin-top: 108px; }
+.iho-designer-block .iho-brands-intro { padding-bottom: 32px; }
+.iho-designer-block .iho-designer-kicker { color: #ef483d; }
+.iho-designer-block h2 { margin: 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: clamp(44px, 5.5vw, 72px); line-height: 0.88; letter-spacing: -0.5px; text-transform: uppercase; color: #17150f; }
+.iho-piece-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 22px; }
+.iho-piece { display: block; color: inherit; text-decoration: none; }
+.iho-piece__mark { aspect-ratio: 1; background: #e6e1d7; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.iho-piece__mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iho-piece__mark span { max-width: 140px; padding: 16px; font-family: "Source Sans 3", sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; color: #b7b1a6; }
+.iho-piece__price { margin-top: 14px; font-family: "Source Sans 3", sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8478; }
+.iho-piece__name { margin-top: 6px; font-family: "Source Sans 3", sans-serif; font-size: 16px; color: #17150f; }
+.iho-piece__detail { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #ef483d; }
+.iho-piece:hover .iho-piece__name { color: #ef483d; }
+.iho-brand-tile__word { font-family: "Source Sans 3", sans-serif; font-size: 20px; line-height: 1.15; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; color: #b7b1a6; }
+.iho-brand-tile__meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-family: "Source Sans 3", sans-serif; font-size: 15px; color: #17150f; }
+.iho-brand-tile__meta svg { flex: none; color: #8a8478; }
+.iho-brand-tile:hover .iho-brand-tile__meta { color: #ef483d; }
+.iho-brand-tile:hover .iho-brand-tile__meta svg { color: #ef483d; }
+.iho-brand-tile:focus-visible { outline: 2px solid #ef483d; outline-offset: 4px; }
+@media (max-width: 768px) {
+  .iho-brands-directory { padding: 108px 20px 56px; }
+  .iho-brands-intro { grid-template-columns: 1fr; gap: 18px; padding-bottom: 28px; }
+  .iho-brands-intro p { justify-self: start; }
+  .iho-brands-tools { flex-direction: column; align-items: stretch; }
+  .iho-brands-search { width: 100%; }
+  .iho-brands-filters { justify-content: flex-start; }
+  .iho-brand-group { grid-template-columns: 1fr; row-gap: 8px; padding: 28px 0 24px; }
+  .iho-brand-group h2 { font-size: 64px; }
+  .iho-brand-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+  .iho-brand-tile { width: auto; }
+  .iho-designer { padding: 108px 20px 56px; }
+  .iho-designer-hero { grid-template-columns: 1fr; }
+  .iho-designer-block { margin-top: 64px; }
+  .iho-piece-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .iho-chips-dark .iho-chip-row a { color: #fff; border-color: rgba(255, 255, 255, 0.4); }
 .iho-chips-dark .iho-chip-row a:hover { background: #fff; color: #17150f; border-color: #fff; }

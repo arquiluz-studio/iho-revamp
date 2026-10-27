@@ -34,7 +34,7 @@ export function SubnavProvider({ children }: { children: React.ReactNode }) {
 
 export const useSubnav = () => useContext(SubnavContext)
 
-export type SubnavItem = { href: string; label: string; current?: boolean; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }
+export type SubnavItem = { href: string; label: string; current?: boolean; arrow?: boolean; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }
 
 /** Full-width bar under the header (positioned against the fixed `<header>`), items aligned with the first nav link. */
 export function SubnavBar({ id, label, items }: { id: string; label: string; items: SubnavItem[] }) {
@@ -58,7 +58,12 @@ export function SubnavBar({ id, label, items }: { id: string; label: string; ite
         <ul role="list" aria-label={label}>
           {items.map(item => (
             <li key={item.href}>
-              <a href={item.href} onClick={item.onClick} aria-current={item.current ? 'true' : undefined}>
+              <a href={item.href} className={item.arrow ? 'iho-subnav-out' : undefined} onClick={item.onClick} aria-current={item.current ? 'true' : undefined}>
+                {item.arrow && (
+                  <svg aria-hidden="true" width={10} height={10} viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="square">
+                    <path d="M1.5 8.5 8 2M3 1.5h5.5V7" />
+                  </svg>
+                )}
                 {item.label}
               </a>
             </li>

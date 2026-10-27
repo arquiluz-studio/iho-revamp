@@ -11,8 +11,8 @@ export type ImageVM = {
   color?: string | null
 }
 
-/** With `items`, the link opens a secondary bar listing them instead of navigating. */
-export type NavLink = { href: string; label: string; items?: NavLink[] }
+/** With `items`, the link opens a secondary bar listing them instead of navigating. `arrow` draws the outbound mark used by Comprar. */
+export type NavLink = { href: string; label: string; items?: NavLink[]; arrow?: boolean }
 
 export type EventVM = {
   slug: string

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { ContentHero } from '@/components/site/pages/ContentHero'
-import { DesignerCards, EmptyNote, PageShell } from '@/components/site/pages/PageParts'
+import { BrandDirectory } from '@/components/site/BrandDirectory'
+import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
-import { toDesignerCardVM } from '@/lib/content/site'
+import { imageOrNull } from '@/lib/content/site'
+import { t } from '@/lib/i18n-fields'
 import { getDesigners } from '@/lib/queries/designers'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, type SiteParams } from '@/lib/site-params'
@@ -24,18 +25,36 @@ export default async function DesignersPage({ params }: { params: Promise<SitePa
     getDesigners(),
     innerChrome(country, locale, paths),
   ])
-  const born = (year: number) => tp('born', { year })
-  const hero = await resolvePageHero(country, 'designers', locale)
+  const nationalities = [...new Set(designers.map(d => t(d, 'nationality', locale)).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, locale, { sensitivity: 'base' }),
+  )
+
   return (
-    <PageShell chrome={chrome} hero={hero.enabled}>
-      <ContentHero hero={hero} />
-      <section className="iho-page-section">
-        {designers.length > 0 ? (
-          <DesignerCards designers={designers.map(d => toDesignerCardVM(d, locale, paths, born))} />
-        ) : (
-          <EmptyNote>{tp('empty')}</EmptyNote>
-        )}
-      </section>
+    <PageShell chrome={chrome} hero={false}>
+      <BrandDirectory
+        label={tp('label')}
+        title={tp('heading')}
+        intro={tp('intro')}
+        photo
+        idPrefix="disenador"
+        locale={locale}
+        lettersLabel={tp('letters')}
+        searchLabel={tp('search')}
+        allLabel={tp('allFilter')}
+        emptyLabel={tp('empty')}
+        noMatchLabel={tp('noMatch')}
+        filters={nationalities.length > 1 ? nationalities.map(name => ({ slug: name, label: name })) : []}
+        brands={designers.map(designer => {
+          const photo = imageOrNull(designer.portrait, locale, designer.name, null, 'md')
+          return {
+            slug: designer.slug,
+            name: designer.name,
+            href: paths.designer(designer.slug),
+            logo: photo ? { ...photo, color: null, placeholder: null } : null,
+            lines: [t(designer, 'nationality', locale)].filter(Boolean),
+          }
+        })}
+      />
     </PageShell>
   )
 }

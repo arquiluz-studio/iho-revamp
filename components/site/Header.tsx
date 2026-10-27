@@ -10,8 +10,6 @@ type Props = {
   logoHref: string
   links: NavLink[]
   cta: NavLink
-  /** Secondary button next to the CTA, to the group's online store. */
-  shop?: NavLink
   /** Fraction of the viewport height after which the header turns solid. */
   threshold?: number
   /** Start solid. Used when the page has no dark hero behind the bar. */
@@ -28,7 +26,7 @@ export function Header(props: Props) {
   )
 }
 
-function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, solid = false, tools }: Props) {
+function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tools }: Props) {
   const t = useTranslations('common')
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -37,7 +35,7 @@ function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, solid = false
   // Read from the browser: on the server the pathname is the internal rewritten route, not the visible URL.
   const pathname = useSyncExternalStore(noopSubscribe, () => window.location.pathname, () => null)
   const matches = (href: string) => pathname !== null && (pathname === href || pathname.startsWith(`${href}/`))
-  const isActive = (link: NavLink) => matches(link.href)
+  const isActive = (link: NavLink) => matches(link.href) || !!link.items?.some(item => matches(item.href))
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * threshold)
@@ -113,20 +111,12 @@ function HeaderBar({ logoHref, links, cta, shop, threshold = 0.75, solid = false
                   <SubnavBar
                     id={id}
                     label={l.label}
-                    items={l.items.map(item => ({ href: item.href, label: item.label, current: matches(item.href) }))}
+                    items={l.items.map(item => ({ href: item.href, label: item.label, current: matches(item.href), arrow: item.arrow }))}
                   />
                 )}
               </div>
             )
           })}
-          {shop && (
-            <a href={shop.href} className="iho-nav-link" aria-current={isActive(shop) ? 'page' : undefined} onClick={close} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <svg aria-hidden="true" width={10} height={10} viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="square" style={{ display: 'block', flex: 'none' }}>
-                <path d="M1.5 8.5 8 2M3 1.5h5.5V7" />
-              </svg>
-              {shop.label}
-            </a>
-          )}
           <a href={cta.href} className="iho-btn" onClick={close} style={{ display: 'inline-flex', alignItems: 'center', background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
             {cta.label}
           </a>

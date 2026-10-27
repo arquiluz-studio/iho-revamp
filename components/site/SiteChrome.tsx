@@ -61,13 +61,21 @@ export async function siteChrome({ country, locale, paths, threshold, contactHre
       label: tn('spaces'),
       items: sectors.map(sector => ({ href: paths.space(localSlug(sector, locale)), label: t(sector, 'name', locale) })),
     },
+    {
+      href: paths.products,
+      label: tn('products'),
+      items: [
+        { href: paths.brands, label: tn('brands') },
+        { href: paths.designers, label: tn('designers') },
+        { href: paths.products, label: tn('shop'), arrow: true },
+      ],
+    },
     { href: paths.projects, label: tn('projects') },
     { href: paths.events, label: tn('events') },
   ]
   const cta: NavLink = { href: paths.contact, label: tn('contact') }
-  const shop: NavLink = { href: paths.products, label: tn('shop') }
   return {
-    header: <Header logoHref={paths.home} threshold={threshold} links={links} cta={cta} shop={shop} tools={<SiteTools country={country} localeHrefs={localeHrefs} />} />,
+    header: <Header logoHref={paths.home} threshold={threshold} links={links} cta={cta} tools={<SiteTools country={country} localeHrefs={localeHrefs} />} />,
     footer: (
       <Footer
         homeHref={paths.home}
