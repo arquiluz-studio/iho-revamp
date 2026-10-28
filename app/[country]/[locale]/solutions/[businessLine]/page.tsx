@@ -1,16 +1,19 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { ArchitecturalView, type ArchitecturalStory } from '@/components/site/ArchitecturalView'
 import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { SolutionView, type SolutionInclude } from '@/components/site/SolutionView'
 import { spacesForSolution } from '@/lib/content/solution-fits'
+import { copyText, parseSolutionPage, solutionPageMediaIds, type Copy, type SolutionPageContent } from '@/lib/content/solution-page'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { imageOf, imageOrNull } from '@/lib/content/site'
+import { toImageVM, type MediaRef } from '@/lib/media'
 import { localSlug, paragraphs, pickBySlug, t } from '@/lib/i18n-fields'
 import { getProjects } from '@/lib/queries/projects'
-import { getBusinessLines, getSectors, getSolutionSpaceFits } from '@/lib/queries/site'
+import { getBusinessLines, getSectors, getSolutionMedia, getSolutionSpaceFits } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
 
@@ -42,14 +45,37 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
   if (!line) notFound()
   if (localSlug(line, locale) !== businessLine) permanentRedirect(paths.solution(localSlug(line, locale)))
 
-  const [tp, chrome, projects, sectors, fits] = await Promise.all([
+  const chrome = await innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/solutions/[businessLine]', params: { businessLine: localSlug(line, l) } })))
+  const name = t(line, 'name', locale)
+  if (line.slug === 'architectural') {
+    const content = parseSolutionPage(line.page_content)
+    const media = await getSolutionMedia(solutionPageMediaIds(content))
+    const images = new Map(media.map(item => [item.id, item]))
+    const currentHref = paths.solution(localSlug(line, locale))
+    return (
+      <PageShell chrome={chrome} hero={false}>
+        <ArchitecturalView
+          story={architecturalStory(
+            content,
+            locale,
+            name,
+            imageOrNull(line.cover, locale, name, legacyMedia.businessLineCover(line.slug), 'lg'),
+            images,
+            paths.contact,
+            lines.map(item => ({ href: paths.solution(localSlug(item, locale)), label: t(item, 'name', locale) })),
+            currentHref,
+          )}
+        />
+      </PageShell>
+    )
+  }
+
+  const [tp, projects, sectors, fits] = await Promise.all([
     getTranslations({ locale, namespace: 'pages.solutions' }),
-    innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/solutions/[businessLine]', params: { businessLine: localSlug(line, l) } }))),
     getProjects(country, { businessLine: line.slug }),
     getSectors(),
     getSolutionSpaceFits(),
   ])
-  const name = t(line, 'name', locale)
   const hero = imageOf(line.cover, locale, name, legacyMedia.businessLineCover(line.slug), 'lg')
   const featured = projects.filter(project => project.business_lines.some(link => link.business_line?.slug === line.slug && link.is_featured))
   const photos = projects.flatMap(project => {
@@ -98,6 +124,96 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
       />
     </PageShell>
   )
+}
+
+function shot(id: string | null, images: Map<string, MediaRef>, locale: string, alt: string) {
+  if (!id) return null
+  const row = images.get(id)
+  return row ? toImageVM(row, locale, 'lg', alt) : null
+}
+
+function architecturalStory(
+  content: SolutionPageContent,
+  locale: string,
+  name: string,
+  hero: ArchitecturalStory['hero'],
+  images: Map<string, MediaRef>,
+  contactHref: string,
+  lines: ArchitecturalStory['lines'],
+  currentHref: string,
+): ArchitecturalStory {
+  const text = (copy: Copy) => copyText(copy, locale).trim()
+  const body = (copy: Copy) => paragraphs(text(copy))
+  const introImage = shot(content.intro.imageId, images, locale, name)
+  const intro = {
+    eyebrow: text(content.intro.eyebrow),
+    title: text(content.intro.title),
+    body: body(content.intro.body),
+    cta: text(content.intro.ctaLabel),
+    image: introImage,
+  }
+  const cards = content.elements.items.flatMap(item => {
+    const title = text(item.title)
+    const itemText = text(item.text)
+    const image = shot(item.imageId, images, locale, title || name)
+    return title || itemText || image ? [{ title, text: itemText, image }] : []
+  })
+  const elementsTitle = text(content.elements.title)
+  const elementsEyebrow = text(content.elements.eyebrow)
+  const elementsIntro = body(content.elements.intro)
+  const spacesImage = shot(content.spaces.imageId, images, locale, name)
+  const spaces = {
+    eyebrow: text(content.spaces.eyebrow),
+    title: text(content.spaces.title),
+    body: body(content.spaces.body),
+    image: spacesImage,
+  }
+  const steps = content.process.steps.flatMap(step => {
+    const title = text(step.title)
+    const stepText = text(step.text)
+    return title || stepText ? [{ title, text: stepText }] : []
+  })
+  const processTitle = text(content.process.title)
+  const processEyebrow = text(content.process.eyebrow)
+  const processIntro = body(content.process.intro)
+  const quoteText = text(content.quote.text)
+  const logos = content.brands.items.flatMap(item => {
+    const label = text(item.label)
+    const image = shot(item.imageId, images, locale, label)
+    return label || image ? [{ name: label, image }] : []
+  })
+  const brandsEyebrow = text(content.brands.eyebrow)
+  const galleryEyebrow = text(content.gallery.eyebrow)
+  const gallery = content.gallery.items.flatMap(item => {
+    const caption = text(item.caption)
+    const itemText = text(item.text)
+    const image = shot(item.imageId, images, locale, caption || name)
+    return caption || itemText || image ? [{ caption, text: itemText, image }] : []
+  })
+  const closeTitle = text(content.close.title)
+  const closeEyebrow = text(content.close.eyebrow)
+  const closeBody = body(content.close.body)
+  const closeCta = text(content.close.ctaLabel)
+  return {
+    name,
+    hero,
+    heroEyebrow: text(content.hero.eyebrow),
+    heroIntro: body(content.hero.intro),
+    heroCta: text(content.hero.ctaLabel),
+    lines,
+    currentHref,
+    contactHref,
+    intro: intro.eyebrow || intro.title || intro.body.length || intro.cta || intro.image ? intro : null,
+    banner: text(content.banner.text),
+    elements: elementsEyebrow || elementsTitle || elementsIntro.length || cards.length ? { eyebrow: elementsEyebrow, title: elementsTitle, intro: elementsIntro, items: cards } : null,
+    categories: content.categories.map(item => text(item.label)).filter(Boolean),
+    spaces: spaces.eyebrow || spaces.title || spaces.body.length || spaces.image ? spaces : null,
+    process: processEyebrow || processTitle || processIntro.length || steps.length ? { eyebrow: processEyebrow, title: processTitle, intro: processIntro, steps } : null,
+    quote: quoteText ? { text: quoteText, attribution: text(content.quote.attribution) } : null,
+    brands: brandsEyebrow || logos.length ? { eyebrow: brandsEyebrow, items: logos } : null,
+    gallery: { eyebrow: galleryEyebrow, items: gallery },
+    close: closeEyebrow || closeTitle || closeBody.length || closeCta ? { eyebrow: closeEyebrow, title: closeTitle, body: closeBody, cta: closeCta } : null,
+  }
 }
 
 function readIncludes(value: unknown): { title: string; text: string }[] {

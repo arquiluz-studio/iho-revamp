@@ -28,18 +28,39 @@ export function imageOf(media: MediaRef | null | undefined, locale: AppLocale, a
   return imageOrNull(media, locale, alt, fallback, largest) ?? { src: PLACEHOLDER_SRC, alt, color: PLACEHOLDER_COLOR }
 }
 
+type ShotSource = {
+  slug: string
+  cover: MediaRef | null | undefined
+  gallery?: readonly { sort: number; media: MediaRef | null }[]
+  variants?: readonly { sort: number; is_active?: boolean; image: MediaRef | null }[]
+}
+
+/** First active variant's product photo. */
+function variantMedia(product: ShotSource): MediaRef | null {
+  return [...(product.variants ?? [])].filter(variant => variant.is_active !== false && variant.image).sort((a, b) => a.sort - b.sort)[0]?.image ?? null
+}
+
+/** First usage photo. That shot is the hover cover. */
+function usageMedia(product: ShotSource): MediaRef | null {
+  if (product.cover) return product.cover
+  return [...(product.gallery ?? [])].sort((a, b) => a.sort - b.sort).find(item => item.media)?.media ?? null
+}
+
 /**
- * Product photo: the cover, otherwise the first gallery shot. The old stock photo is only used when the
+ * Product photo: the first active variant, otherwise a usage photo. The old stock photo is only used when the
  * product has no picture of its own, so removing the cover does not bring that placeholder back.
  */
-export function productShot(
-  product: { slug: string; cover: MediaRef | null | undefined; gallery?: readonly { sort: number; media: MediaRef | null }[] },
-  locale: AppLocale,
-  name: string,
-  largest: ImageVariant,
-): ImageVM | null {
-  const shot = product.cover ?? [...(product.gallery ?? [])].sort((a, b) => a.sort - b.sort).find(item => item.media)?.media
+export function productShot(product: ShotSource, locale: AppLocale, name: string, largest: ImageVariant): ImageVM | null {
+  const shot = variantMedia(product) ?? usageMedia(product)
   return imageOrNull(shot, locale, name, shot ? null : legacyMedia.productCover(product.slug), largest)
+}
+
+/** Usage cover shown on hover, only when it is a different photo from the product shot. */
+export function usageHover(product: ShotSource, locale: AppLocale, name: string, largest: ImageVariant): ImageVM | null {
+  const photo = variantMedia(product)
+  const usage = usageMedia(product)
+  if (!photo || !usage || photo.id === usage.id) return null
+  return imageOrNull(usage, locale, name, null, largest)
 }
 
 /** No media and no fallback means the slot stays empty, instead of a placeholder. */
@@ -140,6 +161,7 @@ export function toProductCardVM(p: CatalogRow, locale: AppLocale, country: strin
     category: category ? t(category, 'name', locale).toUpperCase() : undefined,
     href: labels ? paths.product(localSlug(p, locale)) : `${paths.product(localSlug(p, locale))}#cotizar`,
     image: productShot(p, locale, name, 'md') ?? imageOf(null, locale, name, null, 'md'),
+    hover: usageHover(p, locale, name, 'md'),
     price: labels?.price,
     inquiry: !labels,
   }

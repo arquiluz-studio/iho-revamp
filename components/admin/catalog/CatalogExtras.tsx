@@ -20,7 +20,7 @@ export async function ProductExtras({
   const [{ data: variants }, { data: gallery }] = await Promise.all([
     supabase
       .from('product_variants')
-      .select('id, sku, name_es, name_en, options, erp_ref, is_active, variant_prices(cost, price)')
+      .select(`id, sku, name_es, name_en, options, erp_ref, is_active, image_media_id, variant_prices(cost, price), image:media_assets!product_variants_image_media_id_fkey(${ADMIN_MEDIA_SELECT})`)
       .eq('product_id', productId)
       .order('sort'),
     supabase.from('product_media').select(`sort, media_assets(${ADMIN_MEDIA_SELECT})`).eq('product_id', productId).order('sort'),
@@ -29,7 +29,9 @@ export async function ProductExtras({
     <>
       <VariantsEditor
         productId={productId}
+        countryCode={countryCode}
         canEdit={canEdit}
+        initialMedia={(variants ?? []).flatMap(variant => (variant.image ? [toAdminMedia(variant.image)] : []))}
         initialVariants={(variants ?? []).map(v => ({
           id: v.id,
           sku: v.sku ?? '',
@@ -41,6 +43,7 @@ export async function ProductExtras({
           erpRef: v.erp_ref ?? '',
           cost: amountText(v.variant_prices?.cost),
           price: amountText(v.variant_prices?.price),
+          imageMediaId: v.image_media_id ?? '',
           isActive: v.is_active,
         }))}
       />

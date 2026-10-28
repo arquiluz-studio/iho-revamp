@@ -15,6 +15,8 @@ export type ProfilePiece = {
   href: string
   price: string | null
   image: ImageVM | null
+  /** First usage photo, shown when the pointer is over the piece. */
+  hover?: ImageVM | null
 }
 
 export function DesignerProfile({
@@ -133,6 +135,7 @@ export function DesignerProfile({
               <a key={piece.key} href={piece.href} className="iho-piece">
                 <div className="iho-piece__mark">
                   {piece.image ? <MediaImage image={piece.image} alt="" sizes="(max-width: 768px) 50vw, 280px" /> : <span>{imagePending}</span>}
+                  {piece.hover && <MediaImage image={piece.hover} alt="" sizes="(max-width: 768px) 50vw, 280px" className="iho-shot__hover" />}
                 </div>
                 <div className="iho-piece__price">{piece.price ?? pricePending}</div>
                 <div className="iho-piece__name">{piece.name}</div>

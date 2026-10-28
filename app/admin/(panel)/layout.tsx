@@ -53,13 +53,20 @@ export default async function PanelLayout({ children }: { children: ReactNode })
     })
   }
   if (session.isGlobalScope) {
+    if (!session.isSuperAdmin) {
+      sections.push({
+        title: 'Contenido',
+        items: [
+          { href: '/admin/global/content/solutions', label: 'Soluciones' },
+          { href: '/admin/global/content/spaces', label: 'Espacios' },
+        ],
+      })
+    }
     sections.push({
       title: 'Ajustes Globales',
       items: [
         { href: '/admin/global/brands', label: 'Marcas' },
         { href: '/admin/global/designers', label: 'Diseñadores' },
-        { href: '/admin/global/solutions', label: 'Soluciones' },
-        { href: '/admin/global/spaces', label: 'Espacios' },
         ...(session.isSuperAdmin
           ? [
               { href: '/admin/global/countries', label: 'Países' },

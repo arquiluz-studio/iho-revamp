@@ -15,6 +15,7 @@ const catalogTags = (country: string) => [
 const CATALOG_SELECT = `id, slug, slug_en, name_es, name_en, status, is_purchasable, is_featured, lead_time_days, sort,
   cover:${media('products_cover_media_id_fkey')},
   gallery:product_media(sort, media:${media('product_media_media_id_fkey')}),
+  variants:product_variants(is_active, sort, image:${media('product_variants_image_media_id_fkey')}),
   catalog_brand:catalog_brands!inner(id, name, brand:brands(id, slug, name, is_active)),
   designers:product_designers(designer:designers(id, slug, name, is_active)),
   business_line:business_lines(id, slug, slug_en, name_es, name_en),
@@ -60,7 +61,7 @@ function summarize(list: VariantOffer[] = []) {
 
 /** Products visible in the country, with their current sale price. */
 export function getCatalog(country: string) {
-  return cachedQuery(['catalog', country, 'gallery'], catalogTags(country), async ({ db, draft }) => {
+  return cachedQuery(['catalog', country, 'photo'], catalogTags(country), async ({ db, draft }) => {
     const [rows, prices] = await Promise.all([
       db
         .from('products')
@@ -96,7 +97,7 @@ export async function getProductBySlug(country: string, slug: string, locale: Ap
   if (!listed) return null
   // `listed` is merged outside the cached detail so one cache entry never freezes a stale copy of the other.
   const detail = await cachedQuery(
-    ['product', country, listed.id],
+    ['product', country, listed.id, 'photo'],
     [...catalogTags(country), cacheTags.product(listed.id)],
     async ({ db }) => {
       const [row, prices] = await Promise.all([
@@ -105,7 +106,7 @@ export async function getProductBySlug(country: string, slug: string, locale: Ap
           .select(
             `description_es, description_en, specs,
             gallery:product_media(sort, media:media_assets!product_media_media_id_fkey(${MEDIA_SELECT})),
-            variants:product_variants(id, sku, name_es, name_en, options, is_active, sort)` as const,
+            variants:product_variants(id, sku, name_es, name_en, options, is_active, sort, image:${media('product_variants_image_media_id_fkey')})` as const,
           )
           .eq('id', listed.id)
           .maybeSingle()

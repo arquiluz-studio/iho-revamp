@@ -5,7 +5,7 @@ import { BrandProfile } from '@/components/site/BrandProfile'
 import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { sitePaths } from '@/lib/content/paths'
-import { imageOf, imageOrNull, priceLabels, productShot } from '@/lib/content/site'
+import { imageOf, imageOrNull, priceLabels, productShot, usageHover } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getBrandMedia, getCountryBrand, getCountryBrands } from '@/lib/queries/brands'
 import { getCatalog } from '@/lib/queries/catalog'
@@ -65,12 +65,14 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
     const name = t(product, 'name', locale)
     const labels = product.is_purchasable ? priceLabels(product.price, locale, country) : null
     const image = productShot(product, locale, name, 'md')
+    const hover = usageHover(product, locale, name, 'md')
     return {
       key: product.id,
       name,
       href: paths.product(localSlug(product, locale)),
       price: labels?.price ?? null,
       image: image ? { ...image, color: null, placeholder: null } : null,
+      hover: hover ? { ...hover, color: null, placeholder: null } : null,
     }
   })
   const photos = inspiration.flatMap(item => {
@@ -90,7 +92,7 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
         solutions={lines.map(line => ({ href: paths.solution(localSlug(line, locale)), label: t(line, 'name', locale) }))}
         cover={cover ? { ...cover, color: null, placeholder: null } : null}
         originLabel={tp('origin')}
-        origin={brand.origin_country || undefined}
+        origin={t(brand, 'origin_country', locale) || undefined}
         collaboratorsLabel={tp('collaborators')}
         designers={related.map(designer => ({
           slug: designer.slug,
@@ -101,6 +103,7 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
         previousLabel={tc('previous')}
         nextLabel={tc('next')}
         inspirationLabel={tp('inspiration')}
+        productsTitle={tp('products')}
         pricePending={td('pricePending')}
         imagePending={td('imagePending')}
         detailLabel={td('detail')}

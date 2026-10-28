@@ -21,6 +21,7 @@ const variantSchema = z.object({
   cost: z.string().trim().max(20),
   price: z.string().trim().max(20),
   isActive: z.boolean(),
+  imageMediaId: z.union([z.uuid(), z.literal('')]),
 })
 
 export type VariantInput = z.input<typeof variantSchema>
@@ -92,6 +93,7 @@ export async function saveVariants(productId: string, raw: VariantInput[]): Prom
     options: parseOptions(v.options) as Json,
     erp_ref: v.erpRef || null,
     is_active: v.isActive,
+    image_media_id: v.imageMediaId || null,
     sort,
   }))
   const savedIds: string[] = []
@@ -123,7 +125,7 @@ export async function saveVariants(productId: string, raw: VariantInput[]): Prom
   return { ok: true }
 }
 
-export async function saveProductGallery(productId: string, mediaIds: string[], coverId: string | null): Promise<ActionResult> {
+export async function saveProductGallery(productId: string, mediaIds: string[]): Promise<ActionResult> {
   const session = await getAdminSession()
   if (!session) return EXPIRED
   const ids = z.array(z.uuid()).max(100).safeParse(mediaIds)
@@ -139,7 +141,7 @@ export async function saveProductGallery(productId: string, mediaIds: string[], 
     const added = await supabase.from('product_media').insert(ids.data.map((media_id, sort) => ({ product_id: productId, media_id, sort })))
     if (added.error) return dbError(added.error)
   }
-  const cover = coverId && z.uuid().safeParse(coverId).success ? coverId : (ids.data[0] ?? null)
+  const cover = ids.data[0] ?? null
   const updated = await supabase.from('products').update({ cover_media_id: cover }).eq('id', productId)
   if (updated.error) return dbError(updated.error)
   revalidateProduct(productId, owner.country)

@@ -11,7 +11,7 @@ import { Button, Card, CardHeader, Checkbox, Input, Notice, cn } from './ui'
 
 export type GalleryItem = { media: AdminMedia; captionEs: string; captionEn: string; isDownloadable: boolean }
 
-/** Ordered gallery with drag & drop, cover selection (projects, products) and project captions + per-photo download toggle. */
+/** Ordered gallery with drag and drop. Projects pick a cover; a product's first usage photo is its hover cover. */
 export function GalleryEditor({
   owner,
   ownerId,
@@ -35,7 +35,8 @@ export function GalleryEditor({
   const [message, setMessage] = useState<{ tone: 'green' | 'red'; text: string } | null>(null)
   const [pending, startTransition] = useTransition()
   const isProject = owner === 'project'
-  const hasCover = owner === 'project' || owner === 'product'
+  const isProduct = owner === 'product'
+  const hasCover = isProject
   const hasCaptions = owner === 'project' || owner === 'brand'
   const kind = owner === 'project' ? 'project_photo' : owner === 'product' ? 'product_photo' : owner === 'brand' ? 'generic' : 'event_photo'
 
@@ -67,7 +68,6 @@ export function GalleryEditor({
           ? await saveProductGallery(
               ownerId,
               items.map(i => i.media.id),
-              coverId,
             )
           : owner === 'brand'
             ? await saveBrandGallery(
@@ -99,11 +99,13 @@ export function GalleryEditor({
   return (
     <Card>
       <CardHeader
-        title="Galería"
+        title={isProduct ? 'Fotos de uso' : 'Galería'}
         description={
           isProject
             ? 'Arrastra para ordenar. La estrella marca la portada. "Descargable" permite bajar la foto en alta resolución tras dejar sus datos.'
-            : owner === 'brand'
+            : isProduct
+              ? 'Fotos del producto en uso. Arrastra para ordenar. La primera es la portada que se ve al pasar el cursor.'
+              : owner === 'brand'
               ? 'Fotos de inspiración de la ficha. Arrastra para ordenar. El pie de foto es opcional.'
               : hasCover
                 ? 'Arrastra para ordenar. La estrella marca la foto principal.'

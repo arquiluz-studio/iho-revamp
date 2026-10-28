@@ -135,7 +135,8 @@ export type Database = {
           logo_is_thin: boolean
           logo_media_id: string | null
           name: string
-          origin_country: string | null
+          origin_country_en: string | null
+          origin_country_es: string | null
           slug: string
           updated_at: string
           website_url: string | null
@@ -150,7 +151,8 @@ export type Database = {
           logo_is_thin?: boolean
           logo_media_id?: string | null
           name: string
-          origin_country?: string | null
+          origin_country_en?: string | null
+          origin_country_es?: string | null
           slug: string
           updated_at?: string
           website_url?: string | null
@@ -165,7 +167,8 @@ export type Database = {
           logo_is_thin?: boolean
           logo_media_id?: string | null
           name?: string
-          origin_country?: string | null
+          origin_country_en?: string | null
+          origin_country_es?: string | null
           slug?: string
           updated_at?: string
           website_url?: string | null
@@ -196,6 +199,7 @@ export type Database = {
           id: string
           name_en: string | null
           name_es: string
+          page_content: Json
           slug: string
           slug_en: string | null
           sort: number
@@ -209,6 +213,7 @@ export type Database = {
           id?: string
           name_en?: string | null
           name_es: string
+          page_content?: Json
           slug: string
           slug_en?: string | null
           sort?: number
@@ -222,6 +227,7 @@ export type Database = {
           id?: string
           name_en?: string | null
           name_es?: string
+          page_content?: Json
           slug?: string
           slug_en?: string | null
           sort?: number
@@ -1353,6 +1359,7 @@ export type Database = {
           dimensions: Json | null
           erp_ref: string | null
           id: string
+          image_media_id: string | null
           is_active: boolean
           name_en: string | null
           name_es: string
@@ -1368,6 +1375,7 @@ export type Database = {
           dimensions?: Json | null
           erp_ref?: string | null
           id?: string
+          image_media_id?: string | null
           is_active?: boolean
           name_en?: string | null
           name_es?: string
@@ -1383,6 +1391,7 @@ export type Database = {
           dimensions?: Json | null
           erp_ref?: string | null
           id?: string
+          image_media_id?: string | null
           is_active?: boolean
           name_en?: string | null
           name_es?: string
@@ -1394,6 +1403,13 @@ export type Database = {
           weight_kg?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "product_variants_image_media_id_fkey"
+            columns: ["image_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]

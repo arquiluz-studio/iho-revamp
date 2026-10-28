@@ -6,7 +6,7 @@ import { EventRow, PageShell, SectionHeading } from '@/components/site/pages/Pag
 import { innerChrome } from '@/components/site/SiteChrome'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { sitePaths } from '@/lib/content/paths'
-import { designerYears, getDesignerEventsVM, imageOrNull, priceLabels, productShot } from '@/lib/content/site'
+import { designerYears, getDesignerEventsVM, imageOrNull, priceLabels, productShot, usageHover } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getCountryBrands } from '@/lib/queries/brands'
 import { getCatalog } from '@/lib/queries/catalog'
@@ -76,12 +76,14 @@ export default async function DesignerPage({ params }: { params: Promise<Params>
     const name = t(product, 'name', locale)
     const labels = product.is_purchasable ? priceLabels(product.price, locale, country) : null
     const image = productShot(product, locale, name, 'md')
+    const hover = usageHover(product, locale, name, 'md')
     return {
       key: product.id,
       name,
       href: paths.product(localSlug(product, locale)),
       price: labels?.price ?? null,
       image: image ? { ...image, color: null, placeholder: null } : null,
+      hover: hover ? { ...hover, color: null, placeholder: null } : null,
     }
   })
   const years = designerYears(designer, year => tp('born', { year }))

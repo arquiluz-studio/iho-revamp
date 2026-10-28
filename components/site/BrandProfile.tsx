@@ -27,6 +27,7 @@ export function BrandProfile({
   previousLabel,
   nextLabel,
   inspirationLabel,
+  productsTitle,
   pricePending,
   imagePending,
   detailLabel,
@@ -48,6 +49,7 @@ export function BrandProfile({
   previousLabel: string
   nextLabel: string
   inspirationLabel: string
+  productsTitle: string
   pricePending: string
   imagePending: string
   detailLabel: string
@@ -114,12 +116,13 @@ export function BrandProfile({
 
       {pieces.length > 0 && (
         <section id="piezas" className="iho-brand-products" aria-labelledby="piezas-title">
-          <h2 id="piezas-title">{name}</h2>
+          <h2 id="piezas-title">{productsTitle}</h2>
           <div className="iho-piece-grid">
             {pieces.map(piece => (
               <a key={piece.key} href={piece.href} className="iho-piece">
                 <div className="iho-piece__mark">
                   {piece.image ? <MediaImage image={piece.image} alt="" sizes="(max-width: 768px) 100vw, 380px" /> : <span>{imagePending}</span>}
+                  {piece.hover && <MediaImage image={piece.hover} alt="" sizes="(max-width: 768px) 100vw, 380px" className="iho-shot__hover" />}
                 </div>
                 <div className="iho-piece__price">{piece.price ?? pricePending}</div>
                 <div className="iho-piece__name">{piece.name}</div>

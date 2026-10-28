@@ -1,6 +1,7 @@
 import 'server-only'
 import { COUNTRY_CODES } from '@/config/countries'
 import { cacheTags } from '@/lib/cache-tags'
+import { MEDIA_SELECT, type MediaRef } from '@/lib/media'
 import { cachedQuery, maybe, media, must } from './core'
 
 export function getCountries() {
@@ -112,11 +113,11 @@ export function getTeam(code: string) {
 }
 
 export function getBusinessLines() {
-  return cachedQuery(['business-lines'], [cacheTags.taxonomies], async ({ db }) =>
+  return cachedQuery(['business-lines', 'story-figma-2'], [cacheTags.taxonomies], async ({ db }) =>
     must(
       await db
         .from('business_lines')
-        .select(`id, slug, slug_en, name_es, name_en, description_es, description_en, sort, cover:${media('business_lines_cover_media_id_fkey')}` as const)
+        .select(`id, slug, slug_en, name_es, name_en, description_es, description_en, sort, page_content, cover:${media('business_lines_cover_media_id_fkey')}` as const)
         .order('sort'),
       'business_lines',
     ),
@@ -133,6 +134,15 @@ export function getSectors() {
       'sectors',
     ),
   )
+}
+
+/** Media used inside a solution page, in no particular order. */
+export function getSolutionMedia(ids: readonly string[]) {
+  const unique = [...new Set(ids)].sort()
+  return cachedQuery(['solution-media', unique.join(',')], [cacheTags.taxonomies], async ({ db }) => {
+    if (!unique.length) return [] as MediaRef[]
+    return must(await db.from('media_assets').select(MEDIA_SELECT).in('id', unique), 'media_assets')
+  })
 }
 
 /** One row per solution and space: the sentence and photo shared by both public pages. */

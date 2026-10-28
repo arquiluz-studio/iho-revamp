@@ -2,7 +2,10 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
+import { getMediaByIds } from '@/app/admin/actions/media'
 import { saveVariants, type VariantInput } from '@/app/admin/actions/catalog'
+import type { AdminMedia } from '@/lib/admin/media'
+import { MediaThumb, UploadButton } from '../MediaUpload'
 import { Button, Card, CardHeader, Checkbox, Input, Notice, Textarea } from '../ui'
 
 type Row = VariantInput & { key: string }
@@ -10,10 +13,23 @@ type Row = VariantInput & { key: string }
 let counter = 0
 const newKey = () => `new-${++counter}`
 
-/** Variants of a country product: SKU, cost, sale price and the ERP item code. Cost is not published. */
-export function VariantsEditor({ productId, initialVariants, canEdit }: { productId: string; initialVariants: VariantInput[]; canEdit: boolean }) {
+/** Variants of a country product: product photo, SKU, cost, sale price and the ERP item code. Cost is not published. */
+export function VariantsEditor({
+  productId,
+  countryCode,
+  initialVariants,
+  initialMedia,
+  canEdit,
+}: {
+  productId: string
+  countryCode: string
+  initialVariants: VariantInput[]
+  initialMedia: AdminMedia[]
+  canEdit: boolean
+}) {
   const router = useRouter()
   const [rows, setRows] = useState<Row[]>(() => initialVariants.map(v => ({ ...v, key: v.id ?? newKey() })))
+  const [media, setMedia] = useState(() => Object.fromEntries(initialMedia.map(item => [item.id, item])))
   const [dirty, setDirty] = useState(false)
   const [message, setMessage] = useState<{ tone: 'green' | 'red'; text: string } | null>(null)
   const [pending, startTransition] = useTransition()
@@ -48,13 +64,13 @@ export function VariantsEditor({ productId, initialVariants, canEdit }: { produc
     <Card>
       <CardHeader
         title="Variantes"
-        description="Cada variante tiene su SKU, costo, precio de venta y código de artículo en el ERP. El costo no se publica. Opciones: una por línea, formato «clave: valor»."
+        description="Cada variante tiene su foto de producto, SKU, costo, precio de venta y código de artículo en el ERP. El costo no se publica. Opciones: una por línea, formato «clave: valor»."
         actions={
           canEdit && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => update([...rows, { key: newKey(), sku: '', nameEs: '', nameEn: '', options: '', erpRef: '', cost: '', price: '', isActive: true }])}
+              onClick={() => update([...rows, { key: newKey(), sku: '', nameEs: '', nameEn: '', options: '', erpRef: '', cost: '', price: '', imageMediaId: '', isActive: true }])}
             >
               Agregar variante
             </Button>
@@ -66,6 +82,7 @@ export function VariantsEditor({ productId, initialVariants, canEdit }: { produc
           <table className="w-full text-sm">
             <thead className="text-left text-xs uppercase tracking-wide text-zinc-500">
               <tr>
+                <th className="pb-2 pr-2 font-medium">Foto</th>
                 <th className="pb-2 pr-2 font-medium">SKU</th>
                 <th className="pb-2 pr-2 font-medium">Nombre ES</th>
                 <th className="pb-2 pr-2 font-medium">Name EN</th>
@@ -80,6 +97,25 @@ export function VariantsEditor({ productId, initialVariants, canEdit }: { produc
             <tbody className="align-top">
               {rows.map((row, index) => (
                 <tr key={row.key}>
+                  <td className="py-1 pr-2">
+                    <div className="flex items-center gap-2">
+                      <MediaThumb media={row.imageMediaId ? media[row.imageMediaId] : null} className="h-12 w-12 shrink-0" />
+                      {canEdit && (
+                        <UploadButton
+                          kind="product_photo"
+                          countryCode={countryCode}
+                          label={row.imageMediaId ? 'Cambiar' : 'Subir'}
+                          onUploaded={async ids => {
+                            const [uploaded] = await getMediaByIds(ids)
+                            if (!uploaded) return
+                            setMedia(current => ({ ...current, [uploaded.id]: uploaded }))
+                            setRows(current => current.map(item => (item.key === row.key ? { ...item, imageMediaId: uploaded.id } : item)))
+                            setDirty(true)
+                          }}
+                        />
+                      )}
+                    </div>
+                  </td>
                   <td className="py-1 pr-2">
                     <Input
                       className="h-8 w-36 font-mono text-xs"

@@ -82,7 +82,7 @@ export function ResourceForm({ resource, id, countryCode, initialValues, options
     })
   }
 
-  const titleField = localized.find(f => f.type === 'text')?.name
+  const titleField = localized.find(f => f.type === 'text' && f.name !== 'origin_country')?.name
   /** `slug` comes from the Spanish title, `slug_en` from the English one. */
   const generateSlug = (column: string) => {
     if (!titleField) return

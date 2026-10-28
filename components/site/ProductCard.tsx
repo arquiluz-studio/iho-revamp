@@ -16,14 +16,16 @@ export function ProductCard({ product, showCategory = false, ariaHidden }: Props
       className="iho-prod-card"
       style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}
     >
-      <div style={{ width: '100%', aspectRatio: '1/1', background: '#f1ece3', borderRadius: 4, overflow: 'hidden' }}>
+      <div className="iho-prod-mark">
         <MediaImage
           image={product.image}
           alt={ariaHidden ? '' : product.name}
           sizes="(max-width: 599px) 50vw, (max-width: 899px) 33vw, 300px"
           className="iho-prod-img"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
+        {product.hover && (
+          <MediaImage image={product.hover} alt="" sizes="(max-width: 599px) 50vw, (max-width: 899px) 33vw, 300px" className="iho-shot__hover" />
+        )}
       </div>
       {eyebrow && (
         <div style={{ marginTop: 14 }}>

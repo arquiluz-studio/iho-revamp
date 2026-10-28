@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { emptyValues, singletonId, type ResourceConfig, type ResourceKey } from '@/lib/admin/resources'
+import { parseSolutionPage, solutionPageMediaIds } from '@/lib/content/solution-page'
 import { contentPage } from '@/lib/content/static-pages'
 import { listRecords, loadMedia, loadOptions, loadRecord, mediaIdsOf } from '@/lib/admin/data'
 import { toFormValues } from '@/lib/admin/form-schema'
@@ -19,6 +20,7 @@ import { GalleryEditor, type GalleryItem } from './GalleryEditor'
 import { ProjectsOrderPage } from './ProjectsOrderPage'
 import { PreviousEditionsEditor, type PreviousEditionOption } from './PreviousEditionsEditor'
 import { ResourceForm } from './ResourceForm'
+import { SolutionPageEditor } from './SolutionPageEditor'
 import { SolutionFitEditor, type SolutionSpaceRow } from './SolutionSpacesEditor'
 import { ButtonLink, Notice, PageHeader, cn } from './ui'
 
@@ -231,13 +233,26 @@ export async function ResourceEditPage({
           <BrandGallery id={id} canEdit={canWrite} />
         </div>
       )}
-      {id && (resource === 'solutions' || resource === 'spaces') && (
+      {id && resource === 'solutions' && (
         <div className="mt-6 lg:max-w-[calc(100%-304px)]">
-          <SolutionFits owner={resource} id={id} canEdit={canWrite} />
+          <SolutionPageBlock id={id} raw={row?.page_content} canEdit={canWrite} />
+        </div>
+      )}
+      {id && resource === 'spaces' && (
+        <div className="mt-6 lg:max-w-[calc(100%-304px)]">
+          <SolutionFits owner="spaces" id={id} canEdit={canWrite} />
         </div>
       )}
     </>
   )
+}
+
+async function SolutionPageBlock({ id, raw, canEdit }: { id: string; raw: unknown; canEdit: boolean }) {
+  const content = parseSolutionPage(raw)
+  const ids = solutionPageMediaIds(content)
+  const supabase = await createSupabaseServerClient()
+  const { data } = ids.length ? await supabase.from('media_assets').select(ADMIN_MEDIA_SELECT).in('id', ids) : { data: [] }
+  return <SolutionPageEditor id={id} content={content} media={(data ?? []).map(toAdminMedia)} canEdit={canEdit} />
 }
 
 async function SolutionFits({ owner, id, canEdit }: { owner: 'solutions' | 'spaces'; id: string; canEdit: boolean }) {

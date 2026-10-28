@@ -545,7 +545,7 @@ const brands: ResourceConfig = {
       help: 'Foto grande de la ficha. Puede ser un producto, un espacio o el logo sobre una foto. Si queda vacía, la ficha no lleva foto de fondo.',
     },
     { name: 'website_url', label: 'Sitio web', type: 'url' },
-    { name: 'origin_country', label: 'País de origen', type: 'text', max: 80 },
+    { name: 'origin_country', label: 'País de origen', type: 'text', i18n: true, max: 80 },
     { name: 'is_active', label: 'Activa', type: 'boolean' },
     { name: 'description', label: 'Descripción', type: 'textarea', i18n: true, max: 4000, rows: 6 },
     {
@@ -560,7 +560,7 @@ const brands: ResourceConfig = {
   columns: [
     { key: 'name', label: 'Nombre' },
     { key: 'slug', label: 'Slug' },
-    { key: 'origin_country', label: 'Origen' },
+    { key: 'origin_country_es', label: 'Origen' },
     { key: 'is_active', label: 'Activa', format: 'boolean' },
   ],
   order: [{ column: 'name', ascending: true }],

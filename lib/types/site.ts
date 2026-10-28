@@ -55,6 +55,8 @@ export type ProductCardVM = {
   key: string
   name: string
   image: ImageVM
+  /** First usage photo, shown when the pointer is over the card. */
+  hover?: ImageVM | null
   /** Commercial brand in this country. */
   brand?: string
   category?: string

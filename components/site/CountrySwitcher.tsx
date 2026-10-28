@@ -1,6 +1,7 @@
 'use client'
 import { useLocale, useTranslations } from 'next-intl'
 import { COUNTRIES, COUNTRY_PREF_COOKIE, crossCountryUrl, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
+import { CountryFlag } from './CountryFlag'
 import { SubnavBar, useSubnav } from './SubnavBar'
 
 const ONE_YEAR = 60 * 60 * 24 * 365
@@ -32,7 +33,10 @@ export function CountrySwitcher({ current, countries }: {
         aria-controls="iho-subnav-country"
         onClick={() => toggle('country')}
       >
-        {current.toUpperCase()}
+        <span className="iho-switcher-code">
+          {current.toUpperCase()}
+          <CountryFlag code={current} />
+        </span>
       </button>
       {isOpen && (
         <SubnavBar
