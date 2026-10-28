@@ -9,9 +9,10 @@ import { spacesForSolution } from '@/lib/content/solution-fits'
 import { copyText, parseSolutionPage, solutionPageMediaIds, type Copy, type SolutionPageContent } from '@/lib/content/solution-page'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
-import { imageOf, imageOrNull } from '@/lib/content/site'
+import { imageOf, imageOrNull, toBrandVM } from '@/lib/content/site'
 import { toImageVM, type MediaRef } from '@/lib/media'
 import { localSlug, paragraphs, pickBySlug, t } from '@/lib/i18n-fields'
+import { getCountryBrands } from '@/lib/queries/brands'
 import { getProjects } from '@/lib/queries/projects'
 import { getBusinessLines, getSectors, getSolutionMedia, getSolutionSpaceFits } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
@@ -49,9 +50,37 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
   const name = t(line, 'name', locale)
   if (line.slug === 'architectural') {
     const content = parseSolutionPage(line.page_content)
-    const media = await getSolutionMedia(solutionPageMediaIds(content))
+    const [media, projects, countryBrands, sectors] = await Promise.all([
+      getSolutionMedia(solutionPageMediaIds(content)),
+      getProjects(country, { businessLine: line.slug }),
+      getCountryBrands(country),
+      getSectors(),
+    ])
     const images = new Map(media.map(item => [item.id, item]))
     const currentHref = paths.solution(localSlug(line, locale))
+    const featured = projects
+      .filter(project => project.business_lines.some(link => link.business_line?.slug === line.slug && link.is_featured))
+      .slice(0, 4)
+      .map(project => {
+        const title = t(project, 'title', locale)
+        const summary = t(project, 'summary', locale).trim()
+        return {
+          href: paths.project(localSlug(project, locale)),
+          caption: title,
+          text: summary || project.city || '',
+          image: imageOrNull(project.cover, locale, title, legacyMedia.projectCover(project.slug), 'lg'),
+        }
+      })
+    const featuredBrands = countryBrands.flatMap(brand => {
+      const onLine = brand.business_lines.some(link => link.business_line?.slug === line.slug)
+      if (!brand.is_featured || !onLine) return []
+      const card = toBrandVM(brand, locale, paths)
+      return [{ name: card.name, href: card.href ?? paths.brand(brand.slug), image: card.logo }]
+    })
+    const categories = sectors.map(sector => ({
+      label: t(sector, 'name', locale),
+      href: paths.space(localSlug(sector, locale)),
+    }))
     return (
       <PageShell chrome={chrome} hero={false}>
         <ArchitecturalView
@@ -64,6 +93,9 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
             paths.contact,
             lines.map(item => ({ href: paths.solution(localSlug(item, locale)), label: t(item, 'name', locale) })),
             currentHref,
+            categories,
+            featuredBrands,
+            featured,
           )}
         />
       </PageShell>
@@ -141,6 +173,9 @@ function architecturalStory(
   contactHref: string,
   lines: ArchitecturalStory['lines'],
   currentHref: string,
+  categories: ArchitecturalStory['categories'],
+  brands: NonNullable<ArchitecturalStory['brands']>['items'],
+  projects: ArchitecturalStory['gallery']['items'],
 ): ArchitecturalStory {
   const text = (copy: Copy) => copyText(copy, locale).trim()
   const body = (copy: Copy) => paragraphs(text(copy))
@@ -177,19 +212,8 @@ function architecturalStory(
   const processEyebrow = text(content.process.eyebrow)
   const processIntro = body(content.process.intro)
   const quoteText = text(content.quote.text)
-  const logos = content.brands.items.flatMap(item => {
-    const label = text(item.label)
-    const image = shot(item.imageId, images, locale, label)
-    return label || image ? [{ name: label, image }] : []
-  })
   const brandsEyebrow = text(content.brands.eyebrow)
   const galleryEyebrow = text(content.gallery.eyebrow)
-  const gallery = content.gallery.items.flatMap(item => {
-    const caption = text(item.caption)
-    const itemText = text(item.text)
-    const image = shot(item.imageId, images, locale, caption || name)
-    return caption || itemText || image ? [{ caption, text: itemText, image }] : []
-  })
   const closeTitle = text(content.close.title)
   const closeEyebrow = text(content.close.eyebrow)
   const closeBody = body(content.close.body)
@@ -206,12 +230,12 @@ function architecturalStory(
     intro: intro.eyebrow || intro.title || intro.body.length || intro.cta || intro.image ? intro : null,
     banner: text(content.banner.text),
     elements: elementsEyebrow || elementsTitle || elementsIntro.length || cards.length ? { eyebrow: elementsEyebrow, title: elementsTitle, intro: elementsIntro, items: cards } : null,
-    categories: content.categories.map(item => text(item.label)).filter(Boolean),
+    categories,
     spaces: spaces.eyebrow || spaces.title || spaces.body.length || spaces.image ? spaces : null,
     process: processEyebrow || processTitle || processIntro.length || steps.length ? { eyebrow: processEyebrow, title: processTitle, intro: processIntro, steps } : null,
     quote: quoteText ? { text: quoteText, attribution: text(content.quote.attribution) } : null,
-    brands: brandsEyebrow || logos.length ? { eyebrow: brandsEyebrow, items: logos } : null,
-    gallery: { eyebrow: galleryEyebrow, items: gallery },
+    brands: brands.length ? { eyebrow: brandsEyebrow, items: brands } : null,
+    gallery: { eyebrow: galleryEyebrow, items: projects },
     close: closeEyebrow || closeTitle || closeBody.length || closeCta ? { eyebrow: closeEyebrow, title: closeTitle, body: closeBody, cta: closeCta } : null,
   }
 }

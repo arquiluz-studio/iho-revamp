@@ -7,9 +7,6 @@ import { saveSolutionPage } from '@/app/admin/actions/solution-page'
 import type { AdminMedia } from '@/lib/admin/media'
 import {
   emptyCard,
-  emptyLabel,
-  emptyLogo,
-  emptyShot,
   emptyStep,
   type Copy,
   type SolutionPageContent,
@@ -17,7 +14,7 @@ import {
 import { Button, Card, CardHeader, Input, Notice, Textarea } from './ui'
 import { MediaThumb, UploadButton } from './MediaUpload'
 
-const LIMITS = { cards: 8, labels: 12, steps: 8, shots: 8, logos: 12 }
+const LIMITS = { cards: 8, steps: 8 }
 
 /** Text and photos of the solution layout, in the same order as the public page. */
 export function SolutionPageEditor({
@@ -53,7 +50,12 @@ export function SolutionPageEditor({
 
   const save = () =>
     startTransition(async () => {
-      const result = await saveSolutionPage(id, content)
+      const result = await saveSolutionPage(id, {
+        ...content,
+        categories: [],
+        brands: { eyebrow: content.brands.eyebrow, items: [] },
+        gallery: { eyebrow: content.gallery.eyebrow, items: [] },
+      })
       setMessage(result.ok ? { tone: 'green', text: 'Cambios guardados.' } : { tone: 'red', text: result.error })
       if (result.ok) {
         setDirty(false)
@@ -149,30 +151,6 @@ export function SolutionPageEditor({
             )}
           </Section>
 
-          <Section title="Categorías" help="Etiquetas de la franja roja.">
-            <ul className="space-y-3">
-              {content.categories.map((item, index) => (
-                <li key={index} className="rounded-md border border-zinc-200 p-4">
-                  <RowHead index={index} canEdit={canEdit && !pending} onRemove={() => change({ ...content, categories: content.categories.filter((_, i) => i !== index) })} />
-                  <div className="mt-3">
-                    <Pair
-                      label="Etiqueta"
-                      value={item.label}
-                      max={200}
-                      disabled={!canEdit || pending}
-                      onChange={label => change({ ...content, categories: content.categories.map((row, i) => (i === index ? { label } : row)) })}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-            {canEdit && content.categories.length < LIMITS.labels && (
-              <Button variant="outline" disabled={pending} onClick={() => change({ ...content, categories: [...content.categories, emptyLabel()] })}>
-                Agregar etiqueta
-              </Button>
-            )}
-          </Section>
-
           <Section title="Espacios" help="Texto a la izquierda y una foto a la derecha.">
             <Pair label="Antetítulo" value={content.spaces.eyebrow} max={200} disabled={!canEdit || pending} onChange={eyebrow => change({ ...content, spaces: { ...content.spaces, eyebrow } })} />
             <Pair label="Título" value={content.spaces.title} max={200} rows={2} disabled={!canEdit || pending} onChange={title => change({ ...content, spaces: { ...content.spaces, title } })} />
@@ -227,78 +205,12 @@ export function SolutionPageEditor({
             <Pair label="Texto debajo" value={content.quote.attribution} max={2000} rows={3} disabled={!canEdit || pending} onChange={attribution => change({ ...content, quote: { ...content.quote, attribution } })} />
           </Section>
 
-          <Section title="Galería" help="Foto, número y pie. Hasta 8.">
-            <Pair label="Antetítulo" value={content.gallery.eyebrow} max={200} disabled={!canEdit || pending} onChange={eyebrow => change({ ...content, gallery: { ...content.gallery, eyebrow } })} />
-            <ul className="space-y-3">
-              {content.gallery.items.map((item, index) => (
-                <li key={index} className="rounded-md border border-zinc-200 p-4">
-                  <RowHead index={index} canEdit={canEdit && !pending} onRemove={() => change({ ...content, gallery: { ...content.gallery, items: content.gallery.items.filter((_, i) => i !== index) } })} />
-                  <div className="mt-3 space-y-3">
-                    <Photo
-                      id={item.imageId}
-                      library={library}
-                      canEdit={canEdit}
-                      pending={pending}
-                      onChange={imageId => change({ ...content, gallery: { ...content.gallery, items: content.gallery.items.map((row, i) => (i === index ? { ...row, imageId } : row)) } })}
-                      onUpload={remember}
-                    />
-                    <Pair
-                      label="Pie"
-                      value={item.caption}
-                      max={200}
-                      disabled={!canEdit || pending}
-                      onChange={caption => change({ ...content, gallery: { ...content.gallery, items: content.gallery.items.map((row, i) => (i === index ? { ...row, caption } : row)) } })}
-                    />
-                    <Pair
-                      label="Texto"
-                      value={item.text}
-                      max={2000}
-                      rows={2}
-                      disabled={!canEdit || pending}
-                      onChange={text => change({ ...content, gallery: { ...content.gallery, items: content.gallery.items.map((row, i) => (i === index ? { ...row, text } : row)) } })}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-            {canEdit && content.gallery.items.length < LIMITS.shots && (
-              <Button variant="outline" disabled={pending} onClick={() => change({ ...content, gallery: { ...content.gallery, items: [...content.gallery.items, emptyShot()] } })}>
-                Agregar foto
-              </Button>
-            )}
-          </Section>
-
-          <Section title="Marcas" help="Logos en una fila. Hasta 12.">
+          <Section title="Marcas" help="El antetítulo se edita aquí. Los logos salen de las marcas del país.">
             <Pair label="Antetítulo" value={content.brands.eyebrow} max={200} disabled={!canEdit || pending} onChange={eyebrow => change({ ...content, brands: { ...content.brands, eyebrow } })} />
-            <ul className="space-y-3">
-              {content.brands.items.map((item, index) => (
-                <li key={index} className="rounded-md border border-zinc-200 p-4">
-                  <RowHead index={index} canEdit={canEdit && !pending} onRemove={() => change({ ...content, brands: { ...content.brands, items: content.brands.items.filter((_, i) => i !== index) } })} />
-                  <div className="mt-3 space-y-3">
-                    <Photo
-                      id={item.imageId}
-                      library={library}
-                      canEdit={canEdit}
-                      pending={pending}
-                      onChange={imageId => change({ ...content, brands: { ...content.brands, items: content.brands.items.map((row, i) => (i === index ? { ...row, imageId } : row)) } })}
-                      onUpload={remember}
-                    />
-                    <Pair
-                      label="Nombre"
-                      value={item.label}
-                      max={200}
-                      disabled={!canEdit || pending}
-                      onChange={label => change({ ...content, brands: { ...content.brands, items: content.brands.items.map((row, i) => (i === index ? { ...row, label } : row)) } })}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-            {canEdit && content.brands.items.length < LIMITS.logos && (
-              <Button variant="outline" disabled={pending} onClick={() => change({ ...content, brands: { ...content.brands, items: [...content.brands.items, emptyLogo()] } })}>
-                Agregar marca
-              </Button>
-            )}
+            <p className="text-sm text-zinc-500">
+              Se muestran las marcas marcadas en el home que tienen la solución Architectural. El orden es el de esa lista, y cada logo abre su ficha.{' '}
+              <a className="text-zinc-900 underline" href="/admin/country-brands">Ir a marcas del país</a>
+            </p>
           </Section>
 
           <Section title="Cierre" help="El botón lleva a contacto.">

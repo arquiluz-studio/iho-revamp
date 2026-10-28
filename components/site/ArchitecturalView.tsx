@@ -18,12 +18,12 @@ export type ArchitecturalStory = {
   intro: { eyebrow: string; title: string; body: string[]; cta: string; image: ImageVM | null } | null
   banner: string
   elements: { eyebrow: string; title: string; intro: string[]; items: Shot[] } | null
-  categories: string[]
+  categories: { label: string; href: string }[]
   spaces: { eyebrow: string; title: string; body: string[]; image: ImageVM | null } | null
   process: { eyebrow: string; title: string; intro: string[]; steps: { title: string; text: string }[] } | null
   quote: { text: string; attribution: string } | null
-  brands: { eyebrow: string; items: { name: string; image: ImageVM | null }[] } | null
-  gallery: { eyebrow: string; items: { caption: string; text: string; image: ImageVM | null }[] }
+  brands: { eyebrow: string; items: { name: string; href: string; image: ImageVM | null }[] } | null
+  gallery: { eyebrow: string; items: { href: string; caption: string; text: string; image: ImageVM | null }[] }
   close: { eyebrow: string; title: string; body: string[]; cta: string } | null
 }
 
@@ -108,8 +108,10 @@ export function ArchitecturalView({ story }: { story: ArchitecturalStory }) {
       {story.categories.length > 0 && (
         <section className="iho-story-cats" aria-label="Categorías">
           <ul>
-            {story.categories.map(label => (
-              <li key={label}>{label}</li>
+            {story.categories.map(item => (
+              <li key={item.href}>
+                <a href={item.href}>{item.label}</a>
+              </li>
             ))}
           </ul>
         </section>
@@ -165,12 +167,14 @@ export function ArchitecturalView({ story }: { story: ArchitecturalStory }) {
           {story.brands.eyebrow && <p className="iho-story-kicker">{story.brands.eyebrow}</p>}
           <ul className="iho-story-logos">
             {story.brands.items.map(item => (
-              <li key={item.name}>
-                {item.image ? (
-                  <MediaImage image={item.image} alt={item.name} sizes="180px" style={{ maxWidth: '72%', maxHeight: 42, width: 'auto', height: 'auto', objectFit: 'contain' }} />
-                ) : (
-                  <span>{item.name}</span>
-                )}
+              <li key={item.href}>
+                <a href={item.href} aria-label={item.name}>
+                  {item.image ? (
+                    <MediaImage image={item.image} alt="" sizes="180px" style={{ maxWidth: '72%', maxHeight: 42, width: 'auto', height: 'auto', objectFit: 'contain' }} />
+                  ) : (
+                    <span>{item.name}</span>
+                  )}
+                </a>
               </li>
             ))}
           </ul>
@@ -182,16 +186,16 @@ export function ArchitecturalView({ story }: { story: ArchitecturalStory }) {
           {story.gallery.eyebrow && <p className="iho-story-kicker">{story.gallery.eyebrow}</p>}
           <div className="iho-story-gallery">
             {story.gallery.items.map((item, index) => (
-              <figure key={`${item.caption}-${index}`}>
+              <a key={item.href} href={item.href}>
                 <Photo image={item.image} sizes="(max-width: 768px) 100vw, 600px" />
                 {item.caption && (
-                  <figcaption>
+                  <p className="iho-story-gallery__title">
                     <span>{number(galleryStart + index - 1)}</span>
                     {item.caption}
-                  </figcaption>
+                  </p>
                 )}
                 {item.text && <p>{item.text}</p>}
-              </figure>
+              </a>
             ))}
           </div>
         </section>
