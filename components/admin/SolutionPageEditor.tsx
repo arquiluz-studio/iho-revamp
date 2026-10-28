@@ -19,11 +19,13 @@ const LIMITS = { cards: 8, steps: 8 }
 /** Text and photos of the solution layout, in the same order as the public page. */
 export function SolutionPageEditor({
   id,
+  lineName,
   content: initial,
   media,
   canEdit,
 }: {
   id: string
+  lineName: string
   content: SolutionPageContent
   media: AdminMedia[]
   canEdit: boolean
@@ -208,7 +210,7 @@ export function SolutionPageEditor({
           <Section title="Marcas" help="El antetítulo se edita aquí. Los logos salen de las marcas del país.">
             <Pair label="Antetítulo" value={content.brands.eyebrow} max={200} disabled={!canEdit || pending} onChange={eyebrow => change({ ...content, brands: { ...content.brands, eyebrow } })} />
             <p className="text-sm text-zinc-500">
-              Se muestran las marcas marcadas en el home que tienen la solución Architectural. El orden es el de esa lista, y cada logo abre su ficha.{' '}
+              Se muestran las marcas marcadas en el home que tienen la solución {lineName}. El orden es el de esa lista, y cada logo abre su ficha.{' '}
               <a className="text-zinc-900 underline" href="/admin/country-brands">Ir a marcas del país</a>
             </p>
           </Section>

@@ -113,7 +113,7 @@ export function getTeam(code: string) {
 }
 
 export function getBusinessLines() {
-  return cachedQuery(['business-lines', 'story-figma-2'], [cacheTags.taxonomies], async ({ db }) =>
+  return cachedQuery(['business-lines', 'story-lighting'], [cacheTags.taxonomies], async ({ db }) =>
     must(
       await db
         .from('business_lines')
@@ -125,7 +125,7 @@ export function getBusinessLines() {
 }
 
 export function getSectors() {
-  return cachedQuery(['sectors'], [cacheTags.taxonomies], async ({ db }) =>
+  return cachedQuery(['sectors', 'catalog-order'], [cacheTags.taxonomies], async ({ db }) =>
     must(
       await db
         .from('sectors')

@@ -48,7 +48,7 @@ export default async function SolutionPage({ params }: { params: Promise<Params>
 
   const chrome = await innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/solutions/[businessLine]', params: { businessLine: localSlug(line, l) } })))
   const name = t(line, 'name', locale)
-  if (line.slug === 'architectural') {
+  if (line.slug === 'architectural' || line.slug === 'mobiliario' || line.slug === 'lighting') {
     const content = parseSolutionPage(line.page_content)
     const [media, projects, countryBrands, sectors] = await Promise.all([
       getSolutionMedia(solutionPageMediaIds(content)),

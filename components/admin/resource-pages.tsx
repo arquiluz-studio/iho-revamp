@@ -235,7 +235,7 @@ export async function ResourceEditPage({
       )}
       {id && resource === 'solutions' && (
         <div className="mt-6 lg:max-w-[calc(100%-304px)]">
-          <SolutionPageBlock id={id} raw={row?.page_content} canEdit={canWrite} />
+          <SolutionPageBlock id={id} lineName={String(row?.name_es ?? 'esta solución')} raw={row?.page_content} canEdit={canWrite} />
         </div>
       )}
       {id && resource === 'spaces' && (
@@ -247,12 +247,12 @@ export async function ResourceEditPage({
   )
 }
 
-async function SolutionPageBlock({ id, raw, canEdit }: { id: string; raw: unknown; canEdit: boolean }) {
+async function SolutionPageBlock({ id, lineName, raw, canEdit }: { id: string; lineName: string; raw: unknown; canEdit: boolean }) {
   const content = parseSolutionPage(raw)
   const ids = solutionPageMediaIds(content)
   const supabase = await createSupabaseServerClient()
   const { data } = ids.length ? await supabase.from('media_assets').select(ADMIN_MEDIA_SELECT).in('id', ids) : { data: [] }
-  return <SolutionPageEditor id={id} content={content} media={(data ?? []).map(toAdminMedia)} canEdit={canEdit} />
+  return <SolutionPageEditor id={id} lineName={lineName} content={content} media={(data ?? []).map(toAdminMedia)} canEdit={canEdit} />
 }
 
 async function SolutionFits({ owner, id, canEdit }: { owner: 'solutions' | 'spaces'; id: string; canEdit: boolean }) {
