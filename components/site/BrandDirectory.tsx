@@ -9,7 +9,6 @@ export type DirectoryBrand = {
   name: string
   href?: string
   logo: ImageVM | null
-  cover?: ImageVM | null
   thin?: boolean
   lines: string[]
 }
@@ -127,8 +126,8 @@ export function BrandDirectory({
               <h2 id={`${idPrefix}-h-${letter}`}>{letter}</h2>
               <div className="iho-brand-cards">
                 {groups.get(letter)?.map(brand => {
-                  const image = brand.cover ?? brand.logo
-                  const isPhoto = photo || Boolean(brand.cover)
+                  const image = brand.logo
+                  const isPhoto = photo
                   const body = (
                     <>
                       <div className="iho-brand-tile__mark">

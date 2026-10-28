@@ -24,6 +24,7 @@ export function PageHero({
   image,
   actions = [],
   children,
+  className,
 }: {
   label: string
   title: string
@@ -31,9 +32,10 @@ export function PageHero({
   image?: ImageVM | null
   actions?: HeroCtaVM[]
   children?: React.ReactNode
+  className?: string
 }) {
   return (
-    <section className="iho-page-hero">
+    <section className={className ? `iho-page-hero ${className}` : 'iho-page-hero'}>
       {image && <MediaImage image={image} priority sizes="100vw" />}
       <div className="iho-page-hero__inner">
         {label && <SectionLabel>{label}</SectionLabel>}

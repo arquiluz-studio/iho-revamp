@@ -171,7 +171,7 @@ async function mapCountries(locale: AppLocale): Promise<MapCountryVM[]> {
       .sort((a, b) => a.sort - b.sort || a.city.localeCompare(b.city, locale))
       .map(o => {
         const xy = projectCity(o.city, o)
-        return { id: o.id, name: cityDisplay(o.city), address: o.address, mapsUrl: o.maps_url, x: xy?.[0] ?? null, y: xy?.[1] ?? null }
+        return { id: o.id, name: cityDisplay(o.city), title: o.city, address: o.address, mapsUrl: o.maps_url, x: xy?.[0] ?? null, y: xy?.[1] ?? null }
       })
     if (!cities.length) return []
     return [{ code: c.code, name: t(c, 'name', locale), cities }]
@@ -201,13 +201,13 @@ export async function getGroupVM(country: CountryCode, locale: AppLocale, paths:
   return {
     stats: toStats(settings?.stats, locale),
     mapCountries: countries,
-    brands: brands.map(b => toBrandVM(b, locale, paths)),
+    brands: brands.filter(b => b.is_featured).map(b => toBrandVM(b, locale, paths)),
     projects: projects.map(p => toProjectCardVM(p, locale, paths)),
     team: members.map(m => ({
       name: m.full_name,
       role: t(m, 'role', locale),
       objectPosition: m.photo_position ?? undefined,
-      href: paths.team(m.slug),
+      linkedin: m.linkedin_url,
       photo: imageOf(m.photo, locale, m.full_name, legacyMedia.teamPhoto(m.full_name), 'md'),
     })),
   }

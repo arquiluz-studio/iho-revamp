@@ -31,7 +31,7 @@ export async function getCountryBrand(country: string, slug: string) {
 
 /** Inspiration photos of one brand, in the order saved from the admin. */
 export function getBrandMedia(brandId: string) {
-  return cachedQuery(['brand-media', brandId], [cacheTags.brands, cacheTags.brand(brandId)], async ({ db }) =>
+  return cachedQuery(['brand-media', brandId, 'reel'], [cacheTags.brands, cacheTags.brand(brandId)], async ({ db }) =>
     must(
       await db
         .from('brand_media')

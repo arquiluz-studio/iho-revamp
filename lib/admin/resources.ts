@@ -56,7 +56,7 @@ export type ResourceConfig = {
   /** The primary key is typed by the user on creation (countries.code). */
   pkInput?: boolean
   /** Localized public route used by "Ver en el sitio" / preview. */
-  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/designers/[slug]' | '/products/[slug]' | '/team/[slug]' | '/solutions/[businessLine]' | '/spaces/[sector]' | '/'
+  publicPath?: '/events/[slug]' | '/projects/[slug]' | '/brands/[slug]' | '/designers/[slug]' | '/products/[slug]' | '/solutions/[businessLine]' | '/spaces/[sector]' | '/'
   /** Datetime fields are entered in this row field's timezone (falls back to the country timezone). */
   timezoneField?: string
 }
@@ -312,14 +312,13 @@ const team: ResourceConfig = {
   singular: 'integrante',
   writeRole: 'editor',
   section: 'team',
-  publicPath: '/team/[slug]',
   fields: [
     { name: 'full_name', label: 'Nombre', type: 'text', required: true, max: 160 },
-    { name: 'slug', label: 'Slug (URL)', type: 'slug', required: true, help: 'Dirección de la ficha, por ejemplo salvador-miranda.' },
+    { name: 'slug', label: 'Slug', type: 'slug', required: true, help: 'Identificador interno, por ejemplo salvador-miranda.' },
     { name: 'role', label: 'Puesto', type: 'text', i18n: true, required: true, max: 160 },
     { name: 'photo_media_id', label: 'Foto', type: 'media', kind: 'team_photo' },
     { name: 'photo_position', label: 'Encuadre de la foto', type: 'text', max: 40, help: 'object-position CSS, ej. "50% 20%".' },
-    { name: 'bio', label: 'Biografía', type: 'textarea', i18n: true, max: 4000, rows: 6, wide: true, help: 'Una línea en blanco separa párrafos. Se muestra en la ficha.' },
+    { name: 'bio', label: 'Biografía', type: 'textarea', i18n: true, max: 4000, rows: 6, wide: true, help: 'Una línea en blanco separa párrafos.' },
     { name: 'email', label: 'Correo', type: 'email' },
     { name: 'phone', label: 'Teléfono', type: 'text', max: 60 },
     { name: 'linkedin_url', label: 'LinkedIn', type: 'url', wide: true },
@@ -543,7 +542,7 @@ const brands: ResourceConfig = {
       label: 'Portada',
       type: 'media',
       kind: 'generic',
-      help: 'Foto de la marca en el directorio y en la ficha. Puede ser un producto, un espacio o el logo sobre una foto. Si queda vacía, se usa el logo.',
+      help: 'Foto grande de la ficha. Puede ser un producto, un espacio o el logo sobre una foto. Si queda vacía, la ficha no lleva foto de fondo.',
     },
     { name: 'website_url', label: 'Sitio web', type: 'url' },
     { name: 'origin_country', label: 'País de origen', type: 'text', max: 80 },

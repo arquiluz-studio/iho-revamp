@@ -30,14 +30,12 @@ export default async function BrandsPage({ params }: { params: Promise<SiteParam
   ])
   const directory = brands.map(brand => {
     const logo = imageOrNull(brand.logo, locale, brand.name, legacyMedia.brandLogo(brand.slug), 'md')
-    const cover = imageOrNull(brand.cover, locale, brand.name, null, 'md')
     return {
       slug: brand.slug,
       name: brand.name,
       href: paths.brand(brand.slug),
       thin: brand.logo_is_thin,
       logo: logo ? { ...logo, color: null, placeholder: null } : null,
-      cover: cover ? { ...cover, color: null, placeholder: null } : null,
       lines: brand.business_lines.flatMap(link => (link.business_line?.slug ? [link.business_line.slug] : [])),
     }
   })

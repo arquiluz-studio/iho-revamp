@@ -6,7 +6,7 @@ import { getCatalog } from '@/lib/queries/catalog'
 import { localSlug } from '@/lib/i18n-fields'
 import { getEvents } from '@/lib/queries/events'
 import { getProjects } from '@/lib/queries/projects'
-import { getBusinessLines, getSectors, getTeam } from '@/lib/queries/site'
+import { getBusinessLines, getSectors } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -33,14 +33,13 @@ function entry(country: CountryCode, href: PageHref): string {
 export async function GET(_request: Request, { params }: { params: Promise<{ country: string }> }) {
   const { country } = await params
   if (!isCountryCode(country)) notFound()
-  const [events, projects, brands, lines, sectors, products, team] = await Promise.all([
+  const [events, projects, brands, lines, sectors, products] = await Promise.all([
     getEvents(country),
     getProjects(country),
     getCountryBrands(country),
     getBusinessLines(),
     getSectors(),
     getCatalog(country),
-    getTeam(country),
   ])
   const hrefs: PageHref[] = [
     '/',
@@ -59,7 +58,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cou
     ...lines.map(line => (l: AppLocale) => ({ pathname: '/solutions/[businessLine]' as const, params: { businessLine: localSlug(line, l) } })),
     ...sectors.map(s => (l: AppLocale) => ({ pathname: '/spaces/[sector]' as const, params: { sector: localSlug(s, l) } })),
     ...products.map(p => (l: AppLocale) => ({ pathname: '/products/[slug]' as const, params: { slug: localSlug(p, l) } })),
-    ...team.map(member => ({ pathname: '/team/[slug]' as const, params: { slug: member.slug } })),
   ]
   const body =
     '<?xml version="1.0" encoding="UTF-8"?>' +

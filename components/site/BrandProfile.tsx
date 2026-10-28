@@ -1,154 +1,125 @@
 import { MediaImage } from '@/components/ui/MediaImage'
 import type { ImageVM } from '@/lib/types/site'
+import { InspirationCarousel, type ReelPhoto } from './InspirationCarousel'
+import { Chips, PageHero } from './pages/PageParts'
 import type { ProfilePiece } from './DesignerProfile'
 
 export type BrandDesigner = {
   slug: string
   name: string
   href: string
-  portrait: ImageVM | null
 }
 
 export function BrandProfile({
-  brandsHref,
   brandsLabel,
   name,
-  kicker,
   description,
   website,
+  websiteLabel,
   exclusive,
   solutions,
-  logo,
   cover,
-  thin,
-  exploreHref,
-  exploreLabel,
-  designersLabel,
-  designersTitle,
-  photoPending,
-  productsLabel,
-  productsTitle,
+  originLabel,
+  origin,
+  collaboratorsLabel,
+  designers,
+  photos,
+  previousLabel,
+  nextLabel,
+  inspirationLabel,
   pricePending,
   imagePending,
   detailLabel,
-  designers,
   pieces,
 }: {
-  brandsHref: string
   brandsLabel: string
   name: string
-  kicker?: string
   description: string[]
   website?: { href: string; label: string } | null
+  websiteLabel: string
   exclusive?: string | null
   solutions: { href: string; label: string }[]
-  logo: ImageVM | null
   cover?: ImageVM | null
-  thin?: boolean
-  exploreHref?: string
-  exploreLabel: string
-  designersLabel: string
-  designersTitle: string
-  photoPending: string
-  productsLabel: string
-  productsTitle: string
+  originLabel: string
+  origin?: string
+  collaboratorsLabel: string
+  designers: BrandDesigner[]
+  photos: ReelPhoto[]
+  previousLabel: string
+  nextLabel: string
+  inspirationLabel: string
   pricePending: string
   imagePending: string
   detailLabel: string
-  designers: BrandDesigner[]
   pieces: ProfilePiece[]
 }) {
+  const hasFacts = Boolean(origin || designers.length > 0 || website)
   return (
-    <article className="iho-designer">
-      <p className="iho-crumb">
-        <a href={brandsHref}>{brandsLabel}</a>
-        <span aria-hidden="true"> / </span>
-        <span>{name}</span>
-      </p>
+    <article>
+      <PageHero className="iho-brand-hero" label={brandsLabel} title={name} image={cover}>
+        {solutions.length > 0 && (
+          <div className="iho-chips-dark" style={{ marginTop: 26 }}>
+            <Chips links={solutions} />
+          </div>
+        )}
+      </PageHero>
 
-      <div className="iho-designer-hero">
+      <section className={hasFacts ? 'iho-brand-story' : 'iho-brand-story iho-brand-story--solo'}>
         <div>
-          {kicker && <p className="iho-designer-kicker">{kicker}</p>}
-          <h1>{name}</h1>
+          <p className="iho-brand-wordmark">{name}</p>
           {description.map(paragraph => (
-            <p key={paragraph} className="iho-designer-bio">
-              {paragraph}
-            </p>
+            <p key={paragraph}>{paragraph}</p>
           ))}
-          {website && (
-            <a className="iho-designer-site" href={website.href} target="_blank" rel="noopener noreferrer">
-              {website.label}
-            </a>
-          )}
-          {exclusive && <p className="iho-designer-bio">{exclusive}</p>}
-          {solutions.length > 0 && (
-            <p className="iho-brand-solutions">
-              {solutions.map(solution => (
-                <a key={solution.href} href={solution.href}>
-                  {solution.label}
-                </a>
-              ))}
-            </p>
-          )}
-          {exploreHref && (
-            <a className="iho-explore" href={exploreHref}>
-              {exploreLabel}
-              <svg aria-hidden="true" width={12} height={12} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4}>
-                <path d="M6 1.5v8M2.5 6.5 6 10l3.5-3.5" />
-              </svg>
-            </a>
-          )}
+          {exclusive && <p>{exclusive}</p>}
         </div>
-        <div className={cover ? 'iho-designer-portrait' : thin ? 'iho-designer-portrait iho-designer-portrait--logo iho-designer-portrait--thin' : 'iho-designer-portrait iho-designer-portrait--logo'}>
-          {cover ? (
-            <MediaImage image={cover} alt={name} sizes="(max-width: 768px) 100vw, 520px" />
-          ) : logo ? (
-            <MediaImage image={logo} alt={name} sizes="(max-width: 768px) 100vw, 520px" />
-          ) : (
-            <span>{name}</span>
-          )}
-        </div>
-      </div>
+        {hasFacts && (
+          <dl className="iho-brand-facts">
+            {origin && (
+              <>
+                <dt>{originLabel}</dt>
+                <dd>{origin}</dd>
+              </>
+            )}
+            {designers.length > 0 && (
+              <>
+                <dt>{collaboratorsLabel}</dt>
+                <dd>
+                  {designers.map(designer => (
+                    <a key={designer.slug} href={designer.href}>
+                      {designer.name}
+                    </a>
+                  ))}
+                </dd>
+              </>
+            )}
+            {website && (
+              <>
+                <dt>{websiteLabel}</dt>
+                <dd>
+                  <a href={website.href} target="_blank" rel="noopener noreferrer">
+                    {website.label}
+                  </a>
+                </dd>
+              </>
+            )}
+          </dl>
+        )}
+      </section>
 
-      {designers.length > 0 && (
-        <section id="disenadores" className="iho-designer-block" aria-labelledby="disenadores-title">
-          <div className="iho-designer-heading">
-            <p className="iho-designer-kicker">{designersLabel}</p>
-            <h2 id="disenadores-title">{designersTitle}</h2>
-          </div>
-          <div className="iho-brand-cards">
-            {designers.map(designer => (
-              <a key={designer.slug} href={designer.href} className={designer.portrait ? 'iho-brand-tile iho-brand-tile--photo' : 'iho-brand-tile'}>
-                <div className="iho-brand-tile__mark">
-                  {designer.portrait ? (
-                    <MediaImage image={designer.portrait} alt="" sizes="(max-width: 768px) 50vw, 240px" />
-                  ) : (
-                    <span className="iho-brand-tile__word iho-brand-tile__word--name">{photoPending}</span>
-                  )}
-                </div>
-                <span className="iho-brand-tile__meta">
-                  <span>{designer.name}</span>
-                  <svg aria-hidden="true" width={14} height={14} viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth={1.4}>
-                    <path d="M5 2.5 9.5 7 5 11.5" />
-                  </svg>
-                </span>
-              </a>
-            ))}
-          </div>
+      {photos.length > 0 && (
+        <section id="inspiracion" aria-label={inspirationLabel}>
+          <InspirationCarousel photos={photos} previousLabel={previousLabel} nextLabel={nextLabel} />
         </section>
       )}
 
       {pieces.length > 0 && (
-        <section id="piezas" className="iho-designer-block" aria-labelledby="piezas-title">
-          <div className="iho-designer-heading">
-            <p className="iho-designer-kicker">{productsLabel}</p>
-            <h2 id="piezas-title">{productsTitle}</h2>
-          </div>
+        <section id="piezas" className="iho-brand-products" aria-labelledby="piezas-title">
+          <h2 id="piezas-title">{name}</h2>
           <div className="iho-piece-grid">
             {pieces.map(piece => (
               <a key={piece.key} href={piece.href} className="iho-piece">
                 <div className="iho-piece__mark">
-                  {piece.image ? <MediaImage image={piece.image} alt="" sizes="(max-width: 768px) 50vw, 280px" /> : <span>{imagePending}</span>}
+                  {piece.image ? <MediaImage image={piece.image} alt="" sizes="(max-width: 768px) 100vw, 380px" /> : <span>{imagePending}</span>}
                 </div>
                 <div className="iho-piece__price">{piece.price ?? pricePending}</div>
                 <div className="iho-piece__name">{piece.name}</div>

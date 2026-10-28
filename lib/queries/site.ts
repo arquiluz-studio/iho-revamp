@@ -1,7 +1,6 @@
 import 'server-only'
 import { COUNTRY_CODES } from '@/config/countries'
 import { cacheTags } from '@/lib/cache-tags'
-import { SLUG_PATTERN } from '@/lib/i18n-fields'
 import { cachedQuery, maybe, media, must } from './core'
 
 export function getCountries() {
@@ -110,12 +109,6 @@ export function getTeam(code: string) {
     if (!draft) query = query.eq('is_published', true)
     return must(await query.order('sort'), 'team_members')
   })
-}
-
-export async function getTeamMember(code: string, slug: string) {
-  if (!SLUG_PATTERN.test(slug)) return null
-  const members = await getTeam(code)
-  return members.find(member => member.slug === slug) ?? null
 }
 
 export function getBusinessLines() {

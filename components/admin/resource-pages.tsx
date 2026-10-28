@@ -109,7 +109,6 @@ function publicHref(config: ResourceConfig, row: AnyRow | null, id: string | nul
     case '/brands/[slug]':
     case '/designers/[slug]':
     case '/products/[slug]':
-    case '/team/[slug]':
       return slug ? { pathname: config.publicPath, params: { slug } } : null
     case '/solutions/[businessLine]':
       return slug ? { pathname: config.publicPath, params: { businessLine: slug } } : null

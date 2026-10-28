@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { ContactForm } from '@/components/site/ContactForm'
+import { InspirationCarousel } from '@/components/site/InspirationCarousel'
 import { Chips, Facts, PageShell, Prose, SectionHeading } from '@/components/site/pages/PageParts'
 import { ProductCard } from '@/components/site/ProductCard'
 import { innerChrome } from '@/components/site/SiteChrome'
@@ -9,6 +10,7 @@ import { MediaImage } from '@/components/ui/MediaImage'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { imageOf, priceLabels, productShot, toProductCardVM } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
+import { getBrandMedia } from '@/lib/queries/brands'
 import { getCatalog, getProductBySlug } from '@/lib/queries/catalog'
 import { buildAlternates } from '@/lib/seo'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
@@ -42,9 +44,12 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const product = await getProductBySlug(country, slug, locale)
   if (!product) notFound()
   if (localSlug(product, locale) !== slug) permanentRedirect(paths.product(localSlug(product, locale)))
-  const [catalog, tp, chrome] = await Promise.all([
+  const [catalog, inspiration, tp, tb, tc, chrome] = await Promise.all([
     getCatalog(country),
+    product.brand ? getBrandMedia(product.brand.id) : Promise.resolve([]),
     getTranslations({ locale, namespace: 'pages.products' }),
+    getTranslations({ locale, namespace: 'pages.brands' }),
+    getTranslations({ locale, namespace: 'common' }),
     innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/products/[slug]', params: { slug: localSlug(product, l) } }))),
   ])
 
@@ -57,6 +62,11 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const availability = product.lead_time_days ? tp('leadTime', { days: product.lead_time_days }) : tp('onRequest')
   const variants = product.variants.length > 1 ? product.variants : []
   const related = catalog.filter(p => p.id !== product.id && p.catalogBrandId === product.catalogBrandId).slice(0, 4)
+  const photos = inspiration.flatMap(item => {
+    if (!item.media) return []
+    const caption = t(item, 'caption', locale)
+    return [{ key: item.media.id, image: imageOf(item.media, locale, caption || brandName, null, 'lg'), caption: caption || undefined }]
+  })
   const chips = [
     ...(product.business_line ? [{ href: paths.solution(localSlug(product.business_line, locale)), label: t(product.business_line, 'name', locale) }] : []),
     ...product.sectors.map(s => ({ href: paths.space(localSlug(s, locale)), label: t(s, 'name', locale) })),
@@ -143,6 +153,11 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           </div>
         </div>
       </section>
+      {photos.length > 0 && (
+        <section className="iho-product-reel" aria-label={tb('inspiration')}>
+          <InspirationCarousel photos={photos} previousLabel={tc('previous')} nextLabel={tc('next')} />
+        </section>
+      )}
       {related.length > 0 && (
         <section className="iho-page-section" style={{ paddingTop: 0 }}>
           <SectionHeading label={`— ${brandName.toUpperCase()}`} />

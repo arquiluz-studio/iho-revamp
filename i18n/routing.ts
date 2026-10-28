@@ -19,7 +19,6 @@ export const routing = defineRouting({
     '/designers': { es: '/disenadores', en: '/designers' },
     '/designers/[slug]': { es: '/disenadores/[slug]', en: '/designers/[slug]' },
     '/group': { es: '/grupo-iho', en: '/iho-group' },
-    '/team/[slug]': { es: '/equipo/[slug]', en: '/team/[slug]' },
     '/solutions': { es: '/soluciones', en: '/solutions' },
     '/solutions/[businessLine]': { es: '/soluciones/[businessLine]', en: '/solutions/[businessLine]' },
     '/spaces': { es: '/espacios', en: '/spaces' },

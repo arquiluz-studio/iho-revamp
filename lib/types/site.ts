@@ -76,7 +76,7 @@ export type TeamMemberVM = {
   role: string
   photo: ImageVM
   objectPosition?: string
-  href: string
+  linkedin?: string | null
 }
 
 export type OfficeVM = { city: string; address: string; muted?: boolean }
@@ -117,7 +117,7 @@ export type HeroCtaVM = {
   newWindow: boolean
 }
 
-export type MapCityVM = { id: string; name: string; address: string; mapsUrl: string | null; x: number | null; y: number | null }
+export type MapCityVM = { id: string; name: string; title: string; address: string; mapsUrl: string | null; x: number | null; y: number | null }
 export type MapCountryVM = { code: string; name: string; cities: MapCityVM[] }
 
 export type HomeVM = {
