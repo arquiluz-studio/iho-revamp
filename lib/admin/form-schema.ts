@@ -1,6 +1,6 @@
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
 import { z } from 'zod'
-import { CONTENT_PAGE_KEYS, type ContentPageKey } from '@/lib/content/static-pages'
+import { SITE_PAGE_KEYS, type SitePageKey } from '@/lib/content/static-pages'
 import { fieldColumns, type Field, type ResourceConfig } from './resources'
 
 /**
@@ -25,7 +25,7 @@ export const specSchema = z.object({
 })
 export type SpecValue = z.infer<typeof specSchema>
 
-const pageKeySchema = z.enum(CONTENT_PAGE_KEYS as unknown as [ContentPageKey, ...ContentPageKey[]], 'Elige una página')
+const pageKeySchema = z.enum(SITE_PAGE_KEYS as unknown as [SitePageKey, ...SitePageKey[]], 'Elige una página')
 const ctaFields = {
   style: z.enum(['red', 'outline', 'black']),
   label_es: z.string().trim().min(1, 'Requerido').max(80),

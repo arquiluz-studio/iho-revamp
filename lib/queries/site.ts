@@ -125,11 +125,11 @@ export function getBusinessLines() {
 }
 
 export function getSectors() {
-  return cachedQuery(['sectors', 'catalog-order'], [cacheTags.taxonomies], async ({ db }) =>
+  return cachedQuery(['sectors', 'story-hospitality'], [cacheTags.taxonomies], async ({ db }) =>
     must(
       await db
         .from('sectors')
-        .select(`id, slug, slug_en, name_es, name_en, description_es, description_en, sort, cover:${media('sectors_cover_media_id_fkey')}` as const)
+        .select(`id, slug, slug_en, name_es, name_en, description_es, description_en, sort, page_content, cover:${media('sectors_cover_media_id_fkey')}` as const)
         .order('sort'),
       'sectors',
     ),

@@ -5,7 +5,7 @@ import { toImageVM } from '@/lib/media'
 import { getCountryPage, getCountrySettings, getPageChoice, getSitePage } from '@/lib/queries/site'
 import type { HeroCtaVM, ImageVM } from '@/lib/types/site'
 import { resolveHeroCtas } from './hero-ctas'
-import type { ContentPageKey, CountryPageKey } from './static-pages'
+import type { CountryPageKey, SitePageKey } from './static-pages'
 
 export type ResolvedPageHero = {
   enabled: boolean
@@ -18,7 +18,7 @@ export type ResolvedPageHero = {
 }
 
 /** No choice row means the country publishes the global page. */
-export async function usesGlobalPage(country: CountryCode, page: ContentPageKey) {
+export async function usesGlobalPage(country: CountryCode, page: SitePageKey) {
   const choice = await getPageChoice(country, page)
   return choice?.uses_global !== false
 }

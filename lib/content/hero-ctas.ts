@@ -1,7 +1,7 @@
 import type { AppLocale } from '@/config/countries'
 import { getPathname } from '@/i18n/navigation'
 import type { HeroCtaVM } from '@/lib/types/site'
-import { contentPage, isContentPageKey } from './static-pages'
+import { isSitePageKey, sitePage } from './static-pages'
 
 const STYLES = new Set<HeroCtaVM['style']>(['red', 'outline', 'black'])
 const HREF = /^(https?:\/\/\S+|#\S+)$/
@@ -17,8 +17,8 @@ function labelOf(row: Record<string, unknown>, locale: AppLocale) {
 }
 
 function hrefOf(row: Record<string, unknown>, locale: AppLocale) {
-  if (row.kind === 'page' && typeof row.page === 'string' && isContentPageKey(row.page)) {
-    const page = contentPage(row.page)
+  if (row.kind === 'page' && typeof row.page === 'string' && isSitePageKey(row.page)) {
+    const page = sitePage(row.page)
     return page ? getPathname({ href: page.href, locale }) : null
   }
   if (row.kind === 'url' && typeof row.url === 'string' && HREF.test(row.url.trim())) return row.url.trim()

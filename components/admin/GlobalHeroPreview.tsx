@@ -1,7 +1,7 @@
 import { MediaThumb } from '@/components/admin/MediaUpload'
 import { Card, Notice, PageHeader } from '@/components/admin/ui'
 import { loadMedia } from '@/lib/admin/data'
-import { contentPage, type ContentPageKey } from '@/lib/content/static-pages'
+import { contentPage, sitePage, type ContentPageKey } from '@/lib/content/static-pages'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 const PAGE_FIELDS = [
@@ -31,7 +31,7 @@ function previewCtas(raw: unknown) {
     if (!labelEs && !labelEn) return []
     const destination =
       row.kind === 'page' && typeof row.page === 'string'
-        ? (contentPage(row.page)?.label ?? row.page)
+        ? (sitePage(row.page)?.label ?? row.page)
         : typeof row.url === 'string'
           ? row.url
           : ''

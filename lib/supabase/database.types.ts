@@ -1765,6 +1765,7 @@ export type Database = {
           id: string
           name_en: string | null
           name_es: string
+          page_content: Json
           slug: string
           slug_en: string | null
           sort: number
@@ -1778,6 +1779,7 @@ export type Database = {
           id?: string
           name_en?: string | null
           name_es: string
+          page_content?: Json
           slug: string
           slug_en?: string | null
           sort?: number
@@ -1791,6 +1793,7 @@ export type Database = {
           id?: string
           name_en?: string | null
           name_es?: string
+          page_content?: Json
           slug?: string
           slug_en?: string | null
           sort?: number

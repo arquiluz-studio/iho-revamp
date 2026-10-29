@@ -9,7 +9,7 @@ import { deleteResource, saveResource } from '@/app/admin/actions/resources'
 import { buildSchema, type FormValues } from '@/lib/admin/form-schema'
 import type { AdminMedia } from '@/lib/admin/media'
 import { RESOURCES, fieldColumns, type Field, type MediaKind, type Option, type ResourceKey } from '@/lib/admin/resources'
-import { CONTENT_PAGES } from '@/lib/content/static-pages'
+import { SITE_PAGE_KEYS, sitePage } from '@/lib/content/static-pages'
 import { Dropdown, MultiDropdown } from './Dropdown'
 import { MediaThumb, UploadButton } from './MediaUpload'
 import { Button, Card, Checkbox, FieldShell, Input, Notice, Textarea, cn } from './ui'
@@ -488,7 +488,10 @@ const CTA_WINDOWS: Option[] = [
   { value: 'self', label: 'La misma ventana' },
   { value: 'blank', label: 'Una nueva ventana' },
 ]
-const CTA_PAGES: Option[] = CONTENT_PAGES.map(page => ({ value: page.key, label: page.label }))
+const CTA_PAGES: Option[] = SITE_PAGE_KEYS.flatMap(key => {
+  const page = sitePage(key)
+  return page ? [{ value: page.key, label: page.label }] : []
+})
 
 function ctaMessage(errors: Record<string, unknown>, name: string, index: number, key: string) {
   const field = errors[name]

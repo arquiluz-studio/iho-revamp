@@ -84,7 +84,7 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
 
   return (
     <header data-solid={barSolid ? 'true' : 'false'} style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: barSolid ? '#faf7f1' : 'transparent', borderBottom: `1px solid ${dark ? 'rgba(20,18,12,0.08)' : 'rgba(255,255,255,0.14)'}`, transition: 'background 0.4s ease, border-color 0.4s ease' }}>
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '18px 40px', display: 'flex', alignItems: 'center' }}>
         <a href={logoHref}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={dark ? '/images/logo-iho-black.png' : '/images/logo-iho-white.png'} alt="IHO" style={{ height: 36, display: 'block' }} />
@@ -94,7 +94,7 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
           onTransitionEnd={event => {
             if (event.target === event.currentTarget && event.propertyName === 'transform' && !menuOpen) setClosing(false)
           }}
-          style={{ display: 'flex', alignItems: 'center', gap: 34, fontFamily: '"Source Sans 3", sans-serif', fontSize: 15, fontWeight: 500, color: navColor }}
+          style={{ display: 'flex', alignItems: 'center', gap: 34, marginLeft: 'auto', fontFamily: '"Source Sans 3", sans-serif', fontSize: 15, fontWeight: 500, color: navColor }}
         >
           {links.map(l => {
             if (!l.items) {
@@ -120,8 +120,8 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
           <a href={cta.href} className="iho-btn" onClick={close} style={{ display: 'inline-flex', alignItems: 'center', background: '#ef483d', color: '#fff', padding: '10px 20px', borderRadius: 30, fontWeight: 600, textDecoration: 'none' }}>
             {cta.label}
           </a>
-          {tools && <div className="iho-header-tools" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>{tools}</div>}
         </nav>
+        {tools && <div className="iho-header-tools" style={{ display: 'flex', alignItems: 'center', gap: 14, color: navColor }}>{tools}</div>}
         <button id="iho-menu-btn" className={menuOpen ? 'is-open' : ''} aria-label={t('menu')} aria-expanded={menuOpen} onClick={toggleMenu} style={{ color: dark ? '#17150f' : '#ffffff' }}>
           <span /><span /><span />
         </button>
