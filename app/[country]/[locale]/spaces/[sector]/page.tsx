@@ -59,7 +59,8 @@ export default async function SpacePage({ params }: { params: Promise<Params> })
     const images = new Map(media.map(item => [item.id, item]))
     const brandIds = new Set(projects.flatMap(project => project.brands.map(link => link.brand_id)))
     const linkedLines = new Set(fits.filter(fit => fit.sector_id === row.id).map(fit => fit.business_line_id))
-    const featured = projects.filter(project => project.is_featured).slice(0, 4)
+    const highlighted = projects.filter(project => project.is_featured)
+    const shown = (highlighted.length > 0 ? highlighted : projects).slice(0, 4)
     return (
       <PageShell chrome={chrome} hero={false}>
         <SpaceView
@@ -80,7 +81,7 @@ export default async function SpacePage({ params }: { params: Promise<Params> })
               const card = toBrandVM(brand, locale, paths)
               return [{ name: card.name, href: card.href ?? paths.brand(brand.slug), image: card.logo }]
             }),
-            featured.map(project => {
+            shown.map(project => {
               const title = t(project, 'title', locale)
               const summary = t(project, 'summary', locale).trim()
               return {
