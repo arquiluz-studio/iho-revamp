@@ -47,7 +47,7 @@ export default async function SpacePage({ params }: { params: Promise<Params> })
   if (localSlug(row, locale) !== sector) permanentRedirect(paths.space(localSlug(row, locale)))
   const chrome = await innerChrome(country, locale, paths, localeHrefs(l => ({ pathname: '/spaces/[sector]', params: { sector: localSlug(row, l) } })))
   const name = t(row, 'name', locale)
-  if (row.slug === 'workspace' || row.slug === 'hospitality') {
+  if (row.slug === 'workspace' || row.slug === 'hospitality' || row.slug === 'retail' || row.slug === 'salud' || row.slug === 'cultural' || row.slug === 'educacion' || row.slug === 'residencial') {
     const content = parseSpacePage(row.page_content)
     const [media, projects, countryBrands, lines, fits] = await Promise.all([
       getSolutionMedia(spacePageMediaIds(content)),

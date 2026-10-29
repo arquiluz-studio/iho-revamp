@@ -125,7 +125,7 @@ export function getBusinessLines() {
 }
 
 export function getSectors() {
-  return cachedQuery(['sectors', 'story-hospitality'], [cacheTags.taxonomies], async ({ db }) =>
+  return cachedQuery(['sectors', 'story-cultural-educacion-residencial'], [cacheTags.taxonomies], async ({ db }) =>
     must(
       await db
         .from('sectors')
