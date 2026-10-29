@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
-import { headers } from 'next/headers'
 import { ContentHero } from '@/components/site/pages/ContentHero'
 import { PageShell } from '@/components/site/pages/PageParts'
 import { ProjectBrowser, type BrowserProject } from '@/components/site/ProjectBrowser'
 import { innerChrome } from '@/components/site/SiteChrome'
-import { COUNTRIES, COUNTRY_CODES, crossCountryUrl, sortByCountry } from '@/config/countries'
+import { COUNTRIES, COUNTRY_CODES, sortByCountry } from '@/config/countries'
 import { heroDocumentTitle, resolvePageHero } from '@/lib/content/page-hero'
 import { sitePaths } from '@/lib/content/paths'
 import { toProjectCardVM } from '@/lib/content/site'
-import { localSlug, t } from '@/lib/i18n-fields'
+import { t } from '@/lib/i18n-fields'
 import { getProjects } from '@/lib/queries/projects'
 import { getBusinessLines, getSectors } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
@@ -23,10 +22,6 @@ export async function generateMetadata({ params }: { params: Promise<SiteParams>
 export default async function ProjectsPage({ params }: { params: Promise<SiteParams> }) {
   const { country, locale } = await resolveSiteParams(params)
   const paths = sitePaths(locale)
-  const h = await headers()
-  const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost'
-  const proto = h.get('x-forwarded-proto') ?? 'http'
-  const protocol = proto.endsWith(':') ? proto : `${proto}:`
   const [grouped, sectors, lines, chrome] = await Promise.all([
     Promise.all(COUNTRY_CODES.map(async code => ({ code, rows: await getProjects(code) }))),
     getSectors(),
@@ -37,11 +32,9 @@ export default async function ProjectsPage({ params }: { params: Promise<SitePar
   const projects: BrowserProject[] = grouped.flatMap(({ code, rows }) =>
     rows.map(project => {
       const card = toProjectCardVM(project, locale, paths)
-      const path = paths.project(localSlug(project, locale))
       const space = project.sector ? t(project.sector, 'name', locale) : ''
       return {
         ...card,
-        href: code === country ? path : crossCountryUrl(code, { protocol, host }, path),
         meta: [COUNTRIES[code].name[locale], space].filter(Boolean).join(' · '),
         country: code,
         spaceId: project.sector?.id ?? null,

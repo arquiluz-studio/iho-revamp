@@ -1,5 +1,5 @@
 import 'server-only'
-import type { AppLocale } from '@/config/countries'
+import { COUNTRY_CODES, type AppLocale } from '@/config/countries'
 import { cacheTags } from '@/lib/cache-tags'
 import { pickBySlug, SLUG_PATTERN } from '@/lib/i18n-fields'
 import { MEDIA_SELECT } from '@/lib/media'
@@ -35,32 +35,39 @@ export async function getProjects(country: string, filters: ProjectFilters = {})
   )
 }
 
-function projectsBySlug(country: string, slug: string) {
-  return cachedQuery(['projects-by-slug', country, slug], [cacheTags.country(country, 'projects')], async ({ db, draft }) => {
-    const rows = must(
-      await db
-        .from('projects')
-        .select(
-          `*, cover:${media('projects_cover_media_id_fkey')},
-          sector:sectors(id, slug, slug_en, name_es, name_en),
-          business_lines:project_business_lines(is_featured, business_line:business_lines(id, slug, slug_en, name_es, name_en)),
-          brands:project_brands(brand:brands(id, slug, name, logo_is_thin, is_active, logo:${media('brands_logo_media_id_fkey')})),
-          gallery:project_media(sort, caption_es, caption_en, media:media_assets!project_media_media_id_fkey(${MEDIA_SELECT}, is_downloadable))` as const,
-        )
-        .eq('country_code', country)
-        .or(`slug.eq.${slug},slug_en.eq.${slug}`)
-        .in('status', visibleStatuses(draft))
-        .limit(2),
-      'project',
-    )
-    return rows.map(project => ({ ...project, gallery: [...project.gallery].sort((a, b) => a.sort - b.sort) }))
-  })
+function projectsBySlug(slug: string) {
+  return cachedQuery(
+    ['projects-by-slug', slug],
+    COUNTRY_CODES.map(code => cacheTags.country(code, 'projects')),
+    async ({ db, draft }) => {
+      const rows = must(
+        await db
+          .from('projects')
+          .select(
+            `*, cover:${media('projects_cover_media_id_fkey')},
+            sector:sectors(id, slug, slug_en, name_es, name_en),
+            business_lines:project_business_lines(is_featured, business_line:business_lines(id, slug, slug_en, name_es, name_en)),
+            brands:project_brands(brand:brands(id, slug, name, logo_is_thin, is_active, logo:${media('brands_logo_media_id_fkey')})),
+            gallery:project_media(sort, caption_es, caption_en, media:media_assets!project_media_media_id_fkey(${MEDIA_SELECT}, is_downloadable))` as const,
+          )
+          .or(`slug.eq.${slug},slug_en.eq.${slug}`)
+          .in('status', visibleStatuses(draft)),
+        'project',
+      )
+      return rows.map(project => ({ ...project, gallery: [...project.gallery].sort((a, b) => a.sort - b.sort) }))
+    },
+  )
 }
 
-/** Project addressed by its Spanish or English slug (see `pickBySlug`). */
+/**
+ * Project addressed by its Spanish or English slug (see `pickBySlug`), from any country.
+ * When the same slug exists in more than one country, the visitor's country wins.
+ */
 export async function getProjectBySlug(country: string, slug: string, locale: AppLocale) {
   if (!SLUG_PATTERN.test(slug)) return null
-  return pickBySlug(await projectsBySlug(country, slug), slug, locale)
+  const rows = await projectsBySlug(slug)
+  const own = rows.filter(row => row.country_code === country)
+  return pickBySlug(own.length ? own : rows, slug, locale)
 }
 
 export type ProjectListRow = Awaited<ReturnType<typeof getProjects>>[number]

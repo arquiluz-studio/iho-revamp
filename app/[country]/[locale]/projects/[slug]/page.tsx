@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { PhotoMosaic } from '@/components/site/PhotoMosaic'
 import { BrandLogos, Facts, PageHero, PageShell, ProjectCards, Prose, SectionHeading } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
+import { isCountryCode } from '@/config/countries'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { legacyMedia } from '@/lib/content/legacy-media'
 import { imageOf, toBrandVM, toProjectCardVM } from '@/lib/content/site'
@@ -37,10 +38,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { slug } = await params
   const project = await getProjectBySlug(country, slug, locale)
   if (!project) return {}
+  const owner = isCountryCode(project.country_code) ? project.country_code : country
   return {
     title: `${t(project, 'title', locale)} — IHO`,
     description: t(project, 'summary', locale) || undefined,
-    alternates: buildAlternates({ href: l => ({ pathname: '/projects/[slug]', params: { slug: localSlug(project, l) } }), country, locale, availableIn: [country] }),
+    alternates: buildAlternates({ href: l => ({ pathname: '/projects/[slug]', params: { slug: localSlug(project, l) } }), country: owner, locale, availableIn: [owner] }),
   }
 }
 
@@ -60,7 +62,8 @@ export default async function ProjectPage({ params }: { params: Promise<Params> 
   const cover = imageOf(project.cover, locale, title, legacyMedia.projectCover(project.slug))
   const brands = project.brands.flatMap(b => (b.brand?.is_active ? [toBrandVM(b.brand, locale, paths)] : []))
   const lines = project.business_lines.flatMap(b => (b.business_line ? [b.business_line] : []))
-  const related = project.sector ? (await getProjects(country, { sector: project.sector.slug })).filter(p => p.id !== project.id).slice(0, 3) : []
+  const owner = isCountryCode(project.country_code) ? project.country_code : country
+  const related = project.sector ? (await getProjects(owner, { sector: project.sector.slug })).filter(p => p.id !== project.id).slice(0, 3) : []
   const link = (href: string, label: string) => <a href={href} style={{ color: '#ef483d', textDecoration: 'none' }}>{label}</a>
 
   return (
