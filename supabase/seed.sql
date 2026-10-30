@@ -4,7 +4,7 @@
 -- Countries -------------------------------------------------------------------
 insert into public.countries (code, name_es, name_en, domain, is_hq, currency, timezone, sort) values
   ('mx', 'México', 'Mexico', 'iho.com.mx', true, 'MXN', 'America/Mexico_City', 1),
-  ('gt', 'Guatemala', 'Guatemala', 'iho.com.gt', false, 'GTQ', 'America/Guatemala', 2),
+  ('gt', 'Guatemala', 'Guatemala', 'iho.gt', false, 'GTQ', 'America/Guatemala', 2),
   ('cr', 'Costa Rica', 'Costa Rica', 'iho.cr', false, 'CRC', 'America/Costa_Rica', 3),
   ('pa', 'Panamá', 'Panama', 'iho.com.pa', false, 'USD', 'America/Panama', 4)
 on conflict (code) do nothing;

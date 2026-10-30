@@ -47,7 +47,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
   },
   gt: {
     code: 'gt',
-    domain: 'iho.com.gt',
+    domain: 'iho.gt',
     name: { es: 'Guatemala', en: 'Guatemala' },
     isHeadquarters: false,
     timezone: 'America/Guatemala',

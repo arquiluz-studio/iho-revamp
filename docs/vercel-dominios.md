@@ -5,7 +5,7 @@ El sitio decide el país por el dominio. En Vercel va un solo proyecto, y los cu
 | País | Dominio canónico | Código |
 |---|---|---|
 | México (sede) | `www.iho.com.mx` | `mx` |
-| Guatemala | `www.iho.com.gt` | `gt` |
+| Guatemala | `www.iho.gt` | `gt` |
 | Costa Rica | `www.iho.cr` | `cr` |
 | Panamá | `www.iho.com.pa` | `pa` |
 
@@ -16,7 +16,7 @@ La URL pública no lleva el país en la ruta. `https://www.iho.com.pa/proyectos`
 En el proyecto de Vercel: **Settings → Domains → Add**. Agrega cada dominio en su forma apex y en `www`:
 
 - `iho.com.mx` y `www.iho.com.mx`
-- `iho.com.gt` y `www.iho.com.gt`
+- `iho.gt` y `www.iho.gt`
 - `iho.cr` y `www.iho.cr`
 - `iho.com.pa` y `www.iho.com.pa`
 - `admin.iho.com.mx` (el admin; ver más abajo)
@@ -36,8 +36,8 @@ No cambies los nameservers si esos dominios ya tienen correo (MX), SPF o DKIM. S
 | `iho.com.mx` | A | `@` | `76.76.21.21` |
 | `www.iho.com.mx` | CNAME | `www` | el CNAME del proyecto |
 | `admin.iho.com.mx` | CNAME | `admin` | el mismo CNAME |
-| `iho.com.gt` | A | `@` | `76.76.21.21` |
-| `www.iho.com.gt` | CNAME | `www` | el CNAME del proyecto |
+| `iho.gt` | A | `@` | `76.76.21.21` |
+| `www.iho.gt` | CNAME | `www` | el CNAME del proyecto |
 | `iho.cr` | A | `@` | `76.76.21.21` |
 | `www.iho.cr` | CNAME | `www` | el CNAME del proyecto |
 | `iho.com.pa` | A | `@` | `76.76.21.21` |
@@ -47,7 +47,7 @@ En el apex (el dominio sin subdominio) usa **A**, no CNAME. `.mx`, `.gt`, `.cr` 
 
 Si el dominio ya tiene un **AAAA** apuntando a otro sitio, quítalo. Vercel no atiende IPv6 en ese A, y quien resuelva por IPv6 no llegaría al proyecto.
 
-El apex solo puede tener el A de Vercel. Un A extra al hosting anterior cierra el loop: ese servidor responde 301 a `https://iho.com.mx/`, la app (si la visita viene de Panamá, Costa Rica o Guatemala) devuelve al apex del país, y el ciclo no termina. Hoy `iho.com.pa` e `iho.cr` todavía resuelven también a `199.250.212.46` (Apache del sitio viejo). Hay que borrar ese registro y dejar solo el A que muestra Vercel. `iho.com.gt` y `www.iho.com.gt` no resuelven a nada.
+El apex solo puede tener el A de Vercel. Un A extra al hosting anterior cierra el loop: ese servidor responde 301 a `https://iho.com.mx/`, la app (si la visita viene de Panamá, Costa Rica o Guatemala) devuelve al apex del país, y el ciclo no termina. Hoy `iho.com.pa` e `iho.cr` todavía resuelven también a `199.250.212.46` (Apache del sitio viejo). Hay que borrar ese registro y dejar solo el A que muestra Vercel. Guatemala es `iho.gt`, no `iho.com.gt`.
 
 TTL: 300–3600 segundos mientras pruebas. La propagación puede tardar desde unos minutos hasta 48 horas.
 
@@ -69,7 +69,7 @@ No hace falta un rewrite ni un proyecto por país.
 
 1. El host decide el país. `iho.com.pa` y `www.iho.com.pa` se leen como Panamá (`countryFromHost` quita el `www`).
 2. El selector del header navega a `https://www.<dominio-del-país>/?ref=selector`. Ese query guarda la cookie `iho_country_pref` por un año, así el usuario no vuelve a ser redirigido.
-3. Primera visita a la home de México (`www.iho.com.mx/`), sin esa cookie y sin ser un bot: si Vercel detecta Guatemala, Costa Rica o Panamá (`x-vercel-ip-country`), hay un 302 a `https://www.iho.com.gt/`, `https://www.iho.cr/` o `https://www.iho.com.pa/`. Quien entra directo a un dominio de país se queda ahí. Si su IP es de otro país IHO, aparece un aviso para cambiar, sin forzar el salto.
+3. Primera visita a la home de México (`www.iho.com.mx/`), sin esa cookie y sin ser un bot: si Vercel detecta Guatemala, Costa Rica o Panamá (`x-vercel-ip-country`), hay un 302 a `https://www.iho.gt/`, `https://www.iho.cr/` o `https://www.iho.com.pa/`. Quien entra directo a un dominio de país se queda ahí. Si su IP es de otro país IHO, aparece un aviso para cambiar, sin forzar el salto.
 
 Ese header de geolocalización lo pone Vercel. En otro hosting la redirección automática no ocurre; el selector de país sí, porque solo usa el dominio.
 
