@@ -6,7 +6,8 @@ insert into public.countries (code, name_es, name_en, domain, is_hq, currency, t
   ('mx', 'México', 'Mexico', 'iho.com.mx', true, 'MXN', 'America/Mexico_City', 1),
   ('gt', 'Guatemala', 'Guatemala', 'iho.gt', false, 'GTQ', 'America/Guatemala', 2),
   ('cr', 'Costa Rica', 'Costa Rica', 'iho.cr', false, 'CRC', 'America/Costa_Rica', 3),
-  ('pa', 'Panamá', 'Panama', 'iho.com.pa', false, 'USD', 'America/Panama', 4)
+  ('pa', 'Panamá', 'Panama', 'iho.com.pa', false, 'USD', 'America/Panama', 4),
+  ('ve', 'Venezuela', 'Venezuela', null, false, 'VES', 'America/Caracas', 5)
 on conflict (code) do nothing;
 
 -- Home and page heroes live in site_pages (filled by migration). A country row stays empty until that country uploads its own.
@@ -103,6 +104,7 @@ on conflict do nothing;
 insert into public.country_brands (country_code, brand_id, sort)
 select c.code, b.id, row_number() over (partition by c.code order by b.slug)
 from public.countries c cross join public.brands b
+where c.domain is not null
 on conflict do nothing;
 
 -- Offices ---------------------------------------------------------------------
@@ -117,9 +119,14 @@ from (values
   ('mx', 'CHIHUAHUA', 'Distrito 1, Via Citadela 5701 Edificio Quorum Oficina 301-302, Distrito 1, 31110 Chihuahua, Chih.', false, 6),
   ('pa', 'PANAMÁ', 'Ph Dream Plaza, Av. Centenario, Panamá.', true, 1),
   ('cr', 'COSTA RICA', 'Avenida Escazú, AE 205, Piso 2. Escazú, San José. Costa Rica.', true, 1),
-  ('gt', 'GUATEMALA', '3ra. Avenida 10-80 Zona 10, Edificio Forum Zona Viva, Torre 2, Oficina 1004, Guatemala.', true, 1)
+  ('gt', 'GUATEMALA', '3ra. Avenida 10-80 Zona 10, Edificio Forum Zona Viva, Torre 2, Oficina 1004, Guatemala.', true, 1),
+  ('ve', 'CARACAS', null::text, true, 1)
 ) as v (country_code, city, address, is_main, sort)
 where not exists (select 1 from public.offices o where o.country_code = v.country_code and o.city = v.city);
+
+update public.offices
+set latitude = 10.48, longitude = -66.9
+where country_code = 've' and city = 'CARACAS' and latitude is null;
 
 -- Team (MX) -------------------------------------------------------------------
 insert into public.team_members (country_code, full_name, slug, role_es, role_en, photo_position, sort)

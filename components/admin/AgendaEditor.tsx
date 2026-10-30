@@ -22,7 +22,7 @@ export function AgendaEditor({ eventId, initialItems, canEdit }: { eventId: stri
 
   return (
     <Card>
-      <CardHeader title="Agenda" description="Puntos en orden. La hora es texto libre (ej. 9:00, 10:30 – 11:00)." />
+      <CardHeader title="Agenda" description="Puntos de Sobre el evento, en orden. El encabezado de la columna se edita en Español e English. La hora es texto libre (ej. 9:00, 10:30 – 11:00)." />
       <div className="space-y-2 p-5">
         {items.length === 0 && <p className="text-sm text-zinc-500">Sin agenda.</p>}
         {items.map((item, index) => (

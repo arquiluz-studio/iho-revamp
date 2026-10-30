@@ -67,13 +67,14 @@ export function GroupMap({
               style={{ '--pin-x': `${((activeCity.x ?? 0) / MAP_WIDTH) * 100}%`, '--pin-y': `${((activeCity.y ?? 0) / MAP_HEIGHT) * 100}%` } as CSSProperties}
             >
               <strong>{activeCity.title}</strong>
-              {activeCity.mapsUrl ? (
-                <a href={activeCity.mapsUrl} target="_blank" rel="noopener noreferrer">
-                  {activeCity.address}
-                </a>
-              ) : (
-                <span>{activeCity.address}</span>
-              )}
+              {activeCity.address &&
+                (activeCity.mapsUrl ? (
+                  <a href={activeCity.mapsUrl} target="_blank" rel="noopener noreferrer">
+                    {activeCity.address}
+                  </a>
+                ) : (
+                  <span>{activeCity.address}</span>
+                ))}
             </address>
           )}
         </div>

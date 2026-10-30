@@ -193,7 +193,7 @@ async function mapCountries(locale: AppLocale): Promise<MapCountryVM[]> {
       .sort((a, b) => a.sort - b.sort || a.city.localeCompare(b.city, locale))
       .map(o => {
         const xy = projectCity(o.city, o)
-        return { id: o.id, name: cityDisplay(o.city), title: o.city, address: o.address, mapsUrl: o.maps_url, x: xy?.[0] ?? null, y: xy?.[1] ?? null }
+        return { id: o.id, name: cityDisplay(o.city), title: o.city, address: o.address?.trim() ?? '', mapsUrl: o.maps_url, x: xy?.[0] ?? null, y: xy?.[1] ?? null }
       })
     if (!cities.length) return []
     return [{ code: c.code, name: t(c, 'name', locale), cities }]
@@ -203,7 +203,11 @@ async function mapCountries(locale: AppLocale): Promise<MapCountryVM[]> {
 /** Offices grouped by country in site order (see `sortByCountry`), cities alphabetical within each country; other countries muted. */
 export async function officesFor(current: CountryCode, locale: AppLocale): Promise<OfficeVM[]> {
   const offices = await getOffices()
-  const byCity = [...offices].sort((a, b) => a.city.localeCompare(b.city, locale))
+  const listed = offices.flatMap(o => {
+    const address = o.address?.trim()
+    return address ? [{ ...o, address }] : []
+  })
+  const byCity = [...listed].sort((a, b) => a.city.localeCompare(b.city, locale))
   return sortByCountry(byCity, o => o.country_code).map(o => ({
     city: o.city,
     address: o.address,
@@ -390,7 +394,9 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
     venue: venueParts.filter(Boolean).join(' · '),
     access: labels.access(event.access_type),
     locationLine: `${fullDate.toUpperCase()} · ${place} · ${timeOfDay(event.starts_at, tz)}`,
+    aboutTitle: t(event, 'about_title', locale),
     description: paragraphs(body),
+    agendaHeading: t(event, 'agenda_heading', locale),
     agenda: event.agenda.map((a, i) => ({ num: a.time_label || String(i + 1).padStart(2, '0'), text: t(a, 'text', locale) })),
     gallery,
     previousEditions,

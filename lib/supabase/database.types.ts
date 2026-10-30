@@ -996,8 +996,12 @@ export type Database = {
       }
       events: {
         Row: {
+          about_title_en: string | null
+          about_title_es: string | null
           access_type: Database["public"]["Enums"]["event_access"]
           address: string | null
+          agenda_heading_en: string | null
+          agenda_heading_es: string | null
           body_en: string | null
           body_es: string | null
           capacity: number | null
@@ -1025,8 +1029,12 @@ export type Database = {
           venue_name: string | null
         }
         Insert: {
+          about_title_en?: string | null
+          about_title_es?: string | null
           access_type?: Database["public"]["Enums"]["event_access"]
           address?: string | null
+          agenda_heading_en?: string | null
+          agenda_heading_es?: string | null
           body_en?: string | null
           body_es?: string | null
           capacity?: number | null
@@ -1054,8 +1062,12 @@ export type Database = {
           venue_name?: string | null
         }
         Update: {
+          about_title_en?: string | null
+          about_title_es?: string | null
           access_type?: Database["public"]["Enums"]["event_access"]
           address?: string | null
+          agenda_heading_en?: string | null
+          agenda_heading_es?: string | null
           body_en?: string | null
           body_es?: string | null
           capacity?: number | null
@@ -1185,7 +1197,7 @@ export type Database = {
       }
       offices: {
         Row: {
-          address: string
+          address: string | null
           city: string
           country_code: string
           created_at: string
@@ -1200,7 +1212,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          address: string
+          address?: string | null
           city: string
           country_code: string
           created_at?: string
@@ -1215,7 +1227,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          address?: string
+          address?: string | null
           city?: string
           country_code?: string
           created_at?: string

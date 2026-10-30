@@ -35,7 +35,11 @@ export type EventDetailVM = EventVM & {
   venue: string
   access: string
   locationLine: string
+  /** Heading of “Sobre el evento”. Empty uses the generic translation. */
+  aboutTitle: string
   description: string[]
+  /** Heading of the agenda column. Empty uses the generic translation. */
+  agendaHeading: string
   agenda: { num: string; text: string }[]
   gallery: ImageVM[]
   /** Past events linked from an upcoming event, newest first. Empty hides the section. */
