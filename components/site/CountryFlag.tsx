@@ -37,6 +37,36 @@ function MexicoCoat() {
   )
 }
 
+/** Quetzal, scroll and laurel, scaled to the white stripe of the 96×60 flag. */
+function GuatemalaCoat() {
+  return (
+    <g>
+      <ellipse cx="48" cy="33" rx="12.5" ry="17" fill="#1a6b38" />
+      <ellipse cx="48" cy="32.4" rx="8.8" ry="12.8" fill="#fff" />
+      <ellipse cx="36.4" cy="28" rx="2.3" ry="1.2" fill="#145528" transform="rotate(-68 36.4 28)" />
+      <ellipse cx="37.2" cy="36" rx="2.3" ry="1.15" fill="#2d8a46" transform="rotate(-100 37.2 36)" />
+      <ellipse cx="41.2" cy="43.5" rx="2.2" ry="1.1" fill="#145528" transform="rotate(-140 41.2 43.5)" />
+      <ellipse cx="59.6" cy="27.2" rx="2.3" ry="1.2" fill="#2d8a46" transform="rotate(66 59.6 27.2)" />
+      <ellipse cx="58.8" cy="35.2" rx="2.3" ry="1.15" fill="#145528" transform="rotate(98 58.8 35.2)" />
+      <ellipse cx="54.6" cy="43.2" rx="2.2" ry="1.1" fill="#2d8a46" transform="rotate(140 54.6 43.2)" />
+      <g stroke="#5c3d28" strokeWidth="2.1" strokeLinecap="round">
+        <path d="M41 25.5 55 39.5" />
+        <path d="M55 25.5 41 39.5" />
+      </g>
+      <path fill="#0c6a32" d="M50 29.5c6-4 11.5-11 10-17.2-3.2 4.2-6.4 9.2-10.2 13.2z" />
+      <path fill="#149444" d="M47.5 31.5c6.5-5.5 12-12 15.2-17.6-4.4 3.4-8.6 8.6-12.6 13.4z" />
+      <ellipse cx="46.2" cy="33.2" rx="4.7" ry="6.3" fill="#127a3a" />
+      <circle cx="41" cy="28.4" r="3.05" fill="#127a3a" />
+      <path fill="#0c6a32" d="M40.4 26.4c-2.2-3.2.6-4.4 2.2-1.4z" />
+      <path fill="#0a5c2c" d="M45.5 31.2c5-.8 8.2 2.4 5.4 5.6-3.2-1.4-5.6-2.6-5.4-5.6z" />
+      <ellipse cx="44.6" cy="34.2" rx="2.15" ry="2.7" fill="#d0122a" />
+      <path fill="#e2b33a" d="M38.4 27.6 34.8 29.5 39 30.6z" />
+      <path fill="#e6c56e" d="M35.5 44.2c4.2-3.4 8.4.6 12.5-1.4 4.6-2 8.8 2.4 12.8-.4l.5 5.6c-4.2 2.8-8.4-1.4-12.8.6-4.6 2-8.6-1.8-13-.2z" />
+      <path fill="#b8893a" d="M35.5 49.2c4.4-2 8.4.4 13-.6 4.4-1 8.6 1.6 12.8-.8l.2 1.5c-4.2 2.2-8.4-.6-12.8.8-4.6 1.4-8.6-1.2-13.2-.2z" />
+    </g>
+  )
+}
+
 /** Flag at the same height as the ISO capitals (`1cap` on `.iho-country-flag`). */
 export function CountryFlag({ code }: { code: CountryCode }) {
   const props = { className: 'iho-country-flag', 'aria-hidden': true as const, focusable: false as const }
@@ -52,10 +82,11 @@ export function CountryFlag({ code }: { code: CountryCode }) {
       )
     case 'gt':
       return (
-        <svg {...props} viewBox="0 0 24 15">
-          <rect width="8" height="15" fill="#4997d0" />
-          <rect x="8" width="8" height="15" fill="#fff" />
-          <rect x="16" width="8" height="15" fill="#4997d0" />
+        <svg {...props} viewBox="0 0 96 60">
+          <rect width="32" height="60" fill="#4997d0" />
+          <rect x="32" width="32" height="60" fill="#fff" />
+          <rect x="64" width="32" height="60" fill="#4997d0" />
+          <GuatemalaCoat />
         </svg>
       )
     case 'cr':
