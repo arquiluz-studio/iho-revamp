@@ -95,9 +95,13 @@ export function isProductionDomain(host: string | null | undefined): boolean {
   return Object.values(COUNTRIES).some(c => c.domain === hostname)
 }
 
-/** Canonical public origin of a country site. */
+/**
+ * Canonical public origin. Production serves `www`; the apex (iho.com.pa, iho.cr, …)
+ * is only a permanent redirect to this host. Every generated URL — geo redirect,
+ * country switcher, canonical, sitemap — must use www, or the apex redirect loops.
+ */
 export function countryOrigin(code: CountryCode): string {
-  return `https://${COUNTRIES[code].domain}`
+  return `https://www.${COUNTRIES[code].domain}`
 }
 
 /**
