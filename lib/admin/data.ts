@@ -84,5 +84,12 @@ export async function loadMedia(ids: (string | null | undefined)[]): Promise<Rec
 
 export function mediaIdsOf(config: ResourceConfig, row: AnyRow | null): string[] {
   if (!row) return []
-  return config.fields.filter(f => f.type === 'media').map(f => row[f.name] as string)
+  const ids = config.fields.filter(f => f.type === 'media').map(f => row[f.name] as string)
+  for (const field of config.fields) {
+    if (field.type !== 'slides' || !Array.isArray(row[field.name])) continue
+    for (const slide of row[field.name] as AnyRow[]) {
+      if (slide && typeof slide.media_id === 'string') ids.push(slide.media_id)
+    }
+  }
+  return ids
 }

@@ -45,6 +45,59 @@ export const ctaSchema = z.discriminatedUnion('kind', [
 ])
 export type CtaValue = z.infer<typeof ctaSchema>
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const slideText = (max: number) => z.string().trim().max(max)
+
+export const slideSchema = z
+  .object({
+    kind: z.enum(['image', 'video']),
+    media_id: z.string().trim().regex(UUID, 'Sube una foto o un video'),
+    duration_seconds: z.string(),
+    eyebrow_es: slideText(120),
+    eyebrow_en: slideText(120),
+    title_es: slideText(200),
+    title_en: slideText(200),
+    subtitle_es: slideText(400),
+    subtitle_en: slideText(400),
+    ctas: z.array(ctaSchema).max(2),
+  })
+  .superRefine((slide, ctx) => {
+    if (slide.kind !== 'image') return
+    const seconds = Number(slide.duration_seconds)
+    if (!/^\d+$/.test(slide.duration_seconds) || seconds < 3 || seconds > 30) {
+      ctx.addIssue({ code: 'custom', path: ['duration_seconds'], message: 'Entre 3 y 30 segundos' })
+    }
+  })
+export type SlideValue = z.infer<typeof slideSchema>
+
+function storedCta(cta: CtaValue) {
+  return {
+    style: cta.style,
+    label_es: cta.label_es,
+    label_en: cta.label_en || null,
+    open_in: cta.open_in,
+    kind: cta.kind,
+    ...(cta.kind === 'page' ? { page: cta.page } : { url: cta.url }),
+  }
+}
+
+function isPageKey(value: string): value is SitePageKey {
+  return (SITE_PAGE_KEYS as readonly string[]).includes(value)
+}
+
+function formCta(cta: Record<string, unknown>): CtaValue {
+  const style = cta.style === 'outline' || cta.style === 'black' ? cta.style : 'red'
+  const open_in = cta.open_in === 'blank' ? 'blank' : 'self'
+  const label_es = String(cta.label_es ?? '')
+  const label_en = String(cta.label_en ?? '')
+  const url = String(cta.url ?? '')
+  if (cta.kind === 'url') return { style, label_es, label_en, open_in, kind: 'url', page: '', url }
+  const page = typeof cta.page === 'string' && isPageKey(cta.page) ? cta.page : 'contact'
+  return { style, label_es, label_en, open_in, kind: 'page', page, url }
+}
+
+const blank = (value: string) => value.trim() || null
+
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATETIME_LOCAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 const INTEGER = /^-?\d+$/
@@ -99,6 +152,8 @@ function fieldSchema(field: Field, column: string, required: boolean): z.ZodType
       return z.array(specSchema).max(40)
     case 'ctas':
       return z.array(ctaSchema).max(2)
+    case 'slides':
+      return z.array(slideSchema).max(20, 'Máximo 20 diapositivas')
     default:
       return textSchema(field, required && column.endsWith('_en') === false)
   }
@@ -107,7 +162,7 @@ function fieldSchema(field: Field, column: string, required: boolean): z.ZodType
 export function buildSchema(config: ResourceConfig) {
   const shape: Record<string, z.ZodType> = {}
   for (const field of config.fields) {
-    if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs' || field.type === 'ctas') {
+    if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs' || field.type === 'ctas' || field.type === 'slides') {
       shape[field.name] = fieldSchema(field, field.name, false)
       continue
     }
@@ -144,13 +199,21 @@ export function toRow(config: ResourceConfig, values: FormValues, fallbackTimezo
       continue
     }
     if (field.type === 'ctas') {
-      row[field.name] = ((values[field.name] as CtaValue[]) ?? []).map(cta => ({
-        style: cta.style,
-        label_es: cta.label_es,
-        label_en: cta.label_en || null,
-        open_in: cta.open_in,
-        kind: cta.kind,
-        ...(cta.kind === 'page' ? { page: cta.page } : { url: cta.url }),
+      row[field.name] = ((values[field.name] as CtaValue[]) ?? []).map(storedCta)
+      continue
+    }
+    if (field.type === 'slides') {
+      row[field.name] = ((values[field.name] as SlideValue[]) ?? []).map(slide => ({
+        kind: slide.kind,
+        media_id: slide.media_id,
+        ...(slide.kind === 'image' ? { duration_seconds: Number(slide.duration_seconds) } : {}),
+        eyebrow_es: blank(slide.eyebrow_es),
+        eyebrow_en: blank(slide.eyebrow_en),
+        title_es: blank(slide.title_es),
+        title_en: blank(slide.title_en),
+        subtitle_es: blank(slide.subtitle_es),
+        subtitle_en: blank(slide.subtitle_en),
+        ctas: slide.ctas.map(storedCta),
       }))
       continue
     }
@@ -199,14 +262,22 @@ export function toFormValues(
     }
     if (field.type === 'ctas') {
       const ctas = Array.isArray(row[field.name]) ? (row[field.name] as Record<string, unknown>[]) : []
-      values[field.name] = ctas.map(cta => ({
-        style: cta.style === 'outline' || cta.style === 'black' ? cta.style : 'red',
-        label_es: String(cta.label_es ?? ''),
-        label_en: String(cta.label_en ?? ''),
-        kind: cta.kind === 'url' ? 'url' : 'page',
-        page: typeof cta.page === 'string' && cta.page ? cta.page : 'contact',
-        url: String(cta.url ?? ''),
-        open_in: cta.open_in === 'blank' ? 'blank' : 'self',
+      values[field.name] = ctas.map(formCta)
+      continue
+    }
+    if (field.type === 'slides') {
+      const slides = Array.isArray(row[field.name]) ? (row[field.name] as Record<string, unknown>[]) : []
+      values[field.name] = slides.map(slide => ({
+        kind: slide.kind === 'video' ? 'video' : 'image',
+        media_id: String(slide.media_id ?? ''),
+        duration_seconds: String(slide.duration_seconds ?? 6),
+        eyebrow_es: String(slide.eyebrow_es ?? ''),
+        eyebrow_en: String(slide.eyebrow_en ?? ''),
+        title_es: String(slide.title_es ?? ''),
+        title_en: String(slide.title_en ?? ''),
+        subtitle_es: String(slide.subtitle_es ?? ''),
+        subtitle_en: String(slide.subtitle_en ?? ''),
+        ctas: (Array.isArray(slide.ctas) ? slide.ctas : []).map(cta => formCta(cta as Record<string, unknown>)),
       }))
       continue
     }

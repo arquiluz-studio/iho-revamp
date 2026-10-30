@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { slideMediaError } from '@/lib/admin/hero-slides'
 import { untypedFrom } from '@/lib/admin/data'
 import { buildSchema, toRow } from '@/lib/admin/form-schema'
 import { getResource, singletonId, type ResourceConfig } from '@/lib/admin/resources'
@@ -41,6 +42,11 @@ export async function saveResource(
   if (config.scope === 'country') row.country_code = countryCode
 
   const supabase = await createSupabaseServerClient()
+  const slides = config.fields.find(field => field.type === 'slides')
+  if (slides && Array.isArray(row[slides.name])) {
+    const mediaError = await slideMediaError(supabase, row[slides.name] as { kind: string; media_id: string }[])
+    if (mediaError) return { ok: false, error: mediaError }
+  }
   const table = untypedFrom(supabase, config.table)
   let savedId: string
 

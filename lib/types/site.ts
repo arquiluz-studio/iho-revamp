@@ -123,11 +123,23 @@ export type HeroCtaVM = {
   newWindow: boolean
 }
 
+export type HeroSlideVM = {
+  kind: 'image' | 'video'
+  src: string
+  poster: string | null
+  eyebrow: string
+  title: string
+  subtitle: string
+  actions: HeroCtaVM[]
+  /** Seconds a photo stays on screen. Videos ignore this and play through. */
+  durationSeconds: number | null
+}
+
 export type MapCityVM = { id: string; name: string; title: string; address: string; mapsUrl: string | null; x: number | null; y: number | null }
 export type MapCountryVM = { code: string; name: string; cities: MapCityVM[] }
 
 export type HomeVM = {
-  hero: { enabled: boolean; eyebrow: string; title: string; subtitle: string; videoSrc: string | null; poster?: string | null; actions: HeroCtaVM[] }
+  hero: { enabled: boolean; slides: HeroSlideVM[] }
   sectors: string[]
   products: ProductCardVM[]
   events: EventVM[]

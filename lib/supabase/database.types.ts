@@ -577,6 +577,7 @@ export type Database = {
           hero_eyebrow_en: string | null
           hero_eyebrow_es: string | null
           hero_image_media_id: string | null
+          hero_slides: Json
           hero_subtitle_en: string | null
           hero_subtitle_es: string | null
           hero_title_en: string | null
@@ -597,6 +598,7 @@ export type Database = {
           hero_eyebrow_en?: string | null
           hero_eyebrow_es?: string | null
           hero_image_media_id?: string | null
+          hero_slides?: Json
           hero_subtitle_en?: string | null
           hero_subtitle_es?: string | null
           hero_title_en?: string | null
@@ -617,6 +619,7 @@ export type Database = {
           hero_eyebrow_en?: string | null
           hero_eyebrow_es?: string | null
           hero_image_media_id?: string | null
+          hero_slides?: Json
           hero_subtitle_en?: string | null
           hero_subtitle_es?: string | null
           hero_title_en?: string | null
@@ -1834,6 +1837,7 @@ export type Database = {
           hero_image_media_id: string | null
           hero_intro_en: string | null
           hero_intro_es: string | null
+          hero_slides: Json
           hero_subtitle_en: string | null
           hero_subtitle_es: string | null
           hero_title_en: string | null
@@ -1858,6 +1862,7 @@ export type Database = {
           hero_image_media_id?: string | null
           hero_intro_en?: string | null
           hero_intro_es?: string | null
+          hero_slides?: Json
           hero_subtitle_en?: string | null
           hero_subtitle_es?: string | null
           hero_title_en?: string | null
@@ -1882,6 +1887,7 @@ export type Database = {
           hero_image_media_id?: string | null
           hero_intro_en?: string | null
           hero_intro_es?: string | null
+          hero_slides?: Json
           hero_subtitle_en?: string | null
           hero_subtitle_es?: string | null
           hero_title_en?: string | null

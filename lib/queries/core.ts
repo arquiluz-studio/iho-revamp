@@ -29,7 +29,7 @@ async function isDraft(): Promise<boolean> {
 }
 
 /** The data cache outlives deployments, so entries are scoped per commit: a changed select never reads an old row shape. The local fallback changes with the cached shape. */
-const CACHE_NAMESPACE = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ?? 'local-solution-story'
+const CACHE_NAMESPACE = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ?? 'local-home-hero'
 
 /**
  * Runs a public read. Normally it's cached under `tags` with the anonymous client (RLS: published content

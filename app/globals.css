@@ -880,7 +880,7 @@
           .iho-hero-overlay {
             padding: 0 32px !important;
           }
-          .iho-hero-overlay h1 {
+          .iho-hero-overlay .iho-hero-title {
             font-size: 56px !important;
           }
           #grupo {
@@ -959,7 +959,7 @@
           .iho-hero-overlay {
             padding: 0 24px !important;
           }
-          .iho-hero-overlay h1 {
+          .iho-hero-overlay .iho-hero-title {
             font-size: 40px !important;
           }
 
@@ -1087,7 +1087,7 @@
           .iho-hero-box {
             height: 240px !important;
           }
-          .iho-hero-overlay h1 {
+          .iho-hero-overlay .iho-hero-title {
             font-size: 30px !important;
             line-height: 1 !important;
           }
@@ -1231,7 +1231,7 @@
 
         /* ── Responsive: Hero overlay h1 (video hero, full-bleed) ── */
         @media (max-width: 1024px) {
-          .iho-hero-overlay h1 {
+          .iho-hero-overlay .iho-hero-title {
             font-size: 56px !important;
           }
           /* Landing event hero */
@@ -1258,7 +1258,7 @@
           }
         }
         @media (max-width: 768px) {
-          .iho-hero-overlay h1 {
+          .iho-hero-overlay .iho-hero-title {
             font-size: 40px !important;
           }
           .iho-event-hero h1 {
@@ -1712,6 +1712,63 @@ a.iho-solution-include:focus-visible { outline: 2px solid #ef483d; outline-offse
   .iho-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; padding-bottom: 32px; }
   .iho-presence { grid-template-columns: 1fr; }
   .iho-presence__card { left: 12px; right: 12px; top: auto; bottom: 12px; width: auto; max-width: none; transform: none; }
+}
+.iho-hero-nav {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  pointer-events: none;
+}
+.iho-hero-chevron {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+.iho-hero-chevron svg {
+  display: block;
+  transition: transform 0.35s cubic-bezier(0.2, 0, 0.2, 1);
+}
+.iho-hero-chevron svg.is-flip {
+  transform: scaleX(-1);
+}
+.iho-hero-chevron:hover {
+  opacity: 0.62;
+}
+.iho-hero-chevron:hover svg {
+  transform: translateX(5px);
+}
+.iho-hero-chevron:hover svg.is-flip {
+  transform: scaleX(-1) translateX(5px);
+}
+.iho-hero-chevron:focus-visible {
+  outline: 1px solid #fff;
+  outline-offset: 4px;
+}
+@media (max-width: 768px) {
+  .iho-hero-nav {
+    align-items: flex-end;
+    padding: 0 8px 96px;
+  }
+  .iho-hero-chevron svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iho-hero-layer {
+    transition: none !important;
+  }
 }
 .iho-chips-dark .iho-chip-row a { color: #fff; border-color: rgba(255, 255, 255, 0.4); }
 .iho-chips-dark .iho-chip-row a:hover { background: #fff; color: #17150f; border-color: #fff; }

@@ -21,7 +21,7 @@ export function HomeView({ data, chrome, countryCode, solutionsHref }: { data: H
       {chrome.banner}
       {data.hero.enabled ? chrome.header : solidHeader(chrome.header)}
       {data.hero.enabled ? (
-        <Hero eyebrow={data.hero.eyebrow} title={data.hero.title} subtitle={data.hero.subtitle} videoSrc={data.hero.videoSrc} poster={data.hero.poster} actions={data.hero.actions} />
+        <Hero slides={data.hero.slides} />
       ) : (
         <div style={{ height: 88 }} />
       )}

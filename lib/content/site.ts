@@ -5,7 +5,7 @@ import { dayOfMonth, isPastDate, longDate, shortMonth, timeOfDay, timeRange, typ
 import { plainTitle } from '@/lib/events/ics'
 import { projectCity } from '@/lib/geo/latam-projection'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
-import { toImageVM, videoUrl, type ImageVariant, type MediaRef } from '@/lib/media'
+import { toImageVM, type ImageVariant, type MediaRef } from '@/lib/media'
 import { getCountryBrands, type CountryBrandRow } from '@/lib/queries/brands'
 import { formatPrice, getCatalog, type CatalogRow } from '@/lib/queries/catalog'
 import type { DesignerRow } from '@/lib/queries/designers'
@@ -15,7 +15,7 @@ import { getBusinessLines, getCountries, getOffices, getSectors, getSiteSettings
 import { buildAlternates } from '@/lib/seo'
 import type { SolutionCardVM, BrandVM, DesignerCardVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
 import { cityChip, cityDisplay } from './cities'
-import { resolveHeroCtas } from './hero-ctas'
+import { resolveHomeSlides } from './hero-slides'
 import { legacyMedia } from './legacy-media'
 import { resolveHomeRecord } from './page-hero'
 import type { SitePaths } from './paths'
@@ -260,12 +260,7 @@ export async function getHomeVM(country: CountryCode, locale: AppLocale, paths: 
   return {
     hero: {
       enabled: homeSource?.hero_enabled !== false,
-      eyebrow: t(homeSource, 'hero_eyebrow', locale),
-      title: t(homeSource, 'hero_title', locale),
-      subtitle: t(homeSource, 'hero_subtitle', locale),
-      videoSrc: videoUrl(homeSource?.hero_video),
-      poster: homeSource?.hero_image ? toImageVM(homeSource.hero_image, locale, 'lg').src : null,
-      actions: resolveHeroCtas(homeSource?.hero_ctas, locale),
+      slides: await resolveHomeSlides(homeSource, locale, country),
     },
     sectors: sectors.map(s => t(s, 'name', locale).toUpperCase()),
     products,

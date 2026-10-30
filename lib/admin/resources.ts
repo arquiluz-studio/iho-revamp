@@ -26,6 +26,7 @@ export type Field =
   | (FieldBase & { type: 'stats' })
   | (FieldBase & { type: 'specs' })
   | (FieldBase & { type: 'ctas' })
+  | (FieldBase & { type: 'slides' })
 
 export type ColumnFormat = 'text' | 'datetime' | 'status' | 'boolean' | 'number' | 'enum'
 export type Column = { key: string; label: string; format?: ColumnFormat; options?: Option[] }
@@ -388,29 +389,16 @@ const home: ResourceConfig = {
       type: 'boolean',
       help: 'Apagado, la página se publica sin hero. Si este contenido es el global, los países que lo usan quedan igual.',
     },
-    { name: 'hero_eyebrow', label: 'Hero · antetítulo', type: 'text', i18n: true, max: 120 },
     {
-      name: 'hero_title',
-      label: 'Hero · título',
-      type: 'textarea',
-      i18n: true,
-      max: 200,
-      rows: 3,
-      help: 'Salto de línea = nueva línea. *texto* = resaltado en rojo.',
+      name: 'hero_slides',
+      label: 'Diapositivas',
+      type: 'slides',
+      wide: true,
+      help: 'Cada una lleva una foto o un video, su texto y hasta dos botones. El orden de la lista es el orden en el sitio.',
     },
-    { name: 'hero_subtitle', label: 'Hero · subtítulo', type: 'textarea', i18n: true, max: 400, rows: 3 },
-    { name: 'hero_video_media_id', label: 'Hero · video (MP4)', type: 'media', kind: 'hero', video: true },
-    { name: 'hero_image_media_id', label: 'Hero · imagen (poster / fallback)', type: 'media', kind: 'hero' },
     { name: 'contact_image_media_id', label: 'Imagen de la sección de contacto', type: 'media', kind: 'generic' },
     { name: 'seo_title', label: 'SEO · título', type: 'text', i18n: true, max: 120 },
     { name: 'seo_description', label: 'SEO · descripción', type: 'textarea', i18n: true, max: 300, rows: 3 },
-    {
-      name: 'hero_ctas',
-      label: 'Botones',
-      type: 'ctas',
-      wide: true,
-      help: 'Hasta dos, uno al lado del otro. Si no agregas ninguno, el hero se publica sin botones.',
-    },
   ],
   columns: [],
   order: [],
@@ -801,7 +789,7 @@ export function emptyValues(config: ResourceConfig): Record<string, unknown> {
   const values: Record<string, unknown> = {}
   for (const field of config.fields) {
     if (field.type === 'boolean') values[field.name] = ['is_active', 'is_published', 'registration_enabled', 'is_visible', 'hero_enabled'].includes(field.name)
-    else if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs' || field.type === 'ctas') values[field.name] = []
+    else if (field.type === 'multi' || field.type === 'stats' || field.type === 'specs' || field.type === 'ctas' || field.type === 'slides') values[field.name] = []
     else if (field.type === 'select') values[field.name] = field.required ? field.options[0]?.value ?? '' : ''
     else for (const column of fieldColumns(field)) values[column] = ''
   }
