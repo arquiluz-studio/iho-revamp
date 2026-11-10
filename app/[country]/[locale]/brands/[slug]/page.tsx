@@ -15,12 +15,17 @@ import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site
 
 type Params = SiteParams & { slug: string }
 
-function hostOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '')
-  } catch {
-    return url
-  }
+/** Public site name, always with www, never a link. */
+function siteLabel(url: string): string {
+  const host = (() => {
+    try {
+      return new URL(url).hostname
+    } catch {
+      return url.trim().replace(/^https?:\/\//i, '').split('/')[0] ?? ''
+    }
+  })()
+  if (!host) return url
+  return host.startsWith('www.') ? host : `www.${host}`
 }
 
 export async function generateStaticParams() {
@@ -86,7 +91,7 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
         brandsLabel={tp('label')}
         name={brand.name}
         description={paragraphs(t(brand, 'description', locale))}
-        website={brand.website_url ? { href: brand.website_url, label: hostOf(brand.website_url) } : null}
+        website={brand.website_url ? siteLabel(brand.website_url) : null}
         websiteLabel={tp('website')}
         exclusive={brand.is_exclusive ? tp('exclusive') : null}
         solutions={lines.map(line => ({ href: paths.solution(localSlug(line, locale)), label: t(line, 'name', locale) }))}

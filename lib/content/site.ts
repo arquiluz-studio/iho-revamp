@@ -15,6 +15,7 @@ import { getBusinessLines, getCountries, getOffices, getSectors, getSiteSettings
 import { buildAlternates } from '@/lib/seo'
 import type { SolutionCardVM, BrandVM, DesignerCardVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
 import { cityChip, cityDisplay } from './cities'
+import { mapsHref } from './maps'
 import { resolveHomeSlides } from './hero-slides'
 import { legacyMedia } from './legacy-media'
 import { resolveHomeRecord } from './page-hero'
@@ -193,7 +194,16 @@ async function mapCountries(locale: AppLocale): Promise<MapCountryVM[]> {
       .sort((a, b) => a.sort - b.sort || a.city.localeCompare(b.city, locale))
       .map(o => {
         const xy = projectCity(o.city, o)
-        return { id: o.id, name: cityDisplay(o.city), title: o.city, address: o.address?.trim() ?? '', mapsUrl: o.maps_url, x: xy?.[0] ?? null, y: xy?.[1] ?? null }
+        const address = o.address?.trim() ?? ''
+        return {
+          id: o.id,
+          name: cityDisplay(o.city),
+          title: o.city,
+          address,
+          mapsUrl: mapsHref({ url: o.maps_url, latitude: o.latitude, longitude: o.longitude, address, city: o.city }),
+          x: xy?.[0] ?? null,
+          y: xy?.[1] ?? null,
+        }
       })
     if (!cities.length) return []
     return [{ code: c.code, name: t(c, 'name', locale), cities }]
@@ -211,6 +221,7 @@ export async function officesFor(current: CountryCode, locale: AppLocale): Promi
   return sortByCountry(byCity, o => o.country_code).map(o => ({
     city: o.city,
     address: o.address,
+    mapsUrl: mapsHref({ url: o.maps_url, latitude: o.latitude, longitude: o.longitude, address: o.address, city: o.city }),
     ...(o.country_code === current ? {} : { muted: true }),
   }))
 }
@@ -387,6 +398,7 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
     fullDate,
     timeRange: timeRange(event.starts_at, event.ends_at, tz),
     venue: venueParts.filter(Boolean).join(' · '),
+    mapsUrl: event.is_online ? null : mapsHref({ url: event.maps_url, venue: event.venue_name, address: event.address, city: event.city }),
     access: labels.access(event.access_type),
     locationLine: `${fullDate.toUpperCase()} · ${place} · ${timeOfDay(event.starts_at, tz)}`,
     aboutTitle: t(event, 'about_title', locale),

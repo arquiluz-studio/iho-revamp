@@ -20,7 +20,15 @@ export function EventFacts({ event }: { event: EventDetailVM }) {
         {facts.map(({ label, value }) => (
           <div key={label}>
             <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '1.4px', color: '#ef483d', marginBottom: 8 }}>{label}</div>
-            <div style={{ fontFamily: SANS, fontSize: 16, lineHeight: 1.5, color: '#17150f' }}>{value}</div>
+            <div style={{ fontFamily: SANS, fontSize: 16, lineHeight: 1.5, color: '#17150f' }}>
+              {label === t('venue') && event.mapsUrl ? (
+                <a href={event.mapsUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                  {value}
+                </a>
+              ) : (
+                value
+              )}
+            </div>
           </div>
         ))}
       </div>

@@ -25,9 +25,6 @@ export default async function DesignersPage({ params }: { params: Promise<SitePa
     getDesigners(),
     innerChrome(country, locale, paths),
   ])
-  const nationalities = [...new Set(designers.map(d => t(d, 'nationality', locale)).filter(Boolean))].sort((a, b) =>
-    a.localeCompare(b, locale, { sensitivity: 'base' }),
-  )
 
   return (
     <PageShell chrome={chrome} hero={false}>
@@ -42,7 +39,7 @@ export default async function DesignersPage({ params }: { params: Promise<SitePa
         allLabel={tp('allFilter')}
         emptyLabel={tp('empty')}
         noMatchLabel={tp('noMatch')}
-        filters={nationalities.length > 1 ? nationalities.map(name => ({ slug: name, label: name })) : []}
+        filters={[]}
         brands={designers.map(designer => {
           const photo = imageOrNull(designer.portrait, locale, designer.name, null, 'md')
           return {

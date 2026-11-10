@@ -16,7 +16,7 @@ export type SpaceStory = {
   contactHref: string
   intro: { eyebrow: string; title: string; body: string[]; cta: string; image: ImageVM | null } | null
   banner: { title: string; text: string[] } | null
-  elements: { eyebrow: string; title: string; intro: string[]; items: Shot[]; more: NavLink | null } | null
+  elements: { eyebrow: string; title: string; intro: string[]; items: Shot[] } | null
   solutions: { label: string; href: string }[]
   projects: { eyebrow: string; title: string; intro: string[]; items: { href: string; caption: string; text: string; image: ImageVM | null }[]; more: NavLink | null } | null
   quote: { text: string; attribution: string } | null
@@ -28,7 +28,6 @@ export type SpaceStory = {
 /** Long layout of a space page. Empty sections are left out by the caller. */
 export function SpaceView({ story }: { story: SpaceStory }) {
   const contact = (label: string) => (label ? [{ href: story.contactHref, label, style: 'red' as const, newWindow: false }] : [])
-  const projectStart = (story.elements?.items.length ?? 0) + 1
 
   return (
     <article className="iho-story">
@@ -104,11 +103,6 @@ export function SpaceView({ story }: { story: SpaceStory }) {
               ))}
             </div>
           )}
-          {story.elements.more && (
-            <p className="iho-story-more">
-              <a href={story.elements.more.href}>{story.elements.more.label} →</a>
-            </p>
-          )}
         </section>
       )}
 
@@ -129,15 +123,10 @@ export function SpaceView({ story }: { story: SpaceStory }) {
           <Head id="space-projects" kicker={story.projects.eyebrow} title={story.projects.title} aside={story.projects.intro} />
           {story.projects.items.length > 0 && (
             <div className="iho-story-gallery">
-              {story.projects.items.map((item, index) => (
+              {story.projects.items.map(item => (
                 <a key={item.href} href={item.href}>
                   <Photo image={item.image} sizes="(max-width: 768px) 100vw, 600px" />
-                  {item.caption && (
-                    <p className="iho-story-gallery__title">
-                      <span>{number(projectStart + index - 1)}</span>
-                      {item.caption}
-                    </p>
-                  )}
+                  {item.caption && <p className="iho-story-gallery__title">{item.caption}</p>}
                   {item.text && <p>{item.text}</p>}
                 </a>
               ))}

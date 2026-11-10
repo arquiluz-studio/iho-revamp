@@ -1495,7 +1495,7 @@ a.iho-product-brand:hover { color: #ef483d; }
 .iho-designer-hero h1 { margin: 0; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: clamp(52px, 6.4vw, 84px); line-height: 0.86; letter-spacing: -1px; text-transform: uppercase; color: #17150f; }
 .iho-designer-bio { margin: 22px 0 0; max-width: 440px; font-family: "Source Sans 3", sans-serif; font-size: 15.5px; line-height: 1.6; color: #6d675e; }
 .iho-designer-bio + .iho-designer-bio { margin-top: 12px; }
-.iho-designer-site { display: inline-block; margin-top: 16px; color: #ef483d; font-family: "Source Sans 3", sans-serif; font-size: 14px; text-decoration: none; }
+.iho-designer-site { display: block; margin-top: 16px; color: #ef483d; font-family: "Source Sans 3", sans-serif; font-size: 14px; text-decoration: none; }
 .iho-explore { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #17150f; text-decoration: none; }
 .iho-explore svg { display: block; }
 .iho-designer-portrait { aspect-ratio: 1; background: #e4dfd6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -1611,8 +1611,8 @@ a.iho-solution-include:focus-visible { outline: 2px solid #ef483d; outline-offse
 .iho-story-statement h2 { margin: 0 auto; max-width: 900px; font-family: "Acumin Variable Condensed", "Acumin Pro Condensed", "Saira Condensed", sans-serif; font-weight: 800; font-size: clamp(34px, 4.2vw, 52px); line-height: 0.92; letter-spacing: -0.4px; text-transform: uppercase; color: #17150f; }
 .iho-story-statement p { margin: 22px auto 0; max-width: 760px; font-family: "Source Sans 3", sans-serif; font-size: 15px; line-height: 1.55; color: #6d675e; }
 .iho-story-more { display: flex; justify-content: flex-end; margin: 22px 0 0; }
-.iho-story-more a { font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ef483d; text-decoration: none; }
-.iho-story-more a:hover { text-decoration: underline; }
+.iho-story-more a, .iho-story-more button { font-family: "Source Sans 3", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ef483d; text-decoration: none; background: none; border: 0; padding: 0; cursor: pointer; }
+.iho-story-more a:hover, .iho-story-more button:hover { text-decoration: underline; }
 .iho-story-banner { background: #f3efe6; text-align: center; padding: 28px 56px; }
 .iho-story-banner p { margin: 0 auto; max-width: 820px; font-family: "Source Sans 3", sans-serif; font-size: 15px; line-height: 1.5; color: #6d675e; }
 .iho-story-block { max-width: 1260px; margin: 0 auto; padding: 64px 56px 36px; }

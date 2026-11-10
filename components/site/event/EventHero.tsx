@@ -31,7 +31,7 @@ export function EventHero({ event, showRegistration }: { event: EventDetailVM; s
       <MediaImage image={event.image} priority sizes="100vw" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: event.isPast ? 'grayscale(0.3)' : undefined }} />
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(15,13,11,0.9) 0%, rgba(15,13,11,0.42) 48%, rgba(15,13,11,0.18) 100%)', pointerEvents: 'none' }} />
 
-      <div style={{ position: 'absolute', top: 74, left: 0, right: 0 }}>
+      <div style={{ position: 'absolute', top: 124, left: 0, right: 0 }}>
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 40px', display: 'flex', gap: 0 }}>
           <div style={{ background: event.isPast ? '#17150f' : '#ef483d', color: '#fff', padding: '12px 18px', fontFamily: MONO, fontSize: 12, letterSpacing: '1.5px' }}>
             {event.isPast ? th('done') : th('saveTheDate')}

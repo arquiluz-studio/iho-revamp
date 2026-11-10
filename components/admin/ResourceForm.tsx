@@ -83,11 +83,17 @@ export function ResourceForm({ resource, id, countryCode, initialValues, options
     })
   }
 
-  const titleField = localized.find(f => f.type === 'text' && f.name !== 'origin_country')?.name
-  /** `slug` comes from the Spanish title, `slug_en` from the English one. */
+  /** Plain names (designers, brands, team) are one column. Translated titles use `_es` / `_en`. */
+  const slugSource = (column: string) => {
+    const named = config.fields.find(f => f.type === 'text' && (f.name === 'name' || f.name === 'full_name' || f.name === 'title'))
+    const field = named ?? localized.find(f => f.type === 'text' && f.name !== 'origin_country')
+    if (!field) return null
+    return 'i18n' in field && field.i18n ? `${field.name}_${column === 'slug_en' ? 'en' : 'es'}` : field.name
+  }
   const generateSlug = (column: string) => {
-    if (!titleField) return
-    const source = form.getValues(`${titleField}_${column === 'slug_en' ? 'en' : 'es'}`)
+    const sourceKey = slugSource(column)
+    if (!sourceKey) return
+    const source = form.getValues(sourceKey)
     const slug = slugify(typeof source === 'string' ? source : '')
     if (slug) form.setValue(column, slug, { shouldDirty: true, shouldValidate: true })
   }
@@ -107,7 +113,7 @@ export function ResourceForm({ resource, id, countryCode, initialValues, options
       disabled={!canEdit || (config.pkInput === true && column === config.pk && Boolean(id))}
       projectId={resource === 'projects' ? id : null}
       setValue={setValue}
-      onGenerate={field.type === 'slug' && titleField ? () => generateSlug(column) : undefined}
+      onGenerate={field.type === 'slug' && slugSource(column) ? () => generateSlug(column) : undefined}
     />
   )
 

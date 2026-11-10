@@ -91,8 +91,7 @@ export default async function SpacePage({ params }: { params: Promise<Params> })
                 image: imageOrNull(project.cover, locale, title, legacyMedia.projectCover(project.slug), 'lg'),
               }
             }),
-            paths.solutions,
-            paths.projects,
+            `${paths.projects}?space=${localSlug(row, locale)}`,
           )}
         />
       </PageShell>
@@ -151,7 +150,6 @@ function spaceStory(
   solutions: SpaceStory['solutions'],
   brands: NonNullable<SpaceStory['brands']>['items'],
   projects: NonNullable<SpaceStory['projects']>['items'],
-  solutionsHref: string,
   projectsHref: string,
 ): SpaceStory {
   const text = (copy: Copy) => copyText(copy, locale).trim()
@@ -206,7 +204,7 @@ function spaceStory(
     banner: bannerTitle || bannerText.length ? { title: bannerTitle, text: bannerText } : null,
     elements:
       elementsTitle || elementsEyebrow || elementsIntro.length || cards.length
-        ? { eyebrow: elementsEyebrow, title: elementsTitle, intro: elementsIntro, items: cards, more: more(text(content.elements.moreLabel), solutionsHref) }
+        ? { eyebrow: elementsEyebrow, title: elementsTitle, intro: elementsIntro, items: cards }
         : null,
     solutions,
     projects:

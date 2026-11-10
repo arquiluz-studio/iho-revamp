@@ -33,6 +33,8 @@ export type EventDetailVM = EventVM & {
   fullDate: string
   timeRange: string
   venue: string
+  /** Google Maps link for an in-person venue. Empty for online events and venues without a place. */
+  mapsUrl: string | null
   access: string
   locationLine: string
   /** Heading of “Sobre el evento”. Empty uses the generic translation. */
@@ -85,7 +87,7 @@ export type TeamMemberVM = {
   linkedin?: string | null
 }
 
-export type OfficeVM = { city: string; address: string; muted?: boolean }
+export type OfficeVM = { city: string; address: string; mapsUrl: string | null; muted?: boolean }
 
 export type SolutionCardVM = {
   num: string

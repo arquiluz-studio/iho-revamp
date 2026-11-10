@@ -181,7 +181,7 @@ export function EventsTimeline({ events }: { events: EventVM[] }) {
             return (
               <div key={ev.slug} style={{ position: 'absolute', inset: 0, opacity: active === i ? 1 : 0, transition: 'opacity 0.7s ease', pointerEvents: active === i ? 'auto' : 'none' }}>
                 <MediaImage image={ev.image} sizes="(max-width: 1240px) 100vw, 1160px" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: past ? 'grayscale(0.55)' : undefined }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(15,13,11,0.88) 0%, rgba(15,13,11,0.4) 45%, rgba(15,13,11,0) 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(15,13,11,0.55) 0%, rgba(15,13,11,0.16) 30%, rgba(15,13,11,0) 50%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'absolute', top: 0, left: 0, display: 'flex' }}>
                   <div style={{ background: past ? '#17150f' : '#ef483d', color: '#fff', padding: '12px 18px', fontFamily: MONO, fontSize: 12, letterSpacing: '1.5px' }}>
                     {past ? t('done') : t('saveTheDate')}

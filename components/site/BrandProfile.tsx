@@ -36,7 +36,7 @@ export function BrandProfile({
   brandsLabel: string
   name: string
   description: string[]
-  website?: { href: string; label: string } | null
+  website?: string | null
   websiteLabel: string
   exclusive?: string | null
   solutions: { href: string; label: string }[]
@@ -97,11 +97,7 @@ export function BrandProfile({
             {website && (
               <>
                 <dt>{websiteLabel}</dt>
-                <dd>
-                  <a href={website.href} target="_blank" rel="noopener noreferrer">
-                    {website.label}
-                  </a>
-                </dd>
+                <dd>{website}</dd>
               </>
             )}
           </dl>

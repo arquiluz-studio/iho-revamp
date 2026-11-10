@@ -1015,6 +1015,7 @@ export type Database = {
           ends_at: string | null
           id: string
           is_online: boolean
+          maps_url: string | null
           online_url: string | null
           registration_closes_at: string | null
           registration_enabled: boolean
@@ -1048,6 +1049,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           is_online?: boolean
+          maps_url?: string | null
           online_url?: string | null
           registration_closes_at?: string | null
           registration_enabled?: boolean
@@ -1081,6 +1083,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           is_online?: boolean
+          maps_url?: string | null
           online_url?: string | null
           registration_closes_at?: string | null
           registration_enabled?: boolean

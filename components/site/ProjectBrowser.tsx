@@ -41,15 +41,17 @@ function FilterGroup({ label, options, value, onChange }: { label: string; optio
   )
 }
 
-export function ProjectBrowser({ projects, countries, spaces, solutions }: {
+export function ProjectBrowser({ projects, countries, spaces, solutions, initial }: {
   projects: BrowserProject[]
   countries: Omit<Option, 'count'>[]
   spaces: Omit<Option, 'count'>[]
   solutions: Omit<Option, 'count'>[]
+  /** Filters already checked when the page opens. Empty groups stay unrestricted. */
+  initial?: { countries: Selection; spaces: Selection }
 }) {
   const t = useTranslations('pages.projects')
-  const [countryIds, setCountryIds] = useState<Selection>([])
-  const [spaceIds, setSpaceIds] = useState<Selection>([])
+  const [countryIds, setCountryIds] = useState<Selection>(initial?.countries ?? [])
+  const [spaceIds, setSpaceIds] = useState<Selection>(initial?.spaces ?? [])
   const [solutionIds, setSolutionIds] = useState<Selection>([])
 
   const visible = projects.filter(project => {

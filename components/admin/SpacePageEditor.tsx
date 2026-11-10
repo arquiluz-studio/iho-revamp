@@ -131,13 +131,13 @@ export function SpacePageEditor({
             </p>
           </Section>
 
-          <Section title="Proyectos" help="Las fotos salen de los proyectos destacados de este espacio. Hasta 4, en el orden de la lista. Ver más abre el índice de proyectos.">
+          <Section title="Proyectos" help="Los 4 primeros son los destacados de este espacio. Ver más muestra otros 4 en la misma sección, y después el resto de proyectos de este espacio.">
             <Pair label="Antetítulo" value={content.projects.eyebrow} max={200} disabled={!canEdit || pending} onChange={eyebrow => change({ ...content, projects: { ...content.projects, eyebrow } })} />
             <Pair label="Título" value={content.projects.title} max={200} rows={2} disabled={!canEdit || pending} onChange={title => change({ ...content, projects: { ...content.projects, title } })} />
             <Pair label="Texto al lado" value={content.projects.intro} max={2000} rows={3} disabled={!canEdit || pending} onChange={intro => change({ ...content, projects: { ...content.projects, intro } })} />
             <Pair label="Ver más" value={content.projects.moreLabel} max={200} disabled={!canEdit || pending} onChange={moreLabel => change({ ...content, projects: { ...content.projects, moreLabel } })} />
             <p className="text-sm text-zinc-500">
-              Un proyecto entra si su espacio es {spaceName} y está marcado como destacado.{' '}
+              Primero entran los proyectos de {spaceName} marcados como destacados, en el orden de la lista. Ver más revela el resto, de 4 en 4.{' '}
               <a className="text-zinc-900 underline" href="/admin/projects">Ir a proyectos</a>
             </p>
           </Section>

@@ -24,10 +24,16 @@ export function GroupMap({
 }) {
   const cities = countries.flatMap(country => country.cities)
   const [hover, setHover] = useState<string | null>(null)
-  const activeCity = cities.find(city => city.id === hover) ?? null
-  const selectedCountry = countries.find(country => country.cities.some(city => city.id === hover))?.code
+  const [selected, setSelected] = useState<string | null>(null)
+  const activeId = hover ?? selected
+  const activeCity = cities.find(city => city.id === activeId) ?? null
+  const selectedCountry = countries.find(country => country.cities.some(city => city.id === activeId))?.code
   const pins = cities.filter(city => city.x != null && city.y != null)
   const showCard = activeCity != null && activeCity.x != null && activeCity.y != null
+  const choose = (id: string) => {
+    setHover(id)
+    setSelected(id)
+  }
 
   return (
     <div className="iho-presence">
@@ -39,7 +45,7 @@ export function GroupMap({
             <ul>
               {country.cities.map(city => (
                 <li key={city.id}>
-                  <button type="button" className={hover === city.id ? 'iho-presence__city is-active' : 'iho-presence__city'} onMouseEnter={() => setHover(city.id)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(city.id)} onBlur={() => setHover(null)}>
+                  <button type="button" className={activeId === city.id ? 'iho-presence__city is-active' : 'iho-presence__city'} onMouseEnter={() => choose(city.id)} onMouseLeave={() => setHover(null)} onFocus={() => choose(city.id)} onClick={() => choose(city.id)}>
                     {city.name}
                   </button>
                 </li>
@@ -58,7 +64,7 @@ export function GroupMap({
               ))}
             </g>
             {pins.map(city => (
-              <MapPin key={city.id} city={city} active={hover === city.id} onEnter={() => setHover(city.id)} onLeave={() => setHover(null)} />
+              <MapPin key={city.id} city={city} active={activeId === city.id} onEnter={() => choose(city.id)} onLeave={() => setHover(null)} onSelect={() => choose(city.id)} />
             ))}
           </svg>
           {showCard && activeCity && (
@@ -66,7 +72,15 @@ export function GroupMap({
               className="iho-presence__card"
               style={{ '--pin-x': `${((activeCity.x ?? 0) / MAP_WIDTH) * 100}%`, '--pin-y': `${((activeCity.y ?? 0) / MAP_HEIGHT) * 100}%` } as CSSProperties}
             >
-              <strong>{activeCity.title}</strong>
+              <strong>
+                {activeCity.mapsUrl && !activeCity.address ? (
+                  <a href={activeCity.mapsUrl} target="_blank" rel="noopener noreferrer">
+                    {activeCity.title}
+                  </a>
+                ) : (
+                  activeCity.title
+                )}
+              </strong>
               {activeCity.address &&
                 (activeCity.mapsUrl ? (
                   <a href={activeCity.mapsUrl} target="_blank" rel="noopener noreferrer">
@@ -87,9 +101,9 @@ export function GroupMap({
   )
 }
 
-function MapPin({ city, active, onEnter, onLeave }: { city: MapCityVM; active: boolean; onEnter: () => void; onLeave: () => void }) {
+function MapPin({ city, active, onEnter, onLeave, onSelect }: { city: MapCityVM; active: boolean; onEnter: () => void; onLeave: () => void; onSelect: () => void }) {
   return (
-    <g transform={`translate(${city.x ?? 0} ${city.y ?? 0})`} style={{ cursor: 'pointer' }} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+    <g transform={`translate(${city.x ?? 0} ${city.y ?? 0})`} style={{ cursor: 'pointer' }} onMouseEnter={onEnter} onMouseLeave={onLeave} onClick={onSelect}>
       <title>{city.name}</title>
       {active && <circle r={11} fill="#ef483d" opacity={0.18} />}
       <circle r={active ? 5.5 : 4} fill="#ef483d" stroke="#ffffff" strokeWidth={active ? 2.2 : 1.4} />
