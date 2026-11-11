@@ -34,8 +34,23 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
   const subnav = useSubnav()
   // Read from the browser: on the server the pathname is the internal rewritten route, not the visible URL.
   const pathname = useSyncExternalStore(noopSubscribe, () => window.location.pathname, () => null)
+  const mobile = useSyncExternalStore(
+    onStoreChange => {
+      const query = window.matchMedia('(max-width: 1024px)')
+      query.addEventListener('change', onStoreChange)
+      return () => query.removeEventListener('change', onStoreChange)
+    },
+    () => window.matchMedia('(max-width: 1024px)').matches,
+    () => false,
+  )
   const matches = (href: string) => pathname !== null && (pathname === href || pathname.startsWith(`${href}/`))
   const isActive = (link: NavLink) => matches(link.href) || !!link.items?.some(item => matches(item.href))
+
+  useEffect(() => {
+    if (subnav.open !== 'country' || !menuOpen) return
+    setClosing(true)
+    setMenuOpen(false)
+  }, [subnav.open, menuOpen])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * threshold)
@@ -43,6 +58,13 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
     onScroll()
     return () => window.removeEventListener('scroll', onScroll)
   }, [threshold])
+
+  useEffect(() => {
+    if (!mobile || subnav.open !== 'country') return
+    const root = document.documentElement
+    root.style.overflow = 'hidden'
+    return () => { root.style.overflow = '' }
+  }, [mobile, subnav.open])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -70,10 +92,11 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
 
   // While the panel slides back up the logo and button stay dark, so they never vanish against it.
   const barSolid = solid || scrolled
-  const dark = barSolid || menuOpen || closing
+  const dark = barSolid || menuOpen || closing || (mobile && subnav.open === 'country')
   const navColor = dark ? '#2c2920' : '#ffffff'
   const toggleMenu = () => {
     if (menuOpen) setClosing(true)
+    else subnav.close()
     setMenuOpen(!menuOpen)
   }
   const close = () => {

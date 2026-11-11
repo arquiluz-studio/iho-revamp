@@ -1,19 +1,34 @@
 'use client'
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
 import { useLocale, useTranslations } from 'next-intl'
-import { COUNTRIES, COUNTRY_PREF_COOKIE, crossCountryUrl, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
+import { COUNTRIES, COUNTRY_PREF_COOKIE, LOCALES, crossCountryUrl, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
+import { switchLocalePath } from '@/i18n/locale-path'
+import { getPathname } from '@/i18n/navigation'
 import { CountryFlag } from './CountryFlag'
 import { SubnavBar, useSubnav } from './SubnavBar'
 
+const noopSubscribe = () => () => {}
 const ONE_YEAR = 60 * 60 * 24 * 365
 
-export function CountrySwitcher({ current, countries }: {
+export function CountrySwitcher({ current, countries, localeHrefs }: {
   current: CountryCode
   countries: CountryCode[]
+  /** Overrides the target per locale on pages whose slug is localized. */
+  localeHrefs?: Partial<Record<AppLocale, string>>
 }) {
   const t = useTranslations('switchers')
   const locale = useLocale() as AppLocale
   const { open, toggle } = useSubnav()
   const isOpen = open === 'country'
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [headerEl, setHeaderEl] = useState<HTMLElement | null>(null)
+  // Read from the browser: on the server the pathname is the internal rewritten route, not the visible URL.
+  const location = useSyncExternalStore(noopSubscribe, () => window.location.pathname + window.location.search, () => null)
+
+  useLayoutEffect(() => {
+    setHeaderEl(rootRef.current?.closest('header') ?? null)
+  }, [])
 
   const go = (code: CountryCode) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
@@ -21,14 +36,44 @@ export function CountrySwitcher({ current, countries }: {
     window.location.href = crossCountryUrl(code, window.location, '/?ref=selector')
   }
 
+  const hrefFor = (l: AppLocale) => {
+    if (localeHrefs?.[l]) return localeHrefs[l]
+    if (location === null) return getPathname({ href: '/', locale: l })
+    const [path, search = ''] = location.split('?')
+    return switchLocalePath(path, l) + (search ? `?${search}` : '')
+  }
+
   const sorted = sortByCountry(countries, code => code)
 
+  const panel = isOpen ? (
+    <SubnavBar
+      id="iho-subnav-country"
+      className="iho-subnav-switcher"
+      label={t('selectCountry')}
+      items={sorted.map(code => ({
+        href: `https://${COUNTRIES[code].domain}/?ref=selector`,
+        label: COUNTRIES[code].name[locale],
+        current: code === current,
+        onClick: go(code),
+      }))}
+      aside={{
+        label: t('language'),
+        items: LOCALES.map(l => ({
+          href: hrefFor(l),
+          label: l.toUpperCase(),
+          current: l === locale,
+          hrefLang: l,
+        })),
+      }}
+    />
+  ) : null
+
   return (
-    <div className={`iho-switcher${isOpen ? ' is-open' : ''}`}>
+    <div ref={rootRef} className={`iho-switcher${isOpen ? ' is-open' : ''}`}>
       <button
         type="button"
         className="iho-switcher-toggle"
-        aria-label={t('country')}
+        aria-label={`${t('country')} ${current.toUpperCase()}, ${t('language')} ${locale.toUpperCase()}`}
         aria-expanded={isOpen}
         aria-controls="iho-subnav-country"
         onClick={() => toggle('country')}
@@ -37,19 +82,9 @@ export function CountrySwitcher({ current, countries }: {
           {current.toUpperCase()}
           <CountryFlag code={current} />
         </span>
+        <span className="iho-switcher-locale">{locale.toUpperCase()}</span>
       </button>
-      {isOpen && (
-        <SubnavBar
-          id="iho-subnav-country"
-          label={t('selectCountry')}
-          items={sorted.map(code => ({
-            href: `https://${COUNTRIES[code].domain}/?ref=selector`,
-            label: COUNTRIES[code].name[locale],
-            current: code === current,
-            onClick: go(code),
-          }))}
-        />
-      )}
+      {panel && headerEl ? createPortal(panel, headerEl) : panel}
     </div>
   )
 }

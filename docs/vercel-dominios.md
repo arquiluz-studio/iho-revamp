@@ -1,6 +1,6 @@
 # Dominios en Vercel
 
-El sitio decide el país por el dominio. En Vercel va un solo proyecto, y los cuatro dominios apuntan a ese mismo deployment. El código en `config/countries.ts` hace el resto.
+El sitio decide el país por el dominio. En Vercel va un solo proyecto, y los cinco dominios apuntan a ese mismo deployment. El código en `config/countries.ts` hace el resto.
 
 | País | Dominio canónico | Código |
 |---|---|---|
@@ -8,10 +8,11 @@ El sitio decide el país por el dominio. En Vercel va un solo proyecto, y los cu
 | Guatemala | `www.iho.gt` | `gt` |
 | Costa Rica | `www.iho.cr` | `cr` |
 | Panamá | `www.iho.com.pa` | `pa` |
+| Venezuela | `www.iho.com.ve` | `ve` |
 
 La URL pública no lleva el país en la ruta. `https://www.iho.com.pa/proyectos` es Panamá; `https://www.iho.com.mx/en/projects` es México en inglés. El segmento `[country]` es un rewrite interno. El apex (`iho.com.pa`, `iho.cr`, …) no sirve el sitio: redirige a su `www`.
 
-## 1. Un proyecto, cuatro dominios
+## 1. Un proyecto, cinco dominios
 
 En el proyecto de Vercel: **Settings → Domains → Add**. Agrega cada dominio en su forma apex y en `www`:
 
@@ -19,6 +20,7 @@ En el proyecto de Vercel: **Settings → Domains → Add**. Agrega cada dominio 
 - `iho.gt` y `www.iho.gt`
 - `iho.cr` y `www.iho.cr`
 - `iho.com.pa` y `www.iho.com.pa`
+- `iho.com.ve` y `www.iho.com.ve`
 - `admin.iho.com.mx` (el admin; ver más abajo)
 
 En cada par, deja **`www` conectado a Production** y configura **Redirect** permanente (308) del apex hacia ese `www`. El origen canónico del código es con `www` (`https://www.iho.com.mx`, etc.). Si el apex también sirve el sitio, o si el código manda a la gente al apex mientras Vercel manda el apex de vuelta a `www`, el navegador entra en un loop (`ERR_TOO_MANY_REDIRECTS`).
@@ -42,8 +44,10 @@ No cambies los nameservers si esos dominios ya tienen correo (MX), SPF o DKIM. S
 | `www.iho.cr` | CNAME | `www` | el CNAME del proyecto |
 | `iho.com.pa` | A | `@` | `76.76.21.21` |
 | `www.iho.com.pa` | CNAME | `www` | el CNAME del proyecto |
+| `iho.com.ve` | A | `@` | `76.76.21.21` |
+| `www.iho.com.ve` | CNAME | `www` | el CNAME del proyecto |
 
-En el apex (el dominio sin subdominio) usa **A**, no CNAME. `.mx`, `.gt`, `.cr` y `.pa` casi nunca aceptan CNAME o ALIAS en la raíz. Si el registrador sí ofrece ALIAS/ANAME en `@`, puedes usarlo hacia el mismo target CNAME de Vercel en lugar del A.
+En el apex (el dominio sin subdominio) usa **A**, no CNAME. `.mx`, `.gt`, `.cr`, `.pa` y `.ve` casi nunca aceptan CNAME o ALIAS en la raíz. Si el registrador sí ofrece ALIAS/ANAME en `@`, puedes usarlo hacia el mismo target CNAME de Vercel en lugar del A.
 
 Si el dominio ya tiene un **AAAA** apuntando a otro sitio, quítalo. Vercel no atiende IPv6 en ese A, y quien resuelva por IPv6 no llegaría al proyecto.
 
@@ -69,7 +73,7 @@ No hace falta un rewrite ni un proyecto por país.
 
 1. El host decide el país. `iho.com.pa` y `www.iho.com.pa` se leen como Panamá (`countryFromHost` quita el `www`).
 2. El selector del header navega a `https://www.<dominio-del-país>/?ref=selector`. Ese query guarda la cookie `iho_country_pref` por un año, así el usuario no vuelve a ser redirigido.
-3. Primera visita a la home de México (`www.iho.com.mx/`), sin esa cookie y sin ser un bot: si Vercel detecta Guatemala, Costa Rica o Panamá (`x-vercel-ip-country`), hay un 302 a `https://www.iho.gt/`, `https://www.iho.cr/` o `https://www.iho.com.pa/`. Quien entra directo a un dominio de país se queda ahí. Si su IP es de otro país IHO, aparece un aviso para cambiar, sin forzar el salto.
+3. Primera visita a la home de México (`www.iho.com.mx/`), sin esa cookie y sin ser un bot: si Vercel detecta Guatemala, Costa Rica, Panamá o Venezuela (`x-vercel-ip-country`), hay un 302 a `https://www.iho.gt/`, `https://www.iho.cr/`, `https://www.iho.com.pa/` o `https://www.iho.com.ve/`. Quien entra directo a un dominio de país se queda ahí. Si su IP es de otro país IHO, aparece un aviso para cambiar, sin forzar el salto.
 
 Ese header de geolocalización lo pone Vercel. En otro hosting la redirección automática no ocurre; el selector de país sí, porque solo usa el dominio.
 
@@ -79,7 +83,7 @@ Cuando Vercel marque cada dominio como **Valid Configuration**:
 
 - `https://www.iho.com.mx` abre México. El home no muestra `/mx` en la URL.
 - `https://iho.com.mx` redirige a `https://www.iho.com.mx`.
-- Lo mismo para `.gt`, `.cr` y `.pa`: contenido de ese país, en `www`.
+- Lo mismo para `.gt`, `.cr`, `.pa` y `.ve`: contenido de ese país, en `www`.
 - Desde México, el selector a Panamá termina en `https://www.iho.com.pa/?ref=selector`.
 - En una ventana privada, con VPN o red de Panamá, `https://www.iho.com.mx/` redirige a `https://www.iho.com.pa/`.
 - `https://admin.iho.com.mx` abre el admin. En los dominios públicos, `/admin` no debe abrir el panel.

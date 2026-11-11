@@ -7,8 +7,12 @@ insert into public.countries (code, name_es, name_en, domain, is_hq, currency, t
   ('gt', 'Guatemala', 'Guatemala', 'iho.gt', false, 'GTQ', 'America/Guatemala', 2),
   ('cr', 'Costa Rica', 'Costa Rica', 'iho.cr', false, 'CRC', 'America/Costa_Rica', 3),
   ('pa', 'Panamá', 'Panama', 'iho.com.pa', false, 'USD', 'America/Panama', 4),
-  ('ve', 'Venezuela', 'Venezuela', null, false, 'VES', 'America/Caracas', 5)
+  ('ve', 'Venezuela', 'Venezuela', 'iho.com.ve', false, 'VES', 'America/Caracas', 5)
 on conflict (code) do nothing;
+
+update public.countries
+set domain = 'iho.com.ve'
+where code = 've' and domain is null;
 
 -- Home and page heroes live in site_pages (filled by migration). A country row stays empty until that country uploads its own.
 insert into public.country_settings (country_code)
@@ -120,13 +124,17 @@ from (values
   ('pa', 'PANAMÁ', 'Ph Dream Plaza, Av. Centenario, Panamá.', true, 1),
   ('cr', 'COSTA RICA', 'Avenida Escazú, AE 205, Piso 2. Escazú, San José. Costa Rica.', true, 1),
   ('gt', 'GUATEMALA', '3ra. Avenida 10-80 Zona 10, Edificio Forum Zona Viva, Torre 2, Oficina 1004, Guatemala.', true, 1),
-  ('ve', 'CARACAS', null::text, true, 1)
+  ('ve', 'CARACAS', E'Urbanización Las Mercedes\nCaracas 1080\nMiranda, Venezuela', true, 1)
 ) as v (country_code, city, address, is_main, sort)
 where not exists (select 1 from public.offices o where o.country_code = v.country_code and o.city = v.city);
 
 update public.offices
 set latitude = 10.48, longitude = -66.9
 where country_code = 've' and city = 'CARACAS' and latitude is null;
+
+update public.offices
+set address = E'Urbanización Las Mercedes\nCaracas 1080\nMiranda, Venezuela'
+where country_code = 've' and city = 'CARACAS' and address is null;
 
 -- Team (MX) -------------------------------------------------------------------
 insert into public.team_members (country_code, full_name, slug, role_es, role_en, photo_position, sort)

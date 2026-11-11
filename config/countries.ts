@@ -2,8 +2,8 @@ export const LOCALES = ['es', 'en'] as const
 export type AppLocale = (typeof LOCALES)[number]
 export const DEFAULT_LOCALE: AppLocale = 'es'
 
-/** Also the site-wide display order: north to south, as on the map. */
-export const COUNTRY_CODES = ['mx', 'gt', 'cr', 'pa'] as const
+/** Also the site-wide display order: north to south, then Venezuela last. */
+export const COUNTRY_CODES = ['mx', 'gt', 'cr', 'pa', 've'] as const
 export type CountryCode = (typeof COUNTRY_CODES)[number]
 
 export type CountryConfig = {
@@ -53,6 +53,15 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
     timezone: 'America/Guatemala',
     currency: 'GTQ',
     region: 'GT',
+  },
+  ve: {
+    code: 've',
+    domain: 'iho.com.ve',
+    name: { es: 'Venezuela', en: 'Venezuela' },
+    isHeadquarters: false,
+    timezone: 'America/Caracas',
+    currency: 'VES',
+    region: 'VE',
   },
 }
 
