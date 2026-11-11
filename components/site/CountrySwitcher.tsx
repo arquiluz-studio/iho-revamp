@@ -1,5 +1,5 @@
 'use client'
-import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocale, useTranslations } from 'next-intl'
 import { COUNTRIES, COUNTRY_PREF_COOKIE, LOCALES, crossCountryUrl, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
@@ -19,16 +19,69 @@ export function CountrySwitcher({ current, countries, localeHrefs }: {
 }) {
   const t = useTranslations('switchers')
   const locale = useLocale() as AppLocale
-  const { open, toggle } = useSubnav()
+  const { open, toggle, setPinned } = useSubnav()
   const isOpen = open === 'country'
   const rootRef = useRef<HTMLDivElement>(null)
   const [headerEl, setHeaderEl] = useState<HTMLElement | null>(null)
+  const [mounted, setMounted] = useState(false)
+  const [shown, setShown] = useState(false)
   // Read from the browser: on the server the pathname is the internal rewritten route, not the visible URL.
   const location = useSyncExternalStore(noopSubscribe, () => window.location.pathname + window.location.search, () => null)
 
   useLayoutEffect(() => {
     setHeaderEl(rootRef.current?.closest('header') ?? null)
   }, [])
+
+  useEffect(() => {
+    if (isOpen) setMounted(true)
+  }, [isOpen])
+
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 1024px)').matches
+    setPinned(mounted && mobile)
+    return () => setPinned(false)
+  }, [mounted, setPinned])
+
+  useEffect(() => {
+    if (!mounted) return
+    let cancelled = false
+    if (isOpen) {
+      const frame = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (!cancelled) setShown(true)
+        })
+      })
+      return () => {
+        cancelled = true
+        cancelAnimationFrame(frame)
+      }
+    }
+    const mobile = window.matchMedia('(max-width: 1024px)').matches
+    if (!mobile) {
+      setShown(false)
+      setMounted(false)
+      return
+    }
+    setShown(false)
+    const panel = document.getElementById('iho-subnav-country')
+    let finished = false
+    const finish = () => {
+      if (finished) return
+      finished = true
+      setMounted(false)
+    }
+    const onEnd = (event: TransitionEvent) => {
+      if (event.target !== panel || event.propertyName !== 'transform') return
+      finish()
+    }
+    panel?.addEventListener('transitionend', onEnd)
+    const timeout = window.setTimeout(finish, 700)
+    return () => {
+      cancelled = true
+      panel?.removeEventListener('transitionend', onEnd)
+      window.clearTimeout(timeout)
+    }
+  }, [isOpen, mounted])
 
   const go = (code: CountryCode) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
@@ -45,10 +98,10 @@ export function CountrySwitcher({ current, countries, localeHrefs }: {
 
   const sorted = sortByCountry(countries, code => code)
 
-  const panel = isOpen ? (
+  const panel = mounted ? (
     <SubnavBar
       id="iho-subnav-country"
-      className="iho-subnav-switcher"
+      className={`iho-subnav-switcher${shown ? ' iho-nav-open' : ''}`}
       label={t('selectCountry')}
       items={sorted.map(code => ({
         href: `https://${COUNTRIES[code].domain}/?ref=selector`,

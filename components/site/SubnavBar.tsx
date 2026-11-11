@@ -1,13 +1,24 @@
 'use client'
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
-type SubnavState = { open: string | null; toggle: (id: string) => void; close: () => void }
+type SubnavState = {
+  open: string | null
+  toggle: (id: string) => void
+  close: () => void
+  /** Mobile country sheet is on screen, including while it slides shut. */
+  pinned: boolean
+  setPinned: (pinned: boolean) => void
+}
 
-const SubnavContext = createContext<SubnavState>({ open: null, toggle: () => {}, close: () => {} })
+const SubnavContext = createContext<SubnavState>({ open: null, toggle: () => {}, close: () => {}, pinned: false, setPinned: () => {} })
 
 /** Only one secondary bar (country, solutions, spaces…) is open at a time; clicks outside the header or Escape close it. */
 export function SubnavProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState<string | null>(null)
+  const [pinned, setPinnedState] = useState(false)
+  const setPinned = useCallback((value: boolean) => {
+    setPinnedState(current => (current === value ? current : value))
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -26,7 +37,7 @@ export function SubnavProvider({ children }: { children: React.ReactNode }) {
   }, [open])
 
   return (
-    <SubnavContext.Provider value={{ open, toggle: id => setOpen(o => (o === id ? null : id)), close: () => setOpen(null) }}>
+    <SubnavContext.Provider value={{ open, toggle: id => setOpen(o => (o === id ? null : id)), close: () => setOpen(null), pinned, setPinned }}>
       {children}
     </SubnavContext.Provider>
   )

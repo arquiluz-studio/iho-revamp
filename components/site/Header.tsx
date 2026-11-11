@@ -34,15 +34,6 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
   const subnav = useSubnav()
   // Read from the browser: on the server the pathname is the internal rewritten route, not the visible URL.
   const pathname = useSyncExternalStore(noopSubscribe, () => window.location.pathname, () => null)
-  const mobile = useSyncExternalStore(
-    onStoreChange => {
-      const query = window.matchMedia('(max-width: 1024px)')
-      query.addEventListener('change', onStoreChange)
-      return () => query.removeEventListener('change', onStoreChange)
-    },
-    () => window.matchMedia('(max-width: 1024px)').matches,
-    () => false,
-  )
   const matches = (href: string) => pathname !== null && (pathname === href || pathname.startsWith(`${href}/`))
   const isActive = (link: NavLink) => matches(link.href) || !!link.items?.some(item => matches(item.href))
 
@@ -60,16 +51,14 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
   }, [threshold])
 
   useEffect(() => {
-    if (!mobile || subnav.open !== 'country') return
+    if (!menuOpen && !subnav.pinned) return
     const root = document.documentElement
     root.style.overflow = 'hidden'
     return () => { root.style.overflow = '' }
-  }, [mobile, subnav.open])
+  }, [menuOpen, subnav.pinned])
 
   useEffect(() => {
     if (!menuOpen) return
-    const root = document.documentElement
-    root.style.overflow = 'hidden'
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       setClosing(true)
@@ -84,7 +73,6 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
     window.addEventListener('keydown', onKey)
     desktop.addEventListener('change', onDesktop)
     return () => {
-      root.style.overflow = ''
       window.removeEventListener('keydown', onKey)
       desktop.removeEventListener('change', onDesktop)
     }
@@ -92,7 +80,7 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
 
   // While the panel slides back up the logo and button stay dark, so they never vanish against it.
   const barSolid = solid || scrolled
-  const dark = barSolid || menuOpen || closing || (mobile && subnav.open === 'country')
+  const dark = barSolid || menuOpen || closing || subnav.pinned
   const navColor = dark ? '#2c2920' : '#ffffff'
   const toggleMenu = () => {
     if (menuOpen) setClosing(true)
