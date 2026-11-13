@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { CONTEXT_PATH, COUNTRY_PATHS } from '@/lib/geo/latam-map-data'
 import { MAP_HEIGHT, MAP_WIDTH } from '@/lib/geo/latam-projection'
 import type { MapCityVM, MapCountryVM } from '@/lib/types/site'
@@ -23,6 +23,7 @@ export function GroupMap({
   caption: string
 }) {
   const cities = countries.flatMap(country => country.cities)
+  const present = new Set(countries.map(country => country.code))
   const [hover, setHover] = useState<string | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const activeId = hover ?? selected
@@ -35,6 +36,18 @@ export function GroupMap({
     setSelected(id)
   }
 
+  useEffect(() => {
+    if (!hover && !selected) return
+    const onClick = (event: MouseEvent) => {
+      const target = event.target
+      if (target instanceof Element && target.closest('[data-presence-keep]')) return
+      setHover(null)
+      setSelected(null)
+    }
+    document.addEventListener('click', onClick)
+    return () => document.removeEventListener('click', onClick)
+  }, [hover, selected])
+
   return (
     <div className="iho-presence">
       <div className="iho-presence__list">
@@ -45,7 +58,7 @@ export function GroupMap({
             <ul>
               {country.cities.map(city => (
                 <li key={city.id}>
-                  <button type="button" className={activeId === city.id ? 'iho-presence__city is-active' : 'iho-presence__city'} onMouseEnter={() => choose(city.id)} onMouseLeave={() => setHover(null)} onFocus={() => choose(city.id)} onClick={() => choose(city.id)}>
+                  <button type="button" data-presence-keep className={activeId === city.id ? 'iho-presence__city is-active' : 'iho-presence__city'} onMouseEnter={() => choose(city.id)} onMouseLeave={() => setHover(null)} onFocus={() => choose(city.id)} onClick={() => choose(city.id)}>
                     {city.name}
                   </button>
                 </li>
@@ -58,10 +71,13 @@ export function GroupMap({
         <div className="iho-presence__canvas">
           <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} role="img" aria-label={title} preserveAspectRatio="xMidYMid meet">
             <path d={CONTEXT_PATH} fill={CONTEXT} />
+            {Object.entries(COUNTRY_PATHS).map(([code, d]) =>
+              present.has(code) ? null : <path key={code} d={d} fill={CONTEXT} />,
+            )}
             <g stroke="#ffffff" strokeWidth={0.8} strokeLinejoin="round">
-              {Object.entries(COUNTRY_PATHS).map(([code, d]) => (
-                <path key={code} d={d} fill={code === selectedCountry ? LAND_CURRENT : LAND} />
-              ))}
+              {Object.entries(COUNTRY_PATHS).map(([code, d]) =>
+                present.has(code) ? <path key={code} d={d} fill={code === selectedCountry ? LAND_CURRENT : LAND} /> : null,
+              )}
             </g>
             {pins.map(city => (
               <MapPin key={city.id} city={city} active={activeId === city.id} onEnter={() => choose(city.id)} onLeave={() => setHover(null)} onSelect={() => choose(city.id)} />
@@ -103,7 +119,7 @@ export function GroupMap({
 
 function MapPin({ city, active, onEnter, onLeave, onSelect }: { city: MapCityVM; active: boolean; onEnter: () => void; onLeave: () => void; onSelect: () => void }) {
   return (
-    <g transform={`translate(${city.x ?? 0} ${city.y ?? 0})`} style={{ cursor: 'pointer' }} onMouseEnter={onEnter} onMouseLeave={onLeave} onClick={onSelect}>
+    <g data-presence-keep transform={`translate(${city.x ?? 0} ${city.y ?? 0})`} style={{ cursor: 'pointer' }} onMouseEnter={onEnter} onMouseLeave={onLeave} onClick={onSelect}>
       <title>{city.name}</title>
       {active && <circle r={11} fill="#ef483d" opacity={0.18} />}
       <circle r={active ? 5.5 : 4} fill="#ef483d" stroke="#ffffff" strokeWidth={active ? 2.2 : 1.4} />
