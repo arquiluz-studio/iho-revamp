@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { MediaImage } from '@/components/ui/MediaImage'
-import type { ImageVM } from '@/lib/types/site'
+import { MotionMedia } from '@/components/ui/MotionMedia'
+import type { ImageVM, Playback } from '@/lib/types/site'
 
 export type ReelPhoto = {
   key: string
   image: ImageVM
+  kind: Playback['kind']
+  src: string
   caption?: string
 }
 
@@ -63,7 +65,7 @@ export function InspirationCarousel({
     return (
       <div className="iho-brand-reel is-single">
         <figure className="iho-brand-reel__slide is-center">
-          <MediaImage image={photo.image} alt={photo.caption || photo.image.alt} sizes="(max-width: 768px) 100vw, 60vw" />
+          <ReelFrame photo={photo} active />
         </figure>
       </div>
     )
@@ -81,7 +83,7 @@ export function InspirationCarousel({
           const photo = photos[(index + offset + count) % count]!
           const centered = slot === centerSlot
           const dir = slot === 1 ? -1 : slot === 3 ? 1 : 0
-          const image = <MediaImage image={photo.image} alt={centered ? photo.caption || photo.image.alt : ''} sizes={centered ? '(max-width: 768px) 100vw, 60vw' : '30vw'} />
+          const image = <ReelFrame photo={photo} active={centered} />
           if (!dir) {
             return (
               <div key={slot} className={centered ? 'iho-brand-reel__slide is-center' : 'iho-brand-reel__slide'} aria-hidden={!centered}>
@@ -109,5 +111,18 @@ export function InspirationCarousel({
         </button>
       </div>
     </div>
+  )
+}
+
+function ReelFrame({ photo, active }: { photo: ReelPhoto; active: boolean }) {
+  return (
+    <MotionMedia
+      kind={photo.kind}
+      src={photo.src}
+      image={photo.image}
+      active={active}
+      alt={active ? photo.caption || photo.image.alt : ''}
+      sizes={active ? '(max-width: 768px) 100vw, 60vw' : '30vw'}
+    />
   )
 }

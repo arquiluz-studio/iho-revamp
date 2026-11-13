@@ -7,7 +7,7 @@ import { innerChrome } from '@/components/site/SiteChrome'
 import { isCountryCode } from '@/config/countries'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
 import { legacyMedia } from '@/lib/content/legacy-media'
-import { imageOf, toBrandVM, toProjectCardVM } from '@/lib/content/site'
+import { imageOf, playbackOf, toBrandVM, toProjectCardVM } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getProjectBySlug, getProjects } from '@/lib/queries/projects'
 import { buildAlternates } from '@/lib/seo'
@@ -95,9 +95,12 @@ export default async function ProjectPage({ params }: { params: Promise<Params> 
             photos={project.gallery.flatMap(g => {
               if (!g.media) return []
               const caption = t(g, 'caption', locale)
+              const play = playbackOf(g.media, locale, caption || title, 'lg')
               return [{
                 key: g.media.id,
-                image: imageOf(g.media, locale, caption || title, null, 'lg'),
+                image: play.image,
+                kind: play.kind,
+                playSrc: play.src,
                 caption: caption || undefined,
                 download: g.media.is_downloadable ? { mediaId: g.media.id, countryCode: country } : null,
               }]

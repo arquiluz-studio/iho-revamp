@@ -1,5 +1,6 @@
 'use client'
 
+import { mimeForFile } from '@/lib/media'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import type { MediaKind } from './resources'
 
@@ -22,6 +23,11 @@ export async function uploadMedia(
   options: UploadOptions,
   onStage?: (stage: UploadStage) => void,
 ): Promise<{ mediaId: string | null; error?: string }> {
+  const mimeType = mimeForFile(file)
+  if (!mimeType) {
+    onStage?.('failed')
+    return { mediaId: null, error: 'Formato no soportado o archivo demasiado grande.' }
+  }
   onStage?.('uploading')
   const created = await fetch('/api/media/upload-url', {
     method: 'POST',
@@ -29,7 +35,7 @@ export async function uploadMedia(
     body: JSON.stringify({
       countryCode: options.countryCode,
       kind: options.kind,
-      mimeType: file.type,
+      mimeType,
       bytes: file.size,
       projectId: options.projectId ?? null,
       altEs: options.altEs ?? file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' '),
@@ -45,7 +51,7 @@ export async function uploadMedia(
 
   const { error: uploadError } = await createSupabaseBrowserClient()
     .storage.from(bucket)
-    .uploadToSignedUrl(path, token, file, { contentType: file.type })
+    .uploadToSignedUrl(path, token, file, { contentType: mimeType })
   if (uploadError) {
     onStage?.('failed')
     return { mediaId: null, error: `Error al subir: ${uploadError.message}` }
@@ -67,3 +73,5 @@ export async function uploadMedia(
 
 export const ACCEPT_IMAGES = 'image/jpeg,image/png,image/webp,image/tiff,image/avif,image/svg+xml'
 export const ACCEPT_VIDEO = 'video/mp4'
+export const ACCEPT_STILL_AND_GIF = `${ACCEPT_IMAGES},image/gif`
+export const ACCEPT_GALLERY = `${ACCEPT_STILL_AND_GIF},${ACCEPT_VIDEO}`

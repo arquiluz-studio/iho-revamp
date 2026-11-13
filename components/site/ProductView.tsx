@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { SectionLabel } from '@/components/ui/Section'
 import { MediaImage } from '@/components/ui/MediaImage'
-import type { ImageVM } from '@/lib/types/site'
+import { MotionMedia } from '@/components/ui/MotionMedia'
+import type { ImageVM, Playback } from '@/lib/types/site'
 
 export type ProductVariantChoice = {
   id: string
@@ -21,7 +22,7 @@ export function ProductView({
   children,
 }: {
   variants: ProductVariantChoice[]
-  usage: ImageVM[]
+  usage: Playback[]
   variantsLabel: string
   children: React.ReactNode
 }) {
@@ -37,9 +38,9 @@ export function ProductView({
         )}
         {usage.length > 0 && (
           <div className="iho-gallery-grid iho-product-gallery">
-            {usage.map(img => (
-              <div key={img.src} className="iho-product-photo">
-                <MediaImage image={img} sizes="(max-width: 768px) 100vw, 28vw" />
+            {usage.map(item => (
+              <div key={item.src || item.image.src} className="iho-product-photo">
+                <MotionMedia kind={item.kind} src={item.src} image={item.image} sizes="(max-width: 768px) 100vw, 28vw" />
               </div>
             ))}
           </div>

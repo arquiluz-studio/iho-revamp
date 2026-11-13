@@ -5,7 +5,7 @@ import { dayOfMonth, isPastDate, longDate, shortMonth, timeOfDay, timeRange, typ
 import { plainTitle } from '@/lib/events/ics'
 import { projectCity } from '@/lib/geo/latam-projection'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
-import { toImageVM, type ImageVariant, type MediaRef } from '@/lib/media'
+import { gifUrl, toImageVM, videoUrl, type ImageVariant, type MediaRef } from '@/lib/media'
 import { getCountryBrands, type CountryBrandRow } from '@/lib/queries/brands'
 import { formatPrice, getCatalog, type CatalogRow } from '@/lib/queries/catalog'
 import type { DesignerRow } from '@/lib/queries/designers'
@@ -13,7 +13,7 @@ import { getEventBySlug, getEvents, type EventDetailRow, type EventListRow } fro
 import { getProjects, type ProjectListRow } from '@/lib/queries/projects'
 import { getBusinessLines, getCountries, getOffices, getSectors, getSiteSettings, getTeam } from '@/lib/queries/site'
 import { buildAlternates } from '@/lib/seo'
-import type { SolutionCardVM, BrandVM, DesignerCardVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
+import type { Playback, SolutionCardVM, BrandVM, DesignerCardVM, EventDetailVM, EventVM, HomeVM, ImageVM, MapCountryVM, OfficeVM, ProductCardVM, ProjectCardVM, StatVM } from '@/lib/types/site'
 import { cityChip, cityDisplay } from './cities'
 import { mapsHref } from './maps'
 import { resolveHomeSlides } from './hero-slides'
@@ -41,10 +41,24 @@ function variantMedia(product: ShotSource): MediaRef | null {
   return [...(product.variants ?? [])].filter(variant => variant.is_active !== false && variant.image).sort((a, b) => a.sort - b.sort)[0]?.image ?? null
 }
 
-/** First usage photo. That shot is the hover cover. */
+function isStill(media: MediaRef | null | undefined): media is MediaRef {
+  return Boolean(media && !videoUrl(media))
+}
+
+/** First still usage photo. A video is skipped so the card hover stays an image; a GIF uses its still frame. */
 function usageMedia(product: ShotSource): MediaRef | null {
-  if (product.cover) return product.cover
-  return [...(product.gallery ?? [])].sort((a, b) => a.sort - b.sort).find(item => item.media)?.media ?? null
+  if (isStill(product.cover)) return product.cover
+  return [...(product.gallery ?? [])].sort((a, b) => a.sort - b.sort).find(item => isStill(item.media))?.media ?? null
+}
+
+/** Image, animated GIF, or video for a carousel or gallery. Cards keep using `imageOf`. */
+export function playbackOf(media: MediaRef, locale: AppLocale, alt: string, largest: ImageVariant = 'lg'): Playback {
+  const image = toImageVM(media, locale, largest, alt)
+  const video = videoUrl(media)
+  if (video) return { kind: 'video', image, src: video }
+  const gif = gifUrl(media)
+  if (gif) return { kind: 'gif', image, src: gif }
+  return { kind: 'image', image, src: image.src }
 }
 
 /**
@@ -376,7 +390,7 @@ export async function getEventDetailVM(country: CountryCode, locale: AppLocale, 
   const body = t(event, 'body', locale) || t(event, 'summary', locale)
   const venueParts = event.is_online ? [labels.online, event.venue_name] : [event.venue_name, event.address]
   const place = event.is_online ? labels.online.toUpperCase() : `${(event.city ?? '').toUpperCase() || countryName.toUpperCase()}, ${countryName.toUpperCase()}`
-  const gallery = event.gallery.flatMap(g => (g.media ? [imageOf(g.media, locale, base.title, null, 'lg')] : []))
+  const gallery = event.gallery.flatMap(g => (g.media ? [playbackOf(g.media, locale, base.title, 'lg')] : []))
   const previousEditions = base.isPast
     ? []
     : event.previousEditions.map(previous => {

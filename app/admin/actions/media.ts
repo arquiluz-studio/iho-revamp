@@ -5,7 +5,7 @@ import { ADMIN_MEDIA_SELECT, toAdminMedia, type AdminMedia } from '@/lib/admin/m
 import { getAdminSession } from '@/lib/admin/session'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-const idsSchema = z.array(z.uuid()).min(1).max(100)
+const idsSchema = z.array(z.uuid()).min(1).max(200)
 
 /** Freshly uploaded assets, in the order of `ids`, so forms and galleries can show them right away. */
 export async function getMediaByIds(ids: string[]): Promise<AdminMedia[]> {

@@ -9,6 +9,7 @@ export type AdminMedia = {
   thumbUrl: string | null
   largeUrl: string | null
   videoUrl: string | null
+  gifUrl: string | null
   width: number | null
   height: number | null
   altEs: string
@@ -53,6 +54,7 @@ export function toAdminMedia(row: AdminMediaRow): AdminMedia {
     thumbUrl: image ? publicMediaUrl(image) : null,
     largeUrl: large ? publicMediaUrl(large) : null,
     videoUrl: paths.video ? publicMediaUrl(paths.video) : null,
+    gifUrl: paths.gif ? publicMediaUrl(paths.gif) : null,
     width: row.width,
     height: row.height,
     altEs: row.alt_es ?? '',

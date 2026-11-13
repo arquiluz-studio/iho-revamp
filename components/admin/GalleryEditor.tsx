@@ -6,6 +6,7 @@ import { getMediaByIds } from '@/app/admin/actions/media'
 import { saveProductGallery } from '@/app/admin/actions/catalog'
 import { saveBrandGallery, saveGallery } from '@/app/admin/actions/content'
 import type { AdminMedia } from '@/lib/admin/media'
+import { ACCEPT_GALLERY } from '@/lib/admin/upload'
 import { MediaThumb, UploadButton } from './MediaUpload'
 import { Button, Card, CardHeader, Checkbox, Input, Notice, cn } from './ui'
 
@@ -50,7 +51,10 @@ export function GalleryEditor({
     if (!fresh.length) return
     const next = [...items, ...fresh.map(m => ({ media: m, captionEs: '', captionEn: '', isDownloadable: m.isDownloadable }))]
     update(next)
-    if (hasCover && !coverId) setCoverId(fresh[0].id)
+    if (hasCover && !coverId) {
+      const still = fresh.find(item => !item.videoUrl)
+      if (still) setCoverId(still.id)
+    }
   }
   const move = (from: number, to: number) => {
     if (from === to || to < 0 || to >= items.length) return
@@ -102,27 +106,45 @@ export function GalleryEditor({
         title={isProduct ? 'Fotos de uso' : 'Galería'}
         description={
           isProject
-            ? 'Arrastra para ordenar. La estrella marca la portada. "Descargable" permite bajar la foto en alta resolución tras dejar sus datos.'
+            ? 'Fotos, GIFs y videos. Sube varios archivos o una carpeta. Arrastra para ordenar. La estrella marca la portada; un video no puede serla. "Descargable" permite bajar el archivo en alta resolución tras dejar sus datos.'
             : isProduct
-              ? 'Fotos del producto en uso. Arrastra para ordenar. La primera es la portada que se ve al pasar el cursor.'
+              ? 'Fotos, GIFs o videos del producto en uso. Sube varios archivos o una carpeta. Arrastra para ordenar. La primera imagen fija es la portada que se ve al pasar el cursor.'
               : owner === 'brand'
-              ? 'Fotos de inspiración de la ficha. Arrastra para ordenar. El pie de foto es opcional.'
+              ? 'Fotos, GIFs y videos de inspiración. Sube varios archivos o una carpeta. Arrastra para ordenar. El pie de foto es opcional.'
               : hasCover
                 ? 'Arrastra para ordenar. La estrella marca la foto principal.'
-                : 'Estas fotos se publican como «Así se vivió» cuando el evento ya pasó. La portada se elige en el formulario.'
+                : 'Fotos, GIFs y videos que se publican como «Así se vivió» cuando el evento ya pasó. Sube varios archivos o una carpeta. La portada se elige en el formulario.'
         }
         actions={
           canEdit && (
-            <UploadButton
-              kind={kind}
-              countryCode={countryCode}
-              projectId={isProject ? ownerId : null}
-              multiple
-              label="Subir fotos"
-              onUploaded={async ids => {
-                if (ids.length) add(await getMediaByIds(ids))
-              }}
-            />
+            <div className="flex flex-wrap justify-end gap-2">
+              <UploadButton
+                kind={kind}
+                countryCode={countryCode}
+                projectId={isProject ? ownerId : null}
+                multiple
+                accept={ACCEPT_GALLERY}
+                limit={200 - items.length}
+                disabled={items.length >= 200}
+                label="Subir archivos"
+                onUploaded={async ids => {
+                  if (ids.length) add(await getMediaByIds(ids))
+                }}
+              />
+              <UploadButton
+                kind={kind}
+                countryCode={countryCode}
+                projectId={isProject ? ownerId : null}
+                directory
+                accept={ACCEPT_GALLERY}
+                limit={200 - items.length}
+                disabled={items.length >= 200}
+                label="Subir carpeta"
+                onUploaded={async ids => {
+                  if (ids.length) add(await getMediaByIds(ids))
+                }}
+              />
+            </div>
           )
         }
       />
@@ -148,8 +170,10 @@ export function GalleryEditor({
                   {hasCover && (
                     <button
                       type="button"
-                      disabled={!canEdit}
+                      disabled={!canEdit || Boolean(item.media.videoUrl)}
+                      title={item.media.videoUrl ? 'Un video no puede ser la portada' : 'Usar como portada'}
                       onClick={() => {
+                        if (item.media.videoUrl) return
                         setCoverId(item.media.id)
                         setDirty(true)
                       }}
@@ -157,7 +181,6 @@ export function GalleryEditor({
                         'absolute left-1.5 top-1.5 rounded-full px-2 py-0.5 text-xs font-medium',
                         coverId === item.media.id ? 'bg-amber-400 text-zinc-900' : 'bg-white/90 text-zinc-600 hover:bg-white',
                       )}
-                      title="Usar como portada"
                     >
                       {coverId === item.media.id ? '★ Portada' : '☆'}
                     </button>

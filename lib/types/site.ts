@@ -11,6 +11,13 @@ export type ImageVM = {
   color?: string | null
 }
 
+/** A gallery or carousel item. `image` is the still; `src` is what plays (WebP, GIF, or MP4). */
+export type Playback = {
+  kind: 'image' | 'gif' | 'video'
+  image: ImageVM
+  src: string
+}
+
 /** With `items`, the link opens a secondary bar listing them instead of navigating. `arrow` draws the outbound mark used by Comprar. */
 export type NavLink = { href: string; label: string; items?: NavLink[]; arrow?: boolean }
 
@@ -43,7 +50,7 @@ export type EventDetailVM = EventVM & {
   /** Heading of the agenda column. Empty uses the generic translation. */
   agendaHeading: string
   agenda: { num: string; text: string }[]
-  gallery: ImageVM[]
+  gallery: Playback[]
   /** Past events linked from an upcoming event, newest first. Empty hides the section. */
   previousEditions: { href: string; title: string; image: ImageVM; meta: string }[]
   brands: BrandVM[]

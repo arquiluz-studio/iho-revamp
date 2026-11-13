@@ -3,7 +3,7 @@ import { Arrow } from '@/components/ui/Arrow'
 import { MediaImage } from '@/components/ui/MediaImage'
 import { RichText } from '@/components/ui/Section'
 import { ACUMIN } from '@/components/ui/tokens'
-import type { BrandVM, DesignerCardVM, ImageVM, ProductCardVM } from '@/lib/types/site'
+import type { BrandVM, DesignerCardVM, ImageVM, Playback, ProductCardVM } from '@/lib/types/site'
 import { PhotoMosaic } from '../PhotoMosaic'
 import { ProductCard } from '../ProductCard'
 
@@ -100,7 +100,7 @@ export function EventPreviousEditions({ editions }: { editions: { href: string; 
   )
 }
 
-export function EventGallery({ images, past }: { images: ImageVM[]; past: boolean }) {
+export function EventGallery({ images, past }: { images: Playback[]; past: boolean }) {
   const t = useTranslations('event.gallery')
   if (images.length === 0) return null
   return (
@@ -111,10 +111,12 @@ export function EventGallery({ images, past }: { images: ImageVM[]; past: boolea
           <h2 style={titleStyle}><RichText text={past ? t('pastTitle') : t('title')} /></h2>
         </div>
         <PhotoMosaic
-          photos={images.map((image, index) => ({
-            key: `${image.src}-${index}`,
-            image: { ...image, alt: image.alt || t('item', { n: index + 1 }) },
-            download: { src: image.src },
+          photos={images.map((item, index) => ({
+            key: `${item.src}-${index}`,
+            image: { ...item.image, alt: item.image.alt || t('item', { n: index + 1 }) },
+            kind: item.kind,
+            playSrc: item.src,
+            download: { src: item.src },
           }))}
         />
       </div>

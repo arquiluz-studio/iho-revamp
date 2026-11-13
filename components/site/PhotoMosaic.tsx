@@ -3,12 +3,15 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useTranslations } from 'next-intl'
 import { DownloadButton } from '@/components/site/DownloadButton'
-import { MediaImage } from '@/components/ui/MediaImage'
-import type { ImageVM } from '@/lib/types/site'
+import { MotionMedia } from '@/components/ui/MotionMedia'
+import type { ImageVM, Playback } from '@/lib/types/site'
 
 export type MosaicPhoto = {
   key: string
   image: ImageVM
+  kind?: Playback['kind']
+  /** GIF or MP4. Stills use `image`. */
+  playSrc?: string
   caption?: string
   /** Private original (lead form) or the published file. */
   download?: { mediaId: string; countryCode: string } | { src: string } | null
@@ -40,7 +43,9 @@ export function PhotoMosaic({ photos }: { photos: MosaicPhoto[] }) {
               width: '100%',
             }}
           >
-            <MediaImage
+            <MotionMedia
+              kind={photo.kind ?? 'image'}
+              src={photo.playSrc || photo.image.src}
               image={photo.image}
               alt=""
               sizes={index === 0 ? '(max-width: 768px) 100vw, 600px' : '(max-width: 768px) 50vw, 300px'}
@@ -104,8 +109,7 @@ function PhotoViewer({
         </button>
       )}
       <figure onClick={event => event.stopPropagation()} style={{ position: 'relative', margin: 0, width: 'fit-content', maxWidth: 'calc(100vw - 128px)' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo.image.src} alt={photo.caption || photo.image.alt} style={{ display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 16px)', objectFit: 'contain' }} />
+        <ViewerMedia photo={photo} />
         {photo.download && (
           <div style={{ position: 'absolute', top: 12, right: 12 }}>
             {'mediaId' in photo.download
@@ -125,6 +129,18 @@ function PhotoViewer({
         </button>
       )}
     </div>
+  )
+}
+
+function ViewerMedia({ photo }: { photo: MosaicPhoto }) {
+  const style = { display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 16px)', objectFit: 'contain' as const }
+  const alt = photo.caption || photo.image.alt
+  if (photo.kind === 'video' || photo.kind === 'gif') {
+    return <MotionMedia kind={photo.kind} src={photo.playSrc || photo.image.src} image={photo.image} controls={photo.kind === 'video'} alt={alt} style={style} />
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={photo.image.src} alt={alt} style={style} />
   )
 }
 
@@ -157,7 +173,8 @@ function PublicDownload({ src, name, label }: { src: string; name: string; label
 
 function fileName(photo: MosaicPhoto): string {
   const base = (photo.caption || photo.image.alt || 'iho').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  return `${base || 'iho'}.webp`
+  const ext = photo.kind === 'video' ? 'mp4' : photo.kind === 'gif' ? 'gif' : 'webp'
+  return `${base || 'iho'}.${ext}`
 }
 
 function ViewerIcon({ name }: { name: 'close' | 'previous' | 'next' }) {

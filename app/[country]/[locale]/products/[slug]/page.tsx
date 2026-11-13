@@ -7,7 +7,7 @@ import { ProductCard } from '@/components/site/ProductCard'
 import { ProductView } from '@/components/site/ProductView'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { localeHrefs, sitePaths } from '@/lib/content/paths'
-import { imageOf, priceLabels, productShot, toProductCardVM } from '@/lib/content/site'
+import { imageOf, playbackOf, priceLabels, productShot, toProductCardVM } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getCatalog, getProductBySlug } from '@/lib/queries/catalog'
 import { buildAlternates } from '@/lib/seo'
@@ -58,7 +58,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
     price: product.is_purchasable ? (priceLabels(variant.offer, locale, country)?.price ?? null) : null,
     image: variant.image ? imageOf(variant.image, locale, name, null, 'lg') : fallback,
   }))
-  const usage = product.gallery.flatMap(item => (item.media ? [imageOf(item.media, locale, name, null, 'md')] : []))
+  const usage = product.gallery.flatMap(item => (item.media ? [playbackOf(item.media, locale, name, 'md')] : []))
   const labels = product.is_purchasable ? priceLabels(product.price, locale, country) : null
   const availability = product.lead_time_days ? tp('leadTime', { days: product.lead_time_days }) : tp('onRequest')
   const related = catalog.filter(p => p.id !== product.id && p.catalogBrandId === product.catalogBrandId).slice(0, 4)

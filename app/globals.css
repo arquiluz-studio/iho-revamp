@@ -1432,7 +1432,7 @@ a.iho-product-brand:hover { color: #ef483d; }
 .iho-product-variants li { display: flex; justify-content: space-between; gap: 16px; font-family: "Space Mono", monospace; font-size: 13px; color: #2c2920; border-bottom: 1px solid rgba(20, 18, 12, 0.12); padding-bottom: 10px; }
 .iho-product-variants .is-sku { color: #8a8478; }
 .iho-product-photo { aspect-ratio: 1; background: #f1ece3; border-radius: 4px; overflow: hidden; }
-.iho-product-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iho-product-photo img, .iho-product-photo video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .iho-product-gallery { margin-top: 14px; }
 .iho-product-reel { padding: 8px 0 28px; }
 .iho-event-row { display: grid; grid-template-columns: 110px 1fr 220px; gap: 28px; align-items: center; padding: 22px 0; border-bottom: 1px solid rgba(20, 18, 12, 0.12); color: inherit; text-decoration: none; }
@@ -1556,7 +1556,7 @@ a.iho-product-brand:hover { color: #ef483d; }
 .iho-brand-reel__slide { box-sizing: border-box; margin: 0; padding: 0; border: 0; background: #e7e2d8; overflow: hidden; display: block; flex: none; line-height: 0; min-width: 0; width: var(--side); height: calc(var(--side) * 2 / 3); cursor: pointer; transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1), height 0.65s cubic-bezier(0.22, 1, 0.36, 1); }
 .iho-brand-reel__slide.is-center { width: var(--center); height: calc(var(--center) * 10 / 16); cursor: default; }
 .iho-brand-reel.is-single { display: flex; justify-content: center; }
-.iho-brand-reel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iho-brand-reel img, .iho-brand-reel video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .iho-brand-reel__nav { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; pointer-events: none; }
 .iho-brand-reel__nav button { pointer-events: auto; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(20, 18, 12, 0.16); background: #fff; color: #17150f; display: grid; place-items: center; cursor: pointer; }
 .iho-brand-reel__nav button:hover { border-color: #17150f; }

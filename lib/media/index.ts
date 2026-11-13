@@ -15,7 +15,7 @@ export const UPLOADS_BUCKET = 'uploads-tmp'
 /** Long-edge sizes of the pre-generated WebP variants. */
 export const IMAGE_VARIANTS = { thumb: 480, md: 1280, lg: 2400 } as const
 export type ImageVariant = keyof typeof IMAGE_VARIANTS
-export type PublicPaths = Partial<Record<ImageVariant | 'video' | 'svg', string>>
+export type PublicPaths = Partial<Record<ImageVariant | 'video' | 'svg' | 'gif', string>>
 
 export function mediaFolder(countryCode: string | null): string {
   return countryCode ?? 'global'
@@ -64,14 +64,36 @@ export function videoUrl(media: Pick<MediaRow, 'public_paths'> | null | undefine
   return path ? publicMediaUrl(path) : null
 }
 
+export function gifUrl(media: Pick<MediaRow, 'public_paths'> | null | undefined): string | null {
+  const path = media ? publicPaths(media).gif : undefined
+  return path ? publicMediaUrl(path) : null
+}
+
 const EXTENSIONS: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
   'image/webp': 'webp',
   'image/tiff': 'tif',
   'image/avif': 'avif',
+  'image/gif': 'gif',
   'image/svg+xml': 'svg',
   'video/mp4': 'mp4',
+}
+
+const EXTENSION_ALIASES: Record<string, string> = { jpeg: 'jpg', tiff: 'tif' }
+
+/** MIME type from a file name. `jpeg` and `tiff` count as the canonical extensions. */
+export function mimeForName(name: string): string | null {
+  const ext = name.split('.').pop()?.toLowerCase() ?? ''
+  const normalized = EXTENSION_ALIASES[ext] ?? ext
+  const found = Object.entries(EXTENSIONS).find(([, value]) => value === normalized)
+  return found?.[0] ?? null
+}
+
+/** Browser type when it is one we accept, otherwise the type implied by the file name. */
+export function mimeForFile(file: { name: string; type: string }): string | null {
+  if (file.type && Object.prototype.hasOwnProperty.call(EXTENSIONS, file.type)) return file.type
+  return mimeForName(file.name)
 }
 
 export const ACCEPTED_MIME_TYPES = Object.keys(EXTENSIONS)

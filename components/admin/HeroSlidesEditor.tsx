@@ -6,6 +6,7 @@ import { getMediaByIds } from '@/app/admin/actions/media'
 import type { FormValues } from '@/lib/admin/form-schema'
 import type { AdminMedia } from '@/lib/admin/media'
 import { CtasEditor } from './CtasEditor'
+import { ACCEPT_GALLERY, ACCEPT_STILL_AND_GIF } from '@/lib/admin/upload'
 import { MediaThumb, UploadButton } from './MediaUpload'
 import { Button, Input, Textarea, cn } from './ui'
 
@@ -49,6 +50,19 @@ export function HeroSlidesEditor({
   const initialIds = useRef<Set<string> | null>(null)
   if (initialIds.current === null) initialIds.current = new Set(fields.map(field => field.id))
   const message = (index: number, key: string) => fieldMessage(errors as Record<string, unknown>, name, index, key)
+  const room = MAX_SLIDES - fields.length
+
+  const addFiles = async (ids: string[]) => {
+    const uploaded = await getMediaByIds(ids)
+    const next = uploaded.slice(0, room).map(item => ({
+      ...EMPTY_SLIDE,
+      kind: item.videoUrl ? 'video' : 'image',
+      media_id: item.id,
+      ctas: [],
+    }))
+    for (const item of uploaded.slice(0, room)) onMedia(item)
+    if (next.length) append(next as never)
+  }
 
   return (
     <div className="space-y-3">
@@ -83,12 +97,32 @@ export function HeroSlidesEditor({
         />
       ))}
       <p className="text-xs text-zinc-500">
-        Contrae una diapositiva para arrastrarla más fácil, o escribe su número de orden. Una foto avanza a los segundos que indiques. Un video avanza cuando termina.
+        Contrae una diapositiva para arrastrarla más fácil, o escribe su número de orden. Una foto o un GIF avanza a los segundos que indiques. Un video avanza cuando termina. Subir varios archivos o una carpeta crea una diapositiva por archivo.
       </p>
-      {!disabled && fields.length < MAX_SLIDES && (
-        <Button variant="outline" size="sm" onClick={() => append({ ...EMPTY_SLIDE, ctas: [] } as never)}>
-          Agregar diapositiva
-        </Button>
+      {!disabled && room > 0 && (
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => append({ ...EMPTY_SLIDE, ctas: [] } as never)}>
+            Agregar diapositiva
+          </Button>
+          <UploadButton
+            kind="hero"
+            countryCode={countryCode}
+            multiple
+            accept={ACCEPT_GALLERY}
+            limit={room}
+            label="Subir archivos"
+            onUploaded={addFiles}
+          />
+          <UploadButton
+            kind="hero"
+            countryCode={countryCode}
+            directory
+            accept={ACCEPT_GALLERY}
+            limit={room}
+            label="Subir carpeta"
+            onUploaded={addFiles}
+          />
+        </div>
       )}
     </div>
   )
@@ -143,6 +177,8 @@ function SlideCard({
   const current = (row && typeof row === 'object' ? row : {}) as { kind?: string; media_id?: string; title_es?: string }
   const kind = current.kind === 'video' ? 'video' : 'image'
   const mediaId = current.media_id ?? ''
+  const file = mediaId ? media[mediaId] : null
+  const kindLabel = kind === 'video' ? 'Video' : file?.gifUrl ? 'GIF' : 'Foto'
   const title = (current.title_es ?? '').replace(/\*/g, '').replace(/\s+/g, ' ').trim()
 
   useEffect(() => {
@@ -200,7 +236,7 @@ function SlideCard({
         >
           <span aria-hidden className="text-xs text-zinc-400">{open ? '▾' : '▸'}</span>
           <span className="shrink-0 text-sm font-medium text-zinc-800">Diapositiva {index + 1}</span>
-          <span className="shrink-0 text-xs text-zinc-500">{kind === 'video' ? 'Video' : 'Foto'}</span>
+          <span className="shrink-0 text-xs text-zinc-500">{kindLabel}</span>
           {title && <span className="truncate text-xs text-zinc-500">{title}</span>}
           {invalid && <span className="shrink-0 text-xs text-red-600">Revisa</span>}
         </button>
@@ -301,7 +337,7 @@ function SlideMedia({
   disabled: boolean
   error?: string
 }) {
-  const noun = video ? 'video' : 'foto'
+  const noun = video ? 'video' : 'foto o GIF'
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-3">
@@ -311,6 +347,7 @@ function SlideMedia({
             kind="hero"
             countryCode={countryCode}
             video={video}
+            accept={video ? undefined : ACCEPT_STILL_AND_GIF}
             disabled={disabled}
             label={value ? `Reemplazar ${noun}` : `Subir ${noun}`}
             onUploaded={async ids => {

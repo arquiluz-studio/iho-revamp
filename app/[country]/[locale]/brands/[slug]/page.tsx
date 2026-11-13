@@ -5,7 +5,7 @@ import { BrandProfile } from '@/components/site/BrandProfile'
 import { PageShell } from '@/components/site/pages/PageParts'
 import { innerChrome } from '@/components/site/SiteChrome'
 import { sitePaths } from '@/lib/content/paths'
-import { imageOf, imageOrNull, priceLabels, productShot, usageHover } from '@/lib/content/site'
+import { imageOrNull, playbackOf, priceLabels, productShot, usageHover } from '@/lib/content/site'
 import { localSlug, paragraphs, t } from '@/lib/i18n-fields'
 import { getBrandMedia, getCountryBrand, getCountryBrands } from '@/lib/queries/brands'
 import { getCatalog } from '@/lib/queries/catalog'
@@ -83,7 +83,8 @@ export default async function BrandPage({ params }: { params: Promise<Params> })
   const photos = inspiration.flatMap(item => {
     if (!item.media) return []
     const caption = t(item, 'caption', locale)
-    return [{ key: item.media.id, image: imageOf(item.media, locale, caption || brand.name, null, 'lg'), caption: caption || undefined }]
+    const play = playbackOf(item.media, locale, caption || brand.name, 'lg')
+    return [{ key: item.media.id, image: play.image, kind: play.kind, src: play.src, caption: caption || undefined }]
   })
   return (
     <PageShell chrome={chrome}>

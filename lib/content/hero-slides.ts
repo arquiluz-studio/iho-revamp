@@ -2,7 +2,7 @@ import 'server-only'
 import type { AppLocale, CountryCode } from '@/config/countries'
 import { cacheTags } from '@/lib/cache-tags'
 import { t } from '@/lib/i18n-fields'
-import { MEDIA_SELECT, toImageVM, videoUrl, type MediaRef } from '@/lib/media'
+import { MEDIA_SELECT, gifUrl, toImageVM, videoUrl, type MediaRef } from '@/lib/media'
 import { cachedQuery, must } from '@/lib/queries/core'
 import type { HeroCtaVM, HeroSlideVM } from '@/lib/types/site'
 import { resolveHeroCtas } from './hero-ctas'
@@ -57,9 +57,10 @@ function slideOf(item: Record<string, unknown>, asset: MediaRef, locale: AppLoca
     if (!video) return null
     return { kind: 'video', src: video, poster: image.src || null, ...copy, durationSeconds: null }
   }
-  if (!image.src) return null
+  const gif = gifUrl(asset)
+  if (!gif && !image.src) return null
   const seconds = typeof item.duration_seconds === 'number' ? item.duration_seconds : 6
-  return { kind: 'image', src: image.src, poster: null, ...copy, durationSeconds: seconds >= 3 && seconds <= 30 ? seconds : 6 }
+  return { kind: 'image', src: gif || image.src, poster: null, ...copy, durationSeconds: seconds >= 3 && seconds <= 30 ? seconds : 6 }
 }
 
 /** Slides of the home the country publishes. An empty list falls back to the previous single hero. */

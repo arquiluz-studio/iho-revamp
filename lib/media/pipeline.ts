@@ -17,7 +17,7 @@ type ProcessedImage = {
 
 export async function processImage(input: Buffer): Promise<ProcessedImage> {
   // rotate() applies EXIF orientation; sharp drops all metadata unless asked to keep it.
-  const base = sharp(input, { failOn: 'none' }).rotate()
+  const base = sharp(input, { failOn: 'none', animated: false }).rotate()
   const meta = await base.metadata()
   const oriented = meta.orientation && meta.orientation >= 5
   const width = (oriented ? meta.height : meta.width) ?? 0
@@ -78,6 +78,10 @@ export async function processMediaAsset(mediaId: string): Promise<{ ok: true } |
       if (media.mime_type === 'image/svg+xml') {
         paths.svg = `${folder}/logo.svg`
         await upload(paths.svg, original, 'image/svg+xml')
+      }
+      if (media.mime_type === 'image/gif') {
+        paths.gif = `${folder}/animation.gif`
+        await upload(paths.gif, original, 'image/gif')
       }
       const processed = await processImage(original)
       const longEdge = Math.max(processed.width, processed.height)
