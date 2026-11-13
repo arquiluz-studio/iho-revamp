@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "IHO Group — The whole project, one single supplier",
-    "description": "Latin American group for corporate, industrial, commercial and residential interiors. Architectural and lighting solutions across LATAM."
+    "title": "IHO Group {country} — The whole project, one single supplier",
+    "description": "IHO Group in {country}. Corporate, industrial, commercial and residential interiors. Architectural and lighting solutions across LATAM."
   },
   "common": {
     "previous": "Previous",
@@ -108,7 +108,8 @@
   "footer": {
     "rights": "© {year} IHO Group. All rights reserved.",
     "privacy": "Privacy notice",
-    "contact": "Contact"
+    "contact": "Contact",
+    "countries": "Countries"
   },
   "event": {
     "notFound": "Event not found.",

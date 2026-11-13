@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Grupo IHO — Todo el proyecto, un solo proveedor",
-    "description": "Grupo empresarial latinoamericano de interiorismo corporativo, industrial, comercial y residencial. Soluciones arquitectónicas y de iluminación en LATAM."
+    "title": "Grupo IHO {country} — Todo el proyecto, un solo proveedor",
+    "description": "Grupo IHO en {country}. Interiorismo corporativo, industrial, comercial y residencial. Soluciones arquitectónicas y de iluminación en LATAM."
   },
   "common": {
     "previous": "Anterior",
@@ -108,7 +108,8 @@
   "footer": {
     "rights": "© {year} Grupo IHO. Todos los derechos reservados.",
     "privacy": "Aviso de privacidad",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "countries": "Países"
   },
   "event": {
     "notFound": "Evento no encontrado.",

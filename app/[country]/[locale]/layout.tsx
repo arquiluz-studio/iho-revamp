@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 import { preload } from 'react-dom'
 import { GeoBanner } from '@/components/site/GeoBanner'
-import { COUNTRY_CODES, countryOrigin, htmlLang } from '@/config/countries'
+import { COUNTRIES, COUNTRY_CODES, countryOrigin, htmlLang } from '@/config/countries'
 import { resolveSiteParams, siteStaticParams, type SiteParams } from '@/lib/site-params'
 import '../../globals.css'
 
@@ -14,10 +14,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<SiteParams> }): Promise<Metadata> {
   const { country, locale } = await resolveSiteParams(params)
   const t = await getTranslations({ locale, namespace: 'meta' })
+  const name = COUNTRIES[country].name[locale]
   return {
     metadataBase: new URL(countryOrigin(country)),
-    title: t('title'),
-    description: t('description'),
+    title: { default: t('title', { country: name }), template: `%s · ${name}` },
+    description: t('description', { country: name }),
   }
 }
 

@@ -1,6 +1,6 @@
 import 'server-only'
 import { getTranslations } from 'next-intl/server'
-import type { AppLocale, CountryCode } from '@/config/countries'
+import { COUNTRIES, COUNTRY_CODES, countryOrigin, type AppLocale, type CountryCode } from '@/config/countries'
 import type { SitePaths } from '@/lib/content/paths'
 import { localSlug, t } from '@/lib/i18n-fields'
 import { getBusinessLines, getSectors, getSocialAccounts } from '@/lib/queries/site'
@@ -82,6 +82,11 @@ export async function siteChrome({ country, locale, paths, threshold, contactHre
         contactHref={contactHref ?? paths.homeSection('contacto')}
         privacyHref={paths.privacy}
         socials={socials.map(s => ({ platform: s.platform, url: s.url, label: PLATFORM_LABELS[s.platform] ?? s.platform }))}
+        countries={COUNTRY_CODES.map(code => ({
+          href: `${countryOrigin(code)}/`,
+          label: COUNTRIES[code].name[locale],
+          current: code === country,
+        }))}
       />
     ),
   }

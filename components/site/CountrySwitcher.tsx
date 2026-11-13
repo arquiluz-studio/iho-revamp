@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocale, useTranslations } from 'next-intl'
-import { COUNTRIES, COUNTRY_PREF_COOKIE, LOCALES, crossCountryUrl, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
+import { COUNTRIES, COUNTRY_PREF_COOKIE, LOCALES, countryOrigin, crossCountryUrl, sortByCountry, type AppLocale, type CountryCode } from '@/config/countries'
 import { switchLocalePath } from '@/i18n/locale-path'
 import { getPathname } from '@/i18n/navigation'
 import { CountryFlag } from './CountryFlag'
@@ -104,7 +104,7 @@ export function CountrySwitcher({ current, countries, localeHrefs }: {
       className={`iho-subnav-switcher${shown ? ' iho-nav-open' : ''}`}
       label={t('selectCountry')}
       items={sorted.map(code => ({
-        href: `https://${COUNTRIES[code].domain}/?ref=selector`,
+        href: `${countryOrigin(code)}/?ref=selector`,
         label: COUNTRIES[code].name[locale],
         current: code === current,
         onClick: go(code),
