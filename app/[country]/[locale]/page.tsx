@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<SiteParams>
   const namesCountry = (value: string) => value.toLocaleLowerCase().includes(name.toLocaleLowerCase())
   return {
     // The home page shares this layout, so its title template does not apply here.
-    // A CMS title that already names the country is kept. Otherwise the layout default does: "Grupo IHO México — …".
+    // A CMS title that already names the country is kept. Otherwise the layout default does: "IHO México — …".
     ...(seoTitle && namesCountry(seoTitle) ? { title: { absolute: seoTitle } } : {}),
     ...(seoDescription && namesCountry(seoDescription) ? { description: seoDescription } : {}),
     alternates: buildAlternates({ href: '/', country, locale }),
