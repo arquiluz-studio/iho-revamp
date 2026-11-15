@@ -94,7 +94,7 @@ function HeaderBar({ logoHref, links, cta, threshold = 0.75, solid = false, tool
   }
 
   return (
-    <header data-solid={barSolid ? 'true' : 'false'} style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: barSolid ? '#faf7f1' : 'transparent', borderBottom: `1px solid ${dark ? 'rgba(20,18,12,0.08)' : 'rgba(255,255,255,0.14)'}`, transition: 'background 0.4s ease, border-color 0.4s ease' }}>
+    <header data-solid={barSolid ? 'true' : 'false'} data-subnav={subnav.open ? 'open' : undefined} style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, background: barSolid ? '#faf7f1' : 'transparent', borderBottom: `1px solid ${dark ? 'rgba(20,18,12,0.08)' : 'rgba(255,255,255,0.14)'}`, transition: 'background 0.4s ease, border-color 0.4s ease' }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '18px 40px', display: 'flex', alignItems: 'center' }}>
         <a href={logoHref}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -1332,6 +1332,11 @@
 .iho-subnav li a[aria-current="true"] { font-weight: 500; }
 .iho-subnav, .iho-subnav-label, .iho-subnav li a { transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.25s ease; }
 header[data-solid="false"] .iho-subnav { background: rgba(20, 18, 12, 0.28); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-color: rgba(255, 255, 255, 0.14); box-shadow: none; }
+/* Transparent bar only: opening the secondary bar gives the primary bar the same opal glass. */
+@media (min-width: 1025px) {
+  header[data-solid="false"][data-subnav="open"]::before { content: ""; position: absolute; z-index: -1; inset: 0; background: rgba(20, 18, 12, 0.28); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); pointer-events: none; animation: iho-bar-glass-in 0.25s ease; }
+}
+@keyframes iho-bar-glass-in { from { opacity: 0; } to { opacity: 1; } }
 header[data-solid="false"] .iho-subnav-label { color: rgba(255, 255, 255, 0.6); }
 header[data-solid="false"] .iho-subnav li a { color: #ffffff; }
 header[data-solid="false"] .iho-subnav li a:hover, header[data-solid="false"] .iho-subnav li a[aria-current="true"] { color: #ef483d; }

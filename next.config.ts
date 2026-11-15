@@ -7,7 +7,7 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 const nextConfig: NextConfig = {
   output: 'standalone',
   turbopack: { root: path.resolve('.') },
-  experimental: { globalNotFound: true },
+  experimental: { globalNotFound: true, agentUpgrade: 'security' },
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' }],
   },
